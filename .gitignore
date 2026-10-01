@@ -1,0 +1,5 @@
+# Ignore all documents, spreadsheets, zip archives, and scripts in root
+/*
+!/prototype/
+!/prototype/**
+!/.gitignore

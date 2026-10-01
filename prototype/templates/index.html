@@ -1,0 +1,1496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TIEI - TPS Competency & Learning Management System</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            toyota: {
+              red: '#D71920',
+              dark: '#B01016',
+              light: '#FDE8E9'
+            },
+            gemba: {
+              50: '#F8FAFC',
+              100: '#F1F5F9',
+              800: '#1E293B',
+              900: '#0F172A'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @media print {
+      body * { visibility: hidden; }
+      #certificate-modal, #certificate-modal * { visibility: visible; }
+      #certificate-modal { position: absolute; left: 0; top: 0; width: 100%; }
+    }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
+
+  <!-- TOP HEADER -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row justify-between py-2.5 md:py-0 md:h-16 items-start md:items-center gap-2.5 md:gap-4">
+        <!-- Brand & System Name -->
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-lg bg-toyota-red text-white flex items-center justify-center font-black text-xl shadow-md flex-shrink-0">
+            T
+          </div>
+          <div>
+            <div class="flex items-center space-x-2">
+              <span class="font-extrabold text-base sm:text-lg tracking-tight text-slate-900">TIEI</span>
+              <span class="text-[10px] sm:text-xs bg-red-100 text-toyota-red font-bold px-2 py-0.5 rounded uppercase tracking-wider">Manufacturing Excellence</span>
+            </div>
+            <p class="text-[11px] sm:text-xs text-slate-500 font-medium">TPS Competency, Certification & Learning Management System</p>
+          </div>
+        </div>
+
+        <!-- Role Switcher & User Profile -->
+        <div class="flex items-center justify-between sm:justify-end w-full md:w-auto space-x-3">
+          <!-- Role selector simulation -->
+          <div class="flex items-center space-x-2 bg-slate-50 px-2.5 sm:px-3 py-1.5 rounded-lg border border-slate-300 flex-1 sm:flex-initial">
+            <i class="fa-solid fa-user-gear text-slate-500 text-xs sm:text-sm"></i>
+            <span class="text-[11px] sm:text-xs font-semibold text-slate-600 hidden xs:inline">Role:</span>
+            <select id="role-select" onchange="switchRole(this.value)" class="text-xs bg-transparent font-bold text-slate-800 focus:outline-none cursor-pointer w-full sm:w-auto">
+              <option value="TL">Team Leader (ARUNA D R)</option>
+              <option value="MGR">Section Manager / HOD (MANUKUMAR G)</option>
+              <option value="TRAINER">Master Trainer (Dilip R / Rakshith P)</option>
+              <option value="TPS_OFFICE" selected>TPS Office / System Admin</option>
+              <option value="LEADERSHIP">Plant Leadership (VP / DMD)</option>
+            </select>
+          </div>
+
+          <div class="flex items-center space-x-2.5 border-l border-slate-200 pl-3 flex-shrink-0">
+            <img class="h-8 w-8 sm:h-9 sm:w-9 rounded-full ring-2 ring-toyota-red/20 object-cover" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80" alt="Avatar">
+            <div class="hidden sm:block text-left leading-tight">
+              <div id="user-display-name" class="text-xs font-bold text-slate-800">Dilip R</div>
+              <div id="user-display-role" class="text-[10px] text-slate-500">TPS Office / Digital Captain</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MAIN NAVIGATION TABS -->
+      <nav class="flex space-x-1 sm:space-x-2 overflow-x-auto py-2 -mb-px text-xs font-semibold custom-scrollbar whitespace-nowrap">
+        <button onclick="showTab('dashboard')" id="tab-btn-dashboard" class="tab-btn px-3 py-2 rounded-md flex items-center space-x-2 text-toyota-red bg-red-50 border-b-2 border-toyota-red flex-shrink-0">
+          <i class="fa-solid fa-chart-pie"></i><span>Executive Dashboard</span>
+        </button>
+        <button onclick="showTab('journey')" id="tab-btn-journey" class="tab-btn px-3 py-2 rounded-md flex items-center space-x-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 flex-shrink-0">
+          <i class="fa-solid fa-route"></i><span>Employee TPS Journey (11 Steps)</span>
+        </button>
+        <button onclick="showTab('presentation-board')" id="tab-btn-presentation-board" class="tab-btn px-3 py-2 rounded-md flex items-center space-x-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 flex-shrink-0">
+          <i class="fa-solid fa-chalkboard-user"></i><span>Presentation Board (Komarigoto & 21 KVP)</span>
+        </button>
+        <button onclick="showTab('skill-matrix')" id="tab-btn-skill-matrix" class="tab-btn px-3 py-2 rounded-md flex items-center space-x-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 flex-shrink-0">
+          <i class="fa-solid fa-table-cells"></i><span>Department Skill Matrix</span>
+        </button>
+        <button onclick="showTab('kaizen-amrut')" id="tab-btn-kaizen-amrut" class="tab-btn px-3 py-2 rounded-md flex items-center space-x-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 flex-shrink-0">
+          <i class="fa-solid fa-lightbulb"></i><span>Kaizen & Amrut Integration</span>
+        </button>
+        <button onclick="showTab('promotion')" id="tab-btn-promotion" class="tab-btn px-3 py-2 rounded-md flex items-center space-x-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 flex-shrink-0">
+          <i class="fa-solid fa-award"></i><span>Promotion Readiness Engine</span>
+        </button>
+        <button onclick="showTab('certificates')" id="tab-btn-certificates" class="tab-btn px-3 py-2 rounded-md flex items-center space-x-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 flex-shrink-0">
+          <i class="fa-solid fa-certificate"></i><span>Digital Certificates</span>
+        </button>
+        <button onclick="showTab('batches')" id="tab-btn-batches" class="tab-btn px-3 py-2 rounded-md flex items-center space-x-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 flex-shrink-0">
+          <i class="fa-solid fa-calendar-days"></i><span>Training Batches</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- MAIN APP CONTAINER -->
+  <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 flex-1 w-full">
+
+    <!-- ========================================== -->
+    <!-- TAB 1: EXECUTIVE DASHBOARD & TPS MATURITY -->
+    <!-- ========================================== -->
+    <div id="tab-content-dashboard" class="tab-content space-y-4 sm:space-y-6">
+      
+      <!-- Top Alert Banner -->
+      <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-950 text-white rounded-xl p-4 sm:p-5 shadow-sm border border-slate-700">
+        <div class="flex items-center space-x-2 text-xs font-semibold text-emerald-400 uppercase tracking-wider mb-1">
+          <i class="fa-solid fa-circle-check"></i>
+          <span>Digitalization Form Approved • Reference: SRTIEI2026-MFG-EX</span>
+        </div>
+        <h2 class="text-lg sm:text-xl font-bold">Plant TPS Capability & Continuous Improvement Overview</h2>
+        <p class="text-xs text-slate-300 mt-1 max-w-3xl leading-relaxed">
+          Live operational telemetry tracking 78 Team Leaders across GD Division shops. Replaces manual paper boards, slips, and spreadsheets with real-time competency progression.
+        </p>
+      </div>
+
+      <!-- KPI Summary Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+          <div class="flex justify-between items-start">
+            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Team Leaders</span>
+            <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-sm">
+              <i class="fa-solid fa-users"></i>
+            </div>
+          </div>
+          <div id="stat-total-emps" class="text-2xl font-black text-slate-900 mt-2">78</div>
+          <div class="text-xs text-slate-500 mt-1 flex items-center">
+            <span class="text-emerald-600 font-semibold mr-1">100%</span> mapped in GD division
+          </div>
+        </div>
+
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+          <div class="flex justify-between items-start">
+            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Training Completed</span>
+            <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-sm">
+              <i class="fa-solid fa-graduation-cap"></i>
+            </div>
+          </div>
+          <div id="stat-trained-emps" class="text-2xl font-black text-slate-900 mt-2">59</div>
+          <div class="text-xs text-slate-500 mt-1 flex items-center">
+            <span class="text-indigo-600 font-semibold mr-1">75.6%</span> completed 3 slips & 21 KVP
+          </div>
+        </div>
+
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+          <div class="flex justify-between items-start">
+            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Certified Practitioners</span>
+            <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-sm">
+              <i class="fa-solid fa-certificate"></i>
+            </div>
+          </div>
+          <div id="stat-certified-practitioners" class="text-2xl font-black text-emerald-600 mt-2">2</div>
+          <div class="text-xs text-amber-600 font-medium mt-1 flex items-center">
+            <i class="fa-solid fa-arrow-trend-up mr-1"></i> 57 pending leadership presentation
+          </div>
+        </div>
+
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+          <div class="flex justify-between items-start">
+            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Kaizen Cost Savings</span>
+            <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-sm">
+              <i class="fa-solid fa-indian-rupee-sign"></i>
+            </div>
+          </div>
+          <div id="stat-total-savings" class="text-2xl font-black text-slate-900 mt-2">₹ 14.8 L</div>
+          <div class="text-xs text-emerald-600 font-semibold mt-1 flex items-center">
+            <span id="stat-approved-kaizens" class="mr-1">384</span> Kaizens approved via Amrut
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts Section -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Shop-wise Competency Distribution -->
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+          <div class="flex justify-between items-center mb-4">
+            <div>
+              <h3 class="font-bold text-slate-900 text-sm">Shop-floor TPS Maturity by Working Area</h3>
+              <p class="text-xs text-slate-500">Distribution across GD Head, Crank, Block, Line Supply</p>
+            </div>
+            <span class="text-xs bg-slate-100 text-slate-600 px-2.5 py-1 rounded font-semibold">TIEI GD Division</span>
+          </div>
+          <div class="h-64">
+            <canvas id="chart-area-maturity"></canvas>
+          </div>
+        </div>
+
+        <!-- 4-Level Competency Funnel -->
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+          <div class="flex justify-between items-center mb-4">
+            <div>
+              <h3 class="font-bold text-slate-900 text-sm">Competency Progression Pipeline (Level 1 to 4)</h3>
+              <p class="text-xs text-slate-500">Foundation $\rightarrow$ Practitioner $\rightarrow$ Champion $\rightarrow$ Master</p>
+            </div>
+            <span class="text-xs bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded font-semibold">Live Target</span>
+          </div>
+          <div class="h-64">
+            <canvas id="chart-level-pipeline"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Shop-floor Bottleneck & Action Required Summary -->
+      <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+        <h3 class="font-bold text-slate-900 text-sm mb-3">Key Focus Areas & Immediate Action Triggers</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+          <div class="p-3 rounded-lg bg-amber-50/60 border border-amber-200">
+            <div class="font-bold text-amber-800 flex items-center mb-1">
+              <i class="fa-solid fa-triangle-exclamation mr-1.5 text-amber-600"></i>
+              Board Presentation Bottleneck
+            </div>
+            <p class="text-slate-600 leading-relaxed">
+              57 Team Leaders have completed training & submitted assignments but require final Action Learning Board presentation to VP/DMD for Level 2 Certification.
+            </p>
+          </div>
+          <div class="p-3 rounded-lg bg-blue-50/60 border border-blue-200">
+            <div class="font-bold text-blue-800 flex items-center mb-1">
+              <i class="fa-solid fa-users-gear mr-1.5 text-blue-600"></i>
+              Jishuken-1 & 2 Scheduling
+            </div>
+            <p class="text-slate-600 leading-relaxed">
+              Certified practitioners (e.g., ARUNA D R, KARTHIKEYAN) are queued for autonomous Jishuken study circles to qualify for TPS Champion level.
+            </p>
+          </div>
+          <div class="p-3 rounded-lg bg-emerald-50/60 border border-emerald-200">
+            <div class="font-bold text-emerald-800 flex items-center mb-1">
+              <i class="fa-solid fa-bolt mr-1.5 text-emerald-600"></i>
+              21 KVP Yokoten Deployment
+            </div>
+            <p class="text-slate-600 leading-relaxed">
+              Top implemented Komarigoto countermeasures on Tool Changeover (OP-100) and Splash Guard (OP-120) ready for lateral deployment across Block & Crank.
+            </p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- TAB 2: EMPLOYEE TPS JOURNEY (11 STEPS)    -->
+    <!-- ========================================== -->
+    <div id="tab-content-journey" class="tab-content hidden space-y-6">
+      <!-- Employee Selector Bar -->
+      <div class="bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3">
+        <div class="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-3 w-full sm:w-auto">
+          <label class="text-xs font-bold text-slate-600 whitespace-nowrap">Select Employee:</label>
+          <select id="journey-emp-select" onchange="loadEmployeeJourney(this.value)" class="w-full sm:w-80 text-xs bg-slate-50 border border-slate-300 rounded-lg p-2 font-semibold text-slate-800 focus:ring-2 focus:ring-toyota-red">
+            <!-- Populated via JS -->
+          </select>
+        </div>
+        <div class="flex items-center space-x-2 text-xs flex-wrap sm:flex-nowrap gap-y-2">
+          <span class="text-slate-500 font-medium hidden sm:inline">Actions:</span>
+          <button onclick="advanceNextMilestone()" class="flex-1 sm:flex-initial bg-toyota-red hover:bg-toyota-dark text-white px-3 py-1.5 rounded-lg font-bold shadow-sm transition">
+            <i class="fa-solid fa-forward-step mr-1"></i> Next Step
+          </button>
+          <button onclick="openCertificateModal()" class="flex-1 sm:flex-initial bg-slate-800 hover:bg-slate-900 text-white px-3 py-1.5 rounded-lg font-bold shadow-sm transition">
+            <i class="fa-solid fa-certificate mr-1"></i> Certificate
+          </button>
+        </div>
+      </div>
+
+      <!-- Employee Banner -->
+      <div id="journey-emp-card" class="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- 11-Step Interactive Stepper -->
+      <div class="bg-white p-4 sm:p-6 rounded-xl border border-slate-200 shadow-sm">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4 sm:mb-6">
+          <div>
+            <h3 class="font-extrabold text-slate-900 text-sm sm:text-base">Standardized 11-Step Competency Pathway</h3>
+            <p class="text-xs text-slate-500">From Training Nomination up to TPS Champion & Mentor Deployment (`000_Flow.xlsx` Architecture)</p>
+          </div>
+          <span id="journey-completion-badge" class="px-3 py-1 text-xs font-bold rounded-full bg-indigo-50 text-indigo-700 whitespace-nowrap">
+            Step 6 of 11 Completed
+          </span>
+        </div>
+
+        <!-- Horizontal Stepper Container -->
+        <div id="stepper-container" class="space-y-3 sm:space-y-4">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+
+      <!-- Milestone Interactive Quick Control Panel -->
+      <div class="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm">
+        <h4 class="font-bold text-slate-800 text-xs uppercase tracking-wider mb-3">Trainer / Leadership Verification Controls</h4>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3 text-xs">
+          <button onclick="updateMilestone('training_status', 2)" class="p-2.5 text-left border border-slate-200 hover:border-slate-400 rounded-lg bg-slate-50 hover:bg-white transition">
+            <div class="font-semibold text-slate-800">1. Classroom Training</div>
+            <div class="text-[11px] text-slate-500 mt-0.5">Mark Attendance & Completion</div>
+          </button>
+          <button onclick="promptScore('post_test_score')" class="p-2.5 text-left border border-slate-200 hover:border-slate-400 rounded-lg bg-slate-50 hover:bg-white transition">
+            <div class="font-semibold text-slate-800">2. Post-Training Test</div>
+            <div class="text-[11px] text-slate-500 mt-0.5">Record Test Score (0-100%)</div>
+          </button>
+          <button onclick="updateMilestone('presentation_vp', 2)" class="p-2.5 text-left border border-slate-200 hover:border-slate-400 rounded-lg bg-slate-50 hover:bg-white transition">
+            <div class="font-semibold text-slate-800">3. VP/DMD Presentation</div>
+            <div class="text-[11px] text-slate-500 mt-0.5">Approve Action Learning Board</div>
+          </button>
+          <button onclick="updateMilestone('jishuken_1', 1)" class="p-2.5 text-left border border-slate-200 hover:border-slate-400 rounded-lg bg-slate-50 hover:bg-white transition">
+            <div class="font-semibold text-slate-800">4. Internal Jishuken-1</div>
+            <div class="text-[11px] text-slate-500 mt-0.5">Confirm Jishuken Participation</div>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- TAB 3: PRESENTATION BOARD (KOMARIGOTO & 21 KVP MATRIX)   -->
+    <!-- ======================================================== -->
+    <div id="tab-content-presentation-board" class="tab-content hidden space-y-6">
+      
+      <!-- Board Header & Employee Info -->
+      <div class="bg-gradient-to-r from-red-900 to-slate-900 text-white rounded-xl p-4 sm:p-5 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <div>
+          <div class="text-[10px] sm:text-xs text-red-300 font-bold uppercase tracking-wider mb-0.5">
+            Standard Format: TIEI Presentation Board Rev. (Sheets 3.1 - 3.9)
+          </div>
+          <h2 class="text-lg sm:text-xl font-black">TPS Action Learning Presentation Board</h2>
+          <p class="text-xs text-slate-300 mt-0.5">
+            Practical Gemba Problem Solving • Worksite Komarigoto • 21 Kaizen View Points (21 KVP)
+          </p>
+        </div>
+        <div class="flex items-center space-x-2 w-full sm:w-auto">
+          <button onclick="openAddKomarigotoModal()" class="w-full sm:w-auto justify-center bg-toyota-red hover:bg-toyota-dark text-white px-3.5 py-2 rounded-lg text-xs font-bold shadow-md transition flex items-center space-x-1.5">
+            <i class="fa-solid fa-plus"></i><span>Log New KOMARIGOTO</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 9-Part Presentation Grid (As seen in TPS Presentation Board_REV.xlsx) -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
+        
+        <!-- BLOCK 1 & 2: Training & Classroom Summary -->
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3">
+          <div class="flex items-center space-x-2 border-b border-slate-200 pb-2">
+            <span class="w-6 h-6 rounded bg-slate-800 text-white flex items-center justify-center font-bold text-xs">1-2</span>
+            <h4 class="font-bold text-slate-900 text-xs uppercase">Classroom Learning Summary</h4>
+          </div>
+          <div class="text-xs space-y-2 text-slate-600">
+            <div class="p-2.5 bg-slate-50 rounded border border-slate-200">
+              <span class="font-semibold text-slate-800">Module:</span> TPS Intermediate Training (Z10-Z12)
+            </div>
+            <div class="p-2.5 bg-slate-50 rounded border border-slate-200">
+              <span class="font-semibold text-slate-800">Core Concepts:</span> Standardized Work 3 Slips (STW), Takt Time calculation, 3M Elimination (Muri, Mura, Muda).
+            </div>
+            <div class="p-2.5 bg-slate-50 rounded border border-slate-200">
+              <span class="font-semibold text-slate-800">Venue & Trainer:</span> TPS Dojo Room A • Dilip R / Rakshith Prabhu
+            </div>
+          </div>
+        </div>
+
+        <!-- BLOCK 3: Action Learning Flow -->
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3">
+          <div class="flex items-center space-x-2 border-b border-slate-200 pb-2">
+            <span class="w-6 h-6 rounded bg-slate-800 text-white flex items-center justify-center font-bold text-xs">3</span>
+            <h4 class="font-bold text-slate-900 text-xs uppercase">Action Learning Flow</h4>
+          </div>
+          <div class="text-xs text-slate-600 space-y-1.5">
+            <div class="flex items-center space-x-2 p-1.5 rounded bg-emerald-50 text-emerald-800 font-medium">
+              <i class="fa-solid fa-check text-[10px]"></i><span>3.1 Worksite Komarigoto Listing (SEQPC)</span>
+            </div>
+            <div class="flex items-center space-x-2 p-1.5 rounded bg-emerald-50 text-emerald-800 font-medium">
+              <i class="fa-solid fa-check text-[10px]"></i><span>3.2 Worksite Observation by 21 KVP</span>
+            </div>
+            <div class="flex items-center space-x-2 p-1.5 rounded bg-emerald-50 text-emerald-800 font-medium">
+              <i class="fa-solid fa-check text-[10px]"></i><span>3.3 Probable Countermeasures & Feasibility</span>
+            </div>
+            <div class="flex items-center space-x-2 p-1.5 rounded bg-emerald-50 text-emerald-800 font-medium">
+              <i class="fa-solid fa-check text-[10px]"></i><span>3.4 & 3.5 Timeline Implementation (W1-W4)</span>
+            </div>
+            <div class="flex items-center space-x-2 p-1.5 rounded bg-indigo-50 text-indigo-800 font-medium">
+              <i class="fa-solid fa-arrow-right text-[10px]"></i><span>3.6 Own Outlook & Learnings</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- BLOCK 3.6: Own Outlook After Implementation -->
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3">
+          <div class="flex items-center space-x-2 border-b border-slate-200 pb-2">
+            <span class="w-6 h-6 rounded bg-slate-800 text-white flex items-center justify-center font-bold text-xs">3.6</span>
+            <h4 class="font-bold text-slate-900 text-xs uppercase">Own Outlook & Learnings</h4>
+          </div>
+          <div class="text-xs text-slate-600 space-y-2">
+            <div class="p-2 bg-slate-50 rounded border border-slate-200">
+              <span class="font-bold text-slate-700 block mb-0.5">My Learnings:</span>
+              "Earlier I only noticed equipment breakdown. Now through 21 KVP, I see micro-stopping, poor posture, and waiting waste between machine and man."
+            </div>
+            <div class="p-2 bg-slate-50 rounded border border-slate-200">
+              <span class="font-bold text-slate-700 block mb-0.5">Revised Daily Observation:</span>
+              "Daily check of tool changeover times, oil splatter on walkways, and buffer WIP in the supply lane."
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- SECTION 3.1: Worksite KOMARIGOTO (Challenges) Table -->
+      <div class="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
+          <div>
+            <h3 class="font-extrabold text-slate-900 text-xs sm:text-sm">3.1 Listing of Own Worksite KOMARIGOTO (Challenges)</h3>
+            <p class="text-[11px] sm:text-xs text-slate-500">Categorized by S (Safety), E (Environment), Q (Quality), P (Productivity), C (Cost)</p>
+          </div>
+          <div class="flex flex-wrap gap-1 text-[11px]">
+            <span class="px-2 py-0.5 bg-rose-50 text-rose-700 rounded border border-rose-200 font-bold">S: Safety</span>
+            <span class="px-2 py-0.5 bg-amber-50 text-amber-700 rounded border border-amber-200 font-bold">Q: Quality</span>
+            <span class="px-2 py-0.5 bg-indigo-50 text-indigo-700 rounded border border-indigo-200 font-bold">P: Productivity</span>
+            <span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded border border-emerald-200 font-bold">C: Cost</span>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs border border-slate-200">
+            <thead class="bg-slate-50 text-slate-700 uppercase text-[10px] tracking-wider border-b border-slate-200">
+              <tr>
+                <th class="p-3">Sno</th>
+                <th class="p-3">Worksite Challenge</th>
+                <th class="p-3 text-center">Category</th>
+                <th class="p-3">Current Condition</th>
+                <th class="p-3">Target Condition</th>
+                <th class="p-3">Impact</th>
+                <th class="p-3 text-center">21 KVP Mapped</th>
+                <th class="p-3">Countermeasure</th>
+                <th class="p-3 text-center">Status</th>
+              </tr>
+            </thead>
+            <tbody id="komarigoto-tbody" class="divide-y divide-slate-200 text-slate-700">
+              <!-- Populated dynamically via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- SECTION 3.2 & 3.3: Interactive 21 Kaizen View Points (21 KVP) Reference Sheet -->
+      <div class="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
+          <div>
+            <h3 class="font-extrabold text-slate-900 text-xs sm:text-sm">3.2 The 21 Kaizen View Points (21 KVP) Inspection Matrix</h3>
+            <p class="text-[11px] sm:text-xs text-slate-500">Standardized checklist for detecting Muri, Mura, and Muda on the Gemba</p>
+          </div>
+          <span class="text-xs bg-slate-100 text-slate-700 px-3 py-1 rounded-full font-bold self-start sm:self-auto">Toyota Standard Reference</span>
+        </div>
+        <div id="kvp-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3 text-xs">
+          <!-- Populated dynamically via JS -->
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- TAB 4: DEPARTMENT SKILL MATRIX & HEATMAP   -->
+    <!-- ========================================== -->
+    <div id="tab-content-skill-matrix" class="tab-content hidden space-y-6">
+      <div class="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 mb-4">
+          <div>
+            <h3 class="font-extrabold text-slate-900 text-sm sm:text-base">Department-Wise TPS Competency & Skill Matrix</h3>
+            <p class="text-[11px] sm:text-xs text-slate-500">Live roster of 78 Team Leaders from GD Division (`001_TPS Journey Visualisation.xlsx`)</p>
+          </div>
+          
+          <!-- Filters -->
+          <div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2 text-xs w-full md:w-auto">
+            <select id="matrix-filter-area" onchange="filterSkillMatrix()" class="bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 font-semibold text-slate-700 flex-1 sm:flex-initial">
+              <option value="ALL">All Shops (GD Division)</option>
+              <option value="HEAD">GD HEAD</option>
+              <option value="CRANK">GD CRANK</option>
+              <option value="BLOCK">GD BLOCK</option>
+              <option value="LINE SUPPLY">LINE SUPPLY</option>
+            </select>
+            <select id="matrix-filter-level" onchange="filterSkillMatrix()" class="bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 font-semibold text-slate-700 flex-1 sm:flex-initial">
+              <option value="ALL">All TPS Levels</option>
+              <option value="1">Level 1 - Foundation</option>
+              <option value="2">Level 2 - Practitioner</option>
+              <option value="3">Level 3 - Champion</option>
+            </select>
+            <input type="text" id="matrix-search" oninput="filterSkillMatrix()" placeholder="Search name, emp no, boss..." class="bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5 text-xs focus:ring-2 focus:ring-toyota-red flex-1 sm:flex-initial">
+          </div>
+        </div>
+
+        <!-- Matrix Table -->
+        <div class="overflow-x-auto max-h-[600px] custom-scrollbar border border-slate-200 rounded-lg">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead class="bg-slate-100 text-slate-700 uppercase text-[10px] tracking-wider sticky top-0 z-10 border-b border-slate-200">
+              <tr>
+                <th class="p-3">Emp No</th>
+                <th class="p-3">Employee Name</th>
+                <th class="p-3">Shop / Area</th>
+                <th class="p-3">Desig.</th>
+                <th class="p-3">Reporting Boss</th>
+                <th class="p-3 text-center">Current Level</th>
+                <th class="p-3 text-center">Training</th>
+                <th class="p-3 text-center">Post Test</th>
+                <th class="p-3 text-center">Assignment</th>
+                <th class="p-3 text-center">VP Pres.</th>
+                <th class="p-3 text-center">Practitioner</th>
+                <th class="p-3 text-center">Jishuken</th>
+                <th class="p-3 text-center">Kaizens</th>
+                <th class="p-3 text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="skill-matrix-tbody" class="divide-y divide-slate-200 bg-white">
+              <!-- Populated dynamically via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- TAB 5: KAIZEN & AMRUT INTEGRATION             -->
+    <!-- ============================================== -->
+    <div id="tab-content-kaizen-amrut" class="tab-content hidden space-y-6">
+      
+      <!-- Integration Overview Banner -->
+      <div class="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <div>
+          <div class="flex items-center space-x-2 text-xs font-bold text-indigo-600 uppercase tracking-wider mb-1">
+            <i class="fa-solid fa-link"></i>
+            <span>System Integration: Suggestion Management System ("Amrut")</span>
+          </div>
+          <h3 class="text-sm sm:text-base font-extrabold text-slate-900">Kaizen Ingestion & Cost-Benefit Machine Tracking</h3>
+          <p class="text-xs text-slate-500 mt-0.5">
+            Consumes approved Kaizen records, fabricated machine hours, and verified cost savings without duplicate data entry.
+          </p>
+        </div>
+        <div class="flex space-x-2 text-xs font-semibold self-start sm:self-auto">
+          <span class="bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-lg border border-emerald-200 flex items-center">
+            <i class="fa-solid fa-check-double mr-1.5"></i> Read-Only Sync Active
+          </span>
+        </div>
+      </div>
+
+      <!-- Machine Run Cost Rates (From 20200825_1Y_New_kaizen_request.xlsx) -->
+      <div class="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm">
+        <h4 class="font-bold text-slate-800 text-xs uppercase tracking-wider mb-3">
+          TIEI Standard Machine Fabrication Hourly Cost Master (`TIEI_MNT_EDM-040-1`)
+        </h4>
+        <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2 text-xs text-center">
+          <div class="p-2 bg-slate-50 rounded border border-slate-200">
+            <div class="text-[10px] text-slate-500 font-semibold">Lathe</div>
+            <div class="font-black text-slate-800 text-xs sm:text-sm mt-0.5">₹ 27 / hr</div>
+          </div>
+          <div class="p-2 bg-slate-50 rounded border border-slate-200">
+            <div class="text-[10px] text-slate-500 font-semibold">Welding</div>
+            <div class="font-black text-slate-800 text-xs sm:text-sm mt-0.5">₹ 26 / hr</div>
+          </div>
+          <div class="p-2 bg-slate-50 rounded border border-slate-200">
+            <div class="text-[10px] text-slate-500 font-semibold">Bending</div>
+            <div class="font-black text-slate-800 text-xs sm:text-sm mt-0.5">₹ 18 / hr</div>
+          </div>
+          <div class="p-2 bg-slate-50 rounded border border-slate-200">
+            <div class="text-[10px] text-slate-500 font-semibold">Milling</div>
+            <div class="font-black text-slate-800 text-xs sm:text-sm mt-0.5">₹ 14 / hr</div>
+          </div>
+          <div class="p-2 bg-slate-50 rounded border border-slate-200">
+            <div class="text-[10px] text-slate-500 font-semibold">Drilling</div>
+            <div class="font-black text-slate-800 text-xs sm:text-sm mt-0.5">₹ 12 / hr</div>
+          </div>
+          <div class="p-2 bg-slate-50 rounded border border-slate-200">
+            <div class="text-[10px] text-slate-500 font-semibold">Band Saw</div>
+            <div class="font-black text-slate-800 text-xs sm:text-sm mt-0.5">₹ 10 / hr</div>
+          </div>
+          <div class="p-2 bg-slate-50 rounded border border-slate-200">
+            <div class="text-[10px] text-slate-500 font-semibold">Grinding</div>
+            <div class="font-black text-slate-800 text-xs sm:text-sm mt-0.5">₹ 6 / hr</div>
+          </div>
+          <div class="p-2 bg-slate-50 rounded border border-slate-200">
+            <div class="text-[10px] text-slate-500 font-semibold">Pedestal</div>
+            <div class="font-black text-slate-800 text-xs sm:text-sm mt-0.5">₹ 4 / hr</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Kaizen Ingested Table -->
+      <div class="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm">
+        <h4 class="font-bold text-slate-800 text-xs uppercase tracking-wider mb-3">Live Ingested Kaizen Requests</h4>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs border border-slate-200">
+            <thead class="bg-slate-50 text-slate-700 uppercase text-[10px] border-b border-slate-200">
+              <tr>
+                <th class="p-3">Control No</th>
+                <th class="p-3">Employee</th>
+                <th class="p-3">Work Name</th>
+                <th class="p-3">Category</th>
+                <th class="p-3">Shop / Line</th>
+                <th class="p-3">Fabrication Machine</th>
+                <th class="p-3 text-right">Total Est. Cost</th>
+                <th class="p-3 text-center">Status</th>
+                <th class="p-3">Date</th>
+              </tr>
+            </thead>
+            <tbody id="kaizens-tbody" class="divide-y divide-slate-200">
+              <!-- Populated via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ============================================== -->
+    <!-- TAB 6: PROMOTION READINESS & GAP ANALYSIS     -->
+    <!-- ============================================== -->
+    <div id="tab-content-promotion" class="tab-content hidden space-y-6">
+      <div class="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6">
+          <div>
+            <h3 class="font-extrabold text-slate-900 text-sm sm:text-base">Automated Promotion Readiness & Gap Analysis Engine</h3>
+            <p class="text-xs text-slate-500">Evaluates employee compliance against the next TPS Competency Level criteria</p>
+          </div>
+          <div class="flex items-center space-x-2 w-full sm:w-auto">
+            <label class="text-xs font-bold text-slate-600 whitespace-nowrap">Select Candidate:</label>
+            <select id="promotion-emp-select" onchange="runGapAnalysis(this.value)" class="w-full sm:w-auto text-xs bg-slate-50 border border-slate-300 rounded-lg p-2 font-semibold text-slate-800">
+              <!-- Populated via JS -->
+            </select>
+          </div>
+        </div>
+
+        <div id="gap-analysis-results" class="space-y-4">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- TAB 7: DIGITAL CERTIFICATES                   -->
+    <!-- ============================================== -->
+    <div id="tab-content-certificates" class="tab-content hidden space-y-6">
+      <div class="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+          <div>
+            <h3 class="font-extrabold text-slate-900 text-sm sm:text-base">Digital Certificates Registry</h3>
+            <p class="text-xs text-slate-500">Officially validated and issued TPS competency credentials</p>
+          </div>
+          <button onclick="openIssueCertModal()" class="w-full sm:w-auto justify-center bg-toyota-red hover:bg-toyota-dark text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition flex items-center space-x-1">
+            <i class="fa-solid fa-plus mr-1"></i> Issue Certificate
+          </button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs border border-slate-200">
+            <thead class="bg-slate-50 text-slate-700 uppercase text-[10px] border-b border-slate-200">
+              <tr>
+                <th class="p-3">Certificate No</th>
+                <th class="p-3">Employee Name</th>
+                <th class="p-3">Emp No</th>
+                <th class="p-3">Shop / Area</th>
+                <th class="p-3">Competency Level</th>
+                <th class="p-3">Issue Date</th>
+                <th class="p-3">Authorized Signatory</th>
+                <th class="p-3 text-center">Status</th>
+                <th class="p-3 text-center">Action</th>
+              </tr>
+            </thead>
+            <tbody id="certs-tbody" class="divide-y divide-slate-200">
+              <!-- Populated via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- TAB 8: TRAINING BATCHES                       -->
+    <!-- ============================================== -->
+    <div id="tab-content-batches" class="tab-content hidden space-y-6">
+      <div class="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
+          <div>
+            <h3 class="font-extrabold text-slate-900 text-sm sm:text-base">Training Calendar & Batch Administration</h3>
+            <p class="text-xs text-slate-500">Scheduled Dojo modules, venue capacities, and trainer assignments</p>
+          </div>
+          <span class="text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-bold self-start sm:self-auto">Q3/Q4 2026 Cycle</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4" id="batches-grid">
+          <!-- Populated via JS -->
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ============================================== -->
+  <!-- MODAL 1: ADD KOMARIGOTO CHALLENGE              -->
+  <!-- ============================================== -->
+  <div id="add-komarigoto-modal" class="fixed inset-0 bg-black/60 hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl max-w-2xl w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center border-b border-slate-200 pb-3">
+        <h3 class="font-bold text-slate-900 text-sm">Log Worksite KOMARIGOTO (Challenge)</h3>
+        <button onclick="closeAddKomarigotoModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <form id="komarigoto-form" onsubmit="submitKomarigoto(event)" class="space-y-3 text-xs">
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Candidate Employee:</label>
+          <select id="modal-komarigoto-emp" class="w-full bg-slate-50 border border-slate-300 rounded p-2 text-xs font-semibold">
+            <!-- Populated via JS -->
+          </select>
+        </div>
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Worksite Challenge (Komarigoto):</label>
+          <input type="text" id="kg-challenge" required placeholder="e.g. OP-140: Burrs on crank pin oil hole" class="w-full bg-slate-50 border border-slate-300 rounded p-2 text-xs">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">Category (SEQPC):</label>
+            <select id="kg-category" class="w-full bg-slate-50 border border-slate-300 rounded p-2 text-xs">
+              <option value="S">S - Safety</option>
+              <option value="E">E - Environment</option>
+              <option value="Q">Q - Quality</option>
+              <option value="P" selected>P - Productivity</option>
+              <option value="C">C - Cost</option>
+            </select>
+          </div>
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">Priority (1 or 2):</label>
+            <select id="kg-priority" class="w-full bg-slate-50 border border-slate-300 rounded p-2 text-xs">
+              <option value="1">Priority 1 (Urgent)</option>
+              <option value="2">Priority 2 (Secondary)</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">Current Condition:</label>
+            <input type="text" id="kg-current" placeholder="e.g. Actual 18 min tool change" class="w-full bg-slate-50 border border-slate-300 rounded p-2 text-xs">
+          </div>
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">Target Condition:</label>
+            <input type="text" id="kg-target" placeholder="e.g. Target 5 min" class="w-full bg-slate-50 border border-slate-300 rounded p-2 text-xs">
+          </div>
+        </div>
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Impact:</label>
+          <input type="text" id="kg-impact" placeholder="e.g. Shift output reduced by 15 units" class="w-full bg-slate-50 border border-slate-300 rounded p-2 text-xs">
+        </div>
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Map 21 KVP (Comma separated IDs, e.g. 1, 3, 19):</label>
+          <input type="text" id="kg-kvp" placeholder="1, 3, 19" class="w-full bg-slate-50 border border-slate-300 rounded p-2 text-xs">
+        </div>
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Probable Countermeasure:</label>
+          <textarea id="kg-countermeasures" rows="2" placeholder="Proposed Kaizen solution..." class="w-full bg-slate-50 border border-slate-300 rounded p-2 text-xs"></textarea>
+        </div>
+        <div class="flex justify-end space-x-2 pt-2 border-t border-slate-200">
+          <button type="button" onclick="closeAddKomarigotoModal()" class="px-3 py-1.5 border border-slate-300 rounded text-slate-700">Cancel</button>
+          <button type="submit" class="px-4 py-1.5 bg-toyota-red text-white font-bold rounded hover:bg-toyota-dark">Save to Board</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- MODAL 2: OFFICIAL CERTIFICATE VIEWER / PRINT  -->
+  <!-- ============================================== -->
+  <div id="certificate-modal" class="fixed inset-0 bg-black/70 hidden z-50 flex items-center justify-center p-2 sm:p-4">
+    <div class="bg-white rounded-2xl max-w-3xl w-full p-4 sm:p-8 relative shadow-2xl border-4 border-double border-amber-600 max-h-[95vh] overflow-y-auto">
+      <button onclick="closeCertificateModal()" class="absolute top-3 right-3 sm:top-4 sm:right-4 text-slate-400 hover:text-slate-700 text-lg print:hidden">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <!-- Certificate Layout -->
+      <div class="text-center space-y-3 sm:space-y-4 py-3 sm:py-4 px-3 sm:px-6 border-2 border-amber-500/40 rounded-xl bg-gradient-to-b from-amber-50/20 via-white to-amber-50/10">
+        <!-- Logo -->
+        <div class="flex justify-center items-center space-x-2 sm:space-x-3 mb-2">
+          <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-toyota-red text-white flex items-center justify-center font-black text-xl sm:text-2xl shadow">
+            T
+          </div>
+          <div class="text-left">
+            <div class="text-sm sm:text-lg font-black tracking-widest text-slate-900 leading-tight">TOYOTA INDUSTRIES ENGINE INDIA</div>
+            <div class="text-[9px] sm:text-[10px] tracking-wider text-slate-500 uppercase font-semibold">Manufacturing Excellence Group • TPS Office</div>
+          </div>
+        </div>
+
+        <div class="text-[11px] sm:text-xs font-serif italic text-amber-800 tracking-wider">This is to certify that</div>
+
+        <div id="cert-emp-name" class="text-xl sm:text-3xl font-black text-slate-900 tracking-wide underline decoration-amber-600 decoration-2 underline-offset-8">
+          ARUNA D R
+        </div>
+        <div id="cert-emp-meta" class="text-[11px] sm:text-xs text-slate-600 font-medium">
+          Emp No: 50031 • Designation: Z10 • Department: GD HEAD
+        </div>
+
+        <div class="text-[11px] sm:text-xs text-slate-600 max-w-lg mx-auto leading-relaxed pt-2">
+          has successfully completed the prescribed curriculum, shop-floor action learning project, 21 Kaizen Viewpoints implementation, and leadership evaluation, and is hereby awarded the credential of:
+        </div>
+
+        <div id="cert-level-name" class="text-base sm:text-2xl font-black text-toyota-red uppercase tracking-wider py-1.5 sm:py-2 bg-red-50 border border-red-200 rounded-lg max-w-md mx-auto">
+          Level 2 - TPS Practitioner
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 items-end pt-4 sm:pt-6 border-t border-slate-200 text-xs">
+          <div class="text-center sm:text-left">
+            <div class="font-mono text-[10px] text-slate-500" id="cert-date-display">Date: 2026-06-15</div>
+            <div class="font-mono text-[9px] text-slate-400" id="cert-no-display">Cert No: TIEI/TPS/2026/001</div>
+          </div>
+
+          <!-- QR Simulation -->
+          <div class="flex flex-col items-center">
+            <div class="w-14 h-14 sm:w-16 sm:h-16 border-2 border-slate-800 p-1 rounded bg-white flex items-center justify-center">
+              <i class="fa-solid fa-qrcode text-2xl sm:text-3xl text-slate-800"></i>
+            </div>
+            <span class="text-[9px] text-slate-400 mt-1 font-mono">TIEI Verified</span>
+          </div>
+
+          <div class="text-center sm:text-right">
+            <div class="border-b border-slate-400 pb-1 mb-1 font-serif italic text-slate-800" id="cert-signatory-name">
+              Antony John Sudhakar P
+            </div>
+            <div class="text-[10px] font-bold text-slate-600 uppercase">Authorized Signatory (VP)</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end space-x-3 mt-4 sm:mt-6 print:hidden">
+        <button onclick="window.print()" class="px-4 py-2 bg-slate-800 text-white text-xs font-bold rounded-lg hover:bg-slate-900 flex items-center space-x-2">
+          <i class="fa-solid fa-print"></i><span>Print Certificate</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    let employeesData = [];
+    let selectedEmpId = 1;
+    let kvpData = [];
+    let statsData = {};
+    let chartMaturity = null;
+    let chartPipeline = null;
+
+    // INIT
+    document.addEventListener('DOMContentLoaded', async () => {
+      await fetchKVP();
+      await fetchStats();
+      await fetchEmployees();
+      await fetchKaizens();
+      await fetchCertifications();
+      await fetchBatches();
+    });
+
+    // SWITCH TAB
+    function showTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('text-toyota-red', 'bg-red-50', 'border-b-2', 'border-toyota-red');
+        btn.classList.add('text-slate-600');
+      });
+
+      const target = document.getElementById(`tab-content-${tabId}`);
+      const btn = document.getElementById(`tab-btn-${tabId}`);
+      if (target) target.classList.remove('hidden');
+      if (btn) {
+        btn.classList.add('text-toyota-red', 'bg-red-50', 'border-b-2', 'border-toyota-red');
+        btn.classList.remove('text-slate-600');
+      }
+
+      if (tabId === 'dashboard') {
+        renderCharts();
+      }
+    }
+
+    // SWITCH USER ROLE
+    function switchRole(role) {
+      const nameEl = document.getElementById('user-display-name');
+      const roleEl = document.getElementById('user-display-role');
+      if (role === 'TL') {
+        nameEl.innerText = "ARUNA D R";
+        roleEl.innerText = "Team Leader (GD HEAD)";
+        selectedEmpId = 1;
+        loadEmployeeJourney(1);
+      } else if (role === 'MGR') {
+        nameEl.innerText = "MANUKUMAR G";
+        roleEl.innerText = "Section Manager / HOD";
+      } else if (role === 'TRAINER') {
+        nameEl.innerText = "Dilip R";
+        roleEl.innerText = "Master Trainer & Verifier";
+      } else if (role === 'TPS_OFFICE') {
+        nameEl.innerText = "Rakshith Prabhu";
+        roleEl.innerText = "TPS Office / Digital Captain";
+      } else if (role === 'LEADERSHIP') {
+        nameEl.innerText = "Antony John Sudhakar P";
+        roleEl.innerText = "Vice President (VP)";
+      }
+    }
+
+    // FETCH STATS
+    async function fetchStats() {
+      try {
+        const res = await fetch('/api/stats');
+        statsData = await res.json();
+        document.getElementById('stat-total-emps').innerText = statsData.total_employees;
+        document.getElementById('stat-trained-emps').innerText = statsData.trained_employees;
+        document.getElementById('stat-certified-practitioners').innerText = statsData.practitioners_certified;
+        document.getElementById('stat-total-savings').innerText = `₹ ${(statsData.total_cost_savings_inr / 100000).toFixed(1)} L`;
+        document.getElementById('stat-approved-kaizens').innerText = statsData.total_kaizens_approved;
+        renderCharts();
+      } catch (e) {
+        console.error("Error fetching stats:", e);
+      }
+    }
+
+    // RENDER CHARTS
+    function renderCharts() {
+      if (!statsData.area_stats) return;
+
+      // Area Maturity Chart
+      const areaCtx = document.getElementById('chart-area-maturity');
+      if (areaCtx) {
+        if (chartMaturity) chartMaturity.destroy();
+        const labels = statsData.area_stats.map(a => a.working_area);
+        const totals = statsData.area_stats.map(a => a.total);
+        const certs = statsData.area_stats.map(a => a.certified);
+
+        chartMaturity = new Chart(areaCtx, {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: [
+              { label: 'Total Team Leaders', data: totals, backgroundColor: '#94A3B8' },
+              { label: 'Certified Practitioners', data: certs, backgroundColor: '#D71920' }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: { y: { beginAtZero: true } }
+          }
+        });
+      }
+
+      // Pipeline Funnel Chart
+      const pipeCtx = document.getElementById('chart-level-pipeline');
+      if (pipeCtx) {
+        if (chartPipeline) chartPipeline.destroy();
+        const l1 = statsData.level_stats[1] || 0;
+        const l2 = statsData.level_stats[2] || 0;
+        const l3 = statsData.level_stats[3] || 0;
+        const l4 = statsData.level_stats[4] || 0;
+
+        chartPipeline = new Chart(pipeCtx, {
+          type: 'doughnut',
+          data: {
+            labels: ['L1: Foundation', 'L2: Practitioner', 'L3: Champion', 'L4: Master'],
+            datasets: [{
+              data: [l1, l2, l3, l4],
+              backgroundColor: ['#CBD5E1', '#38BDF8', '#10B981', '#D71920']
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'bottom' } }
+          }
+        });
+      }
+    }
+
+    // FETCH EMPLOYEES
+    async function fetchEmployees() {
+      try {
+        const res = await fetch('/api/employees');
+        employeesData = await res.json();
+        
+        // Populate Selects
+        const journeySel = document.getElementById('journey-emp-select');
+        const promoSel = document.getElementById('promotion-emp-select');
+        const modalSel = document.getElementById('modal-komarigoto-emp');
+        
+        journeySel.innerHTML = '';
+        promoSel.innerHTML = '';
+        modalSel.innerHTML = '';
+
+        employeesData.forEach(e => {
+          const opt = `<option value="${e.id}">${e.name} (${e.emp_no}) - ${e.working_area}</option>`;
+          journeySel.innerHTML += opt;
+          promoSel.innerHTML += opt;
+          modalSel.innerHTML += opt;
+        });
+
+        // Load default employee (ARUNA D R)
+        if (employeesData.length > 0) {
+          loadEmployeeJourney(employeesData[0].id);
+          renderSkillMatrix(employeesData);
+          runGapAnalysis(employeesData[0].id);
+        }
+      } catch (e) {
+        console.error("Error fetching employees:", e);
+      }
+    }
+
+    // FETCH 21 KVP
+    async function fetchKVP() {
+      try {
+        const res = await fetch('/api/viewpoints_21');
+        kvpData = await res.json();
+        const grid = document.getElementById('kvp-grid');
+        grid.innerHTML = '';
+
+        kvpData.forEach(k => {
+          let badgeColor = 'bg-slate-100 text-slate-700';
+          if (k.category === 'Muri') badgeColor = 'bg-red-50 text-red-700 border border-red-200';
+          if (k.category === 'Mura') badgeColor = 'bg-amber-50 text-amber-700 border border-amber-200';
+          if (k.category === 'Muda') badgeColor = 'bg-blue-50 text-blue-700 border border-blue-200';
+
+          grid.innerHTML += `
+            <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg hover:shadow-sm transition">
+              <div class="flex justify-between items-center mb-1">
+                <span class="font-black text-slate-800">#${k.id}</span>
+                <span class="text-[10px] px-2 py-0.5 rounded font-bold ${badgeColor}">${k.category} • ${k.subcategory}</span>
+              </div>
+              <div class="font-bold text-slate-800 text-xs mb-0.5">${k.name}</div>
+              <div class="text-[11px] text-slate-500 leading-tight">${k.desc}</div>
+            </div>
+          `;
+        });
+      } catch (e) {
+        console.error("Error fetching KVP:", e);
+      }
+    }
+
+    // LOAD EMPLOYEE JOURNEY (11 STEPS)
+    async function loadEmployeeJourney(empId) {
+      selectedEmpId = empId;
+      try {
+        const res = await fetch(`/api/employees/${empId}`);
+        const emp = await res.json();
+
+        // Render Banner
+        const banner = document.getElementById('journey-emp-card');
+        let levelBadge = `<span class="px-2.5 py-1 text-xs font-bold rounded bg-slate-100 text-slate-700">Level 1 - Foundation</span>`;
+        if (emp.current_level === 2) levelBadge = `<span class="px-2.5 py-1 text-xs font-bold rounded bg-blue-100 text-blue-800">Level 2 - Practitioner</span>`;
+        if (emp.current_level === 3) levelBadge = `<span class="px-2.5 py-1 text-xs font-bold rounded bg-emerald-100 text-emerald-800">Level 3 - Champion</span>`;
+
+        banner.innerHTML = `
+          <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+            <div class="flex items-center space-x-3 sm:space-x-4">
+              <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-slate-200 flex items-center justify-center font-black text-lg sm:text-xl text-slate-700 ring-2 ring-toyota-red/30 flex-shrink-0">
+                ${emp.name.charAt(0)}
+              </div>
+              <div>
+                <div class="flex items-center space-x-2 flex-wrap gap-y-1">
+                  <h3 class="text-base sm:text-lg font-black text-slate-900">${emp.name}</h3>
+                  <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">Emp #${emp.emp_no}</span>
+                  ${levelBadge}
+                </div>
+                <div class="text-[11px] sm:text-xs text-slate-500 mt-1 flex flex-wrap gap-x-3 sm:gap-x-4 gap-y-0.5">
+                  <span><i class="fa-solid fa-industry mr-1"></i> Division: <b>${emp.division}</b> (${emp.working_area})</span>
+                  <span><i class="fa-solid fa-id-badge mr-1"></i> Desig: <b>${emp.designation}</b></span>
+                  <span><i class="fa-solid fa-user-tie mr-1"></i> Reporting Boss: <b>${emp.boss_name}</b></span>
+                </div>
+              </div>
+            </div>
+            <div class="grid grid-cols-3 gap-2 sm:gap-3 text-center text-xs w-full lg:w-auto">
+              <div class="p-2 bg-slate-50 rounded border border-slate-200">
+                <div class="text-[9px] sm:text-[10px] text-slate-500">Post Test</div>
+                <div class="font-bold text-slate-800 text-xs sm:text-sm">${emp.post_test_score}%</div>
+              </div>
+              <div class="p-2 bg-slate-50 rounded border border-slate-200">
+                <div class="text-[9px] sm:text-[10px] text-slate-500">Kaizens</div>
+                <div class="font-bold text-slate-800 text-xs sm:text-sm">${emp.kaizens_approved}</div>
+              </div>
+              <div class="p-2 bg-slate-50 rounded border border-slate-200">
+                <div class="text-[9px] sm:text-[10px] text-slate-500">KPI Score</div>
+                <div class="font-bold text-emerald-600 text-xs sm:text-sm">${emp.kpi_score}</div>
+              </div>
+            </div>
+          </div>
+        `;
+
+        // Render 11 Steps
+        const steps = [
+          { num: 1, title: "Identify & Plan Training", done: emp.training_status >= 1, desc: "Employee mapped to training calendar" },
+          { num: 2, title: "Pre-Training Test Score", done: emp.pre_test_score > 0, desc: `Scored ${emp.pre_test_score}% (Baseline assessment)` },
+          { num: 3, title: "Post-Training Test Score", done: emp.post_test_score >= 70, desc: `Scored ${emp.post_test_score}% (Passed >=70%)` },
+          { num: 4, title: "Post-Training Assignment", done: emp.assignment_status >= 2, desc: "KOMARIGOTO & 21 KVP action learning submitted" },
+          { num: 5, title: "Presentation (MGR & Trainer)", done: emp.presentation_mgr === 2, desc: "Shop-floor review with Section Manager" },
+          { num: 6, title: "Presentation (VP & DMD)", done: emp.presentation_vp === 2, desc: "Executive board review & sign-off" },
+          { num: 7, title: "TPS Practitioner Certification", done: emp.practitioner_certified === 1, desc: "Formally certified Level 2 Practitioner" },
+          { num: 8, title: "Participate in Jishuken 1", done: emp.jishuken_1 === 1, desc: "Completed intensive Kaizen workshop 1" },
+          { num: 9, title: "Participate in Jishuken 2", done: emp.jishuken_2 === 1, desc: "Completed intensive Kaizen workshop 2" },
+          { num: 10, title: "Evaluation by Master Trainer", done: emp.champion_eval >= 80, desc: `Rated ${emp.champion_eval}% by Master Trainer` },
+          { num: 11, title: "TPS Champion Certification", done: emp.champion_certified === 1, desc: "Accredited Level 3 Champion / Mentor" }
+        ];
+
+        let completedSteps = steps.filter(s => s.done).length;
+        document.getElementById('journey-completion-badge').innerText = `Step ${completedSteps} of 11 Completed`;
+
+        const container = document.getElementById('stepper-container');
+        container.innerHTML = '';
+
+        steps.forEach((st, idx) => {
+          let stateClass = st.done 
+            ? 'bg-emerald-50 border-emerald-300 text-emerald-800' 
+            : (idx === completedSteps ? 'bg-amber-50 border-amber-300 text-amber-800' : 'bg-slate-50 border-slate-200 text-slate-400');
+          let icon = st.done 
+            ? '<i class="fa-solid fa-circle-check text-emerald-600 text-base"></i>' 
+            : (idx === completedSteps ? '<i class="fa-solid fa-circle-dot text-amber-600 text-base"></i>' : '<i class="fa-regular fa-circle text-slate-300 text-base"></i>');
+
+          container.innerHTML += `
+            <div class="p-3 rounded-lg border ${stateClass} flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs transition">
+              <div class="flex items-start sm:items-center space-x-3">
+                <div class="mt-0.5 sm:mt-0 flex-shrink-0">${icon}</div>
+                <div>
+                  <div class="font-black text-slate-800">${st.num}. ${st.title}</div>
+                  <div class="text-slate-500 text-[11px]">${st.desc}</div>
+                </div>
+              </div>
+              <div class="self-end sm:self-center flex-shrink-0">
+                ${st.done ? '<span class="px-2.5 py-0.5 rounded font-bold bg-emerald-100 text-emerald-800 text-[10px]">PASSED</span>' : (idx === completedSteps ? '<span class="px-2.5 py-0.5 rounded font-bold bg-amber-100 text-amber-800 text-[10px]">NEXT UP</span>' : '<span class="px-2.5 py-0.5 rounded font-bold bg-slate-200 text-slate-500 text-[10px]">LOCKED</span>')}
+              </div>
+            </div>
+          `;
+        });
+
+        // Render Komarigoto table in Presentation Board tab
+        renderKomarigotoTable(emp.challenges || []);
+
+      } catch (e) {
+        console.error("Error loading journey:", e);
+      }
+    }
+
+    // UPDATE MILESTONE VIA QUICK CONTROL
+    async function updateMilestone(field, val) {
+      try {
+        const res = await fetch(`/api/employees/${selectedEmpId}/journey_update`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ field: field, value: val })
+        });
+        await loadEmployeeJourney(selectedEmpId);
+        await fetchStats();
+      } catch (e) {
+        console.error("Error updating milestone:", e);
+      }
+    }
+
+    function promptScore(field) {
+      const score = prompt("Enter score percentage (0-100):", "85");
+      if (score !== null && !isNaN(score)) {
+        updateMilestone(field, parseFloat(score));
+      }
+    }
+
+    // ADVANCE NEXT MILESTONE SIMULATION
+    async function advanceNextMilestone() {
+      const res = await fetch(`/api/employees/${selectedEmpId}`);
+      const emp = await res.json();
+
+      if (emp.training_status < 2) {
+        await updateMilestone('training_status', 2);
+      } else if (emp.post_test_score < 70) {
+        await updateMilestone('post_test_score', 88);
+      } else if (emp.assignment_status < 2) {
+        await updateMilestone('assignment_status', 2);
+      } else if (emp.presentation_mgr < 2) {
+        await updateMilestone('presentation_mgr', 2);
+      } else if (emp.presentation_vp < 2) {
+        await updateMilestone('presentation_vp', 2);
+      } else if (emp.jishuken_1 < 1) {
+        await updateMilestone('jishuken_1', 1);
+      } else if (emp.jishuken_2 < 1) {
+        await updateMilestone('jishuken_2', 1);
+      } else if (emp.champion_eval < 80) {
+        await updateMilestone('champion_eval', 91.5);
+      } else if (emp.champion_certified < 1) {
+        await updateMilestone('champion_certified', 1);
+      } else {
+        alert("This employee has reached the highest TPS Champion milestone!");
+      }
+    }
+
+    // RENDER KOMARIGOTO TABLE
+    function renderKomarigotoTable(challenges) {
+      const tbody = document.getElementById('komarigoto-tbody');
+      tbody.innerHTML = '';
+      if (challenges.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-slate-400">No Komarigoto challenges logged yet. Click '+ Log New KOMARIGOTO' to add one.</td></tr>`;
+        return;
+      }
+
+      challenges.forEach((c, idx) => {
+        let catClass = 'bg-indigo-50 text-indigo-700';
+        if (c.category === 'S') catClass = 'bg-rose-50 text-rose-700';
+        if (c.category === 'Q') catClass = 'bg-amber-50 text-amber-700';
+        if (c.category === 'C') catClass = 'bg-emerald-50 text-emerald-700';
+
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="p-3 font-bold">${idx + 1}</td>
+            <td class="p-3 font-semibold text-slate-800">${c.challenge}</td>
+            <td class="p-3 text-center"><span class="px-2 py-0.5 rounded font-black text-[10px] ${catClass}">${c.category}</span></td>
+            <td class="p-3 text-slate-600">${c.current_condition || '-'}</td>
+            <td class="p-3 text-slate-600 font-semibold text-emerald-700">${c.target_condition || '-'}</td>
+            <td class="p-3 text-slate-500">${c.impact || '-'}</td>
+            <td class="p-3 text-center font-mono font-bold text-toyota-red">#${c.viewpoints_21 || '-'}</td>
+            <td class="p-3 text-slate-700">${c.countermeasures || '-'}</td>
+            <td class="p-3 text-center"><span class="px-2 py-0.5 rounded font-bold text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200">${c.status}</span></td>
+          </tr>
+        `;
+      });
+    }
+
+    // MODAL LOGIC FOR KOMARIGOTO
+    function openAddKomarigotoModal() {
+      document.getElementById('add-komarigoto-modal').classList.remove('hidden');
+    }
+    function closeAddKomarigotoModal() {
+      document.getElementById('add-komarigoto-modal').classList.add('hidden');
+    }
+    async function submitKomarigoto(e) {
+      e.preventDefault();
+      const payload = {
+        emp_id: selectedEmpId,
+        challenge: document.getElementById('kg-challenge').value,
+        category: document.getElementById('kg-category').value,
+        priority: document.getElementById('kg-priority').value,
+        current_condition: document.getElementById('kg-current').value,
+        target_condition: document.getElementById('kg-target').value,
+        impact: document.getElementById('kg-impact').value,
+        viewpoints_21: document.getElementById('kg-kvp').value,
+        countermeasures: document.getElementById('kg-countermeasures').value,
+        status: 'In Progress'
+      };
+
+      await fetch('/api/komarigoto', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      closeAddKomarigotoModal();
+      await loadEmployeeJourney(selectedEmpId);
+    }
+
+    // RENDER SKILL MATRIX TABLE
+    function renderSkillMatrix(employees) {
+      const tbody = document.getElementById('skill-matrix-tbody');
+      tbody.innerHTML = '';
+
+      employees.forEach(e => {
+        let levelTag = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-600">L1 Foundation</span>';
+        if (e.current_level === 2) levelTag = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-800">L2 Practitioner</span>';
+        if (e.current_level === 3) levelTag = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">L3 Champion</span>';
+
+        let trnBadge = e.training_status >= 2 ? '<i class="fa-solid fa-check text-emerald-600"></i>' : '<span class="text-slate-400">-</span>';
+        let testBadge = e.post_test_score >= 70 ? `<span class="font-bold text-emerald-600">${e.post_test_score}%</span>` : '<span class="text-slate-400">-</span>';
+        let asgnBadge = e.assignment_status >= 2 ? '<i class="fa-solid fa-check text-emerald-600"></i>' : '<span class="text-slate-400">-</span>';
+        let presBadge = e.presentation_vp === 2 ? '<i class="fa-solid fa-check text-emerald-600"></i>' : '<span class="text-slate-400">-</span>';
+        let certBadge = e.practitioner_certified === 1 ? '<i class="fa-solid fa-certificate text-toyota-red"></i>' : '<span class="text-slate-400">-</span>';
+        let jishukenBadge = (e.jishuken_1 + e.jishuken_2) > 0 ? `<span class="font-bold text-indigo-600">${e.jishuken_1 + e.jishuken_2}/2</span>` : '<span class="text-slate-400">0/2</span>';
+
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-50 transition cursor-pointer" onclick="selectEmployeeFromMatrix(${e.id})">
+            <td class="p-3 font-mono font-bold text-slate-800">${e.emp_no}</td>
+            <td class="p-3 font-bold text-slate-900">${e.name}</td>
+            <td class="p-3"><span class="font-semibold text-slate-700">${e.working_area}</span></td>
+            <td class="p-3 font-mono text-slate-500">${e.designation}</td>
+            <td class="p-3 text-slate-600">${e.boss_name}</td>
+            <td class="p-3 text-center">${levelTag}</td>
+            <td class="p-3 text-center">${trnBadge}</td>
+            <td class="p-3 text-center">${testBadge}</td>
+            <td class="p-3 text-center">${asgnBadge}</td>
+            <td class="p-3 text-center">${presBadge}</td>
+            <td class="p-3 text-center">${certBadge}</td>
+            <td class="p-3 text-center">${jishukenBadge}</td>
+            <td class="p-3 text-center font-bold text-slate-800">${e.kaizens_approved}</td>
+            <td class="p-3 text-center">
+              <button onclick="event.stopPropagation(); viewJourneyFor(${e.id})" class="text-toyota-red hover:underline font-bold text-[11px]">View</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function filterSkillMatrix() {
+      const area = document.getElementById('matrix-filter-area').value;
+      const level = document.getElementById('matrix-filter-level').value;
+      const search = document.getElementById('matrix-search').value.toLowerCase();
+
+      const filtered = employeesData.filter(e => {
+        const matchArea = (area === 'ALL' || e.working_area === area);
+        const matchLevel = (level === 'ALL' || e.current_level.toString() === level);
+        const matchSearch = (!search || e.name.toLowerCase().includes(search) || e.emp_no.toLowerCase().includes(search) || e.boss_name.toLowerCase().includes(search));
+        return matchArea && matchLevel && matchSearch;
+      });
+      renderSkillMatrix(filtered);
+    }
+
+    function selectEmployeeFromMatrix(id) {
+      document.getElementById('journey-emp-select').value = id;
+      document.getElementById('promotion-emp-select').value = id;
+      loadEmployeeJourney(id);
+      runGapAnalysis(id);
+      showTab('journey');
+    }
+
+    function viewJourneyFor(id) {
+      selectEmployeeFromMatrix(id);
+    }
+
+    // GAP ANALYSIS / PROMOTION READINESS
+    async function runGapAnalysis(empId) {
+      try {
+        const res = await fetch(`/api/promotion_readiness/${empId}`);
+        const data = await res.json();
+        const container = document.getElementById('gap-analysis-results');
+
+        let targetTitle = data.target_level === 2 ? 'Level 2 - TPS Practitioner' : (data.target_level === 3 ? 'Level 3 - TPS Champion' : 'Level 4 - TPS Master');
+
+        let gapsHtml = data.gaps.map(g => {
+          let badge = g.met 
+            ? '<span class="px-2 py-0.5 rounded font-bold bg-emerald-100 text-emerald-800 text-[10px]">MET</span>' 
+            : '<span class="px-2 py-0.5 rounded font-bold bg-rose-100 text-rose-800 text-[10px]">UNMET GAP</span>';
+          return `
+            <tr class="border-b border-slate-100">
+              <td class="p-3 font-semibold text-slate-800">${g.item}</td>
+              <td class="p-3 text-slate-600">${g.required}</td>
+              <td class="p-3 font-mono font-bold ${g.met ? 'text-emerald-700' : 'text-rose-600'}">${g.actual}</td>
+              <td class="p-3 text-center">${badge}</td>
+            </tr>
+          `;
+        }).join('');
+
+        container.innerHTML = `
+          <div class="p-3 sm:p-4 rounded-xl border border-slate-200 bg-slate-50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-4">
+            <div>
+              <div class="text-[10px] sm:text-xs text-slate-500 font-bold uppercase">Candidate Evaluation:</div>
+              <div class="text-sm sm:text-base font-black text-slate-900">${data.emp_name} (Target: ${targetTitle})</div>
+            </div>
+            <div>
+              <span class="px-2.5 py-1 rounded-full text-xs font-black bg-${data.status_color}-100 text-${data.status_color}-800 border border-${data.status_color}-300 inline-block">
+                ${data.eligibility_status}
+              </span>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto border border-slate-200 rounded-lg">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-100 text-slate-700 uppercase text-[10px]">
+                <tr>
+                  <th class="p-3">Competency Benchmark</th>
+                  <th class="p-3">Standard Requirement</th>
+                  <th class="p-3">Candidate Status</th>
+                  <th class="p-3 text-center">Compliance</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-slate-100">
+                ${gapsHtml}
+              </tbody>
+            </table>
+          </div>
+        `;
+      } catch (e) {
+        console.error("Error in gap analysis:", e);
+      }
+    }
+
+    // FETCH KAIZEN AMRUT DATA
+    async function fetchKaizens() {
+      try {
+        const res = await fetch('/api/kaizen_requests');
+        const kaizens = await res.json();
+        const tbody = document.getElementById('kaizens-tbody');
+        tbody.innerHTML = '';
+
+        kaizens.forEach(k => {
+          tbody.innerHTML += `
+            <tr class="hover:bg-slate-50 transition">
+              <td class="p-3 font-mono font-bold text-slate-800">${k.control_no}</td>
+              <td class="p-3 font-semibold text-slate-900">${k.emp_name}</td>
+              <td class="p-3 text-slate-700">${k.work_name}</td>
+              <td class="p-3"><span class="px-2 py-0.5 rounded font-bold text-[10px] bg-slate-100 text-slate-700">${k.category}</span></td>
+              <td class="p-3 text-slate-600">${k.line}</td>
+              <td class="p-3 font-mono text-slate-500">${k.machine}</td>
+              <td class="p-3 text-right font-bold text-slate-800 font-mono">₹ ${k.total_cost.toLocaleString()}</td>
+              <td class="p-3 text-center"><span class="px-2 py-0.5 rounded font-bold text-[10px] bg-emerald-100 text-emerald-800">${k.status}</span></td>
+              <td class="p-3 text-slate-500 font-mono">${k.request_date}</td>
+            </tr>
+          `;
+        });
+      } catch (e) {
+        console.error("Error fetching kaizens:", e);
+      }
+    }
+
+    // FETCH CERTIFICATIONS
+    async function fetchCertifications() {
+      try {
+        const res = await fetch('/api/certifications');
+        const certs = await res.json();
+        const tbody = document.getElementById('certs-tbody');
+        tbody.innerHTML = '';
+
+        certs.forEach(c => {
+          tbody.innerHTML += `
+            <tr class="hover:bg-slate-50 transition">
+              <td class="p-3 font-mono font-bold text-toyota-red">${c.cert_no}</td>
+              <td class="p-3 font-bold text-slate-900">${c.emp_name}</td>
+              <td class="p-3 font-mono text-slate-600">${c.emp_no}</td>
+              <td class="p-3 text-slate-600">${c.working_area}</td>
+              <td class="p-3 font-semibold text-slate-800">${c.level_name}</td>
+              <td class="p-3 font-mono text-slate-500">${c.issue_date}</td>
+              <td class="p-3 text-slate-700">${c.signatory}</td>
+              <td class="p-3 text-center"><span class="px-2 py-0.5 rounded font-bold text-[10px] bg-emerald-100 text-emerald-800">${c.status}</span></td>
+              <td class="p-3 text-center">
+                <button onclick="displayCertificateDetails('${c.emp_name}', '${c.emp_no}', '${c.working_area}', '${c.level_name}', '${c.cert_no}', '${c.issue_date}', '${c.signatory}')" class="text-toyota-red hover:underline font-bold text-xs">
+                  <i class="fa-solid fa-eye mr-1"></i>View
+                </button>
+              </td>
+            </tr>
+          `;
+        });
+      } catch (e) {
+        console.error("Error fetching certs:", e);
+      }
+    }
+
+    // FETCH BATCHES
+    async function fetchBatches() {
+      try {
+        const res = await fetch('/api/training_batches');
+        const batches = await res.json();
+        const grid = document.getElementById('batches-grid');
+        grid.innerHTML = '';
+
+        batches.forEach(b => {
+          grid.innerHTML += `
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-2">
+              <div class="flex justify-between items-start">
+                <span class="font-mono text-[10px] font-bold bg-slate-100 text-slate-600 px-2 py-0.5 rounded">${b.batch_code}</span>
+                <span class="text-[10px] px-2 py-0.5 rounded font-bold ${b.status === 'Full' ? 'bg-rose-100 text-rose-800' : 'bg-emerald-100 text-emerald-800'}">${b.status}</span>
+              </div>
+              <h4 class="font-bold text-slate-900 text-xs">${b.level_name}</h4>
+              <div class="text-[11px] text-slate-600"><span class="font-semibold">Module:</span> ${b.module_name}</div>
+              <div class="text-[11px] text-slate-500"><i class="fa-solid fa-chalkboard-user mr-1"></i> ${b.trainer_name}</div>
+              <div class="text-[11px] text-slate-500"><i class="fa-solid fa-location-dot mr-1"></i> ${b.venue}</div>
+              <div class="pt-2 border-t border-slate-100 flex justify-between items-center text-[10px] text-slate-500 font-mono">
+                <span>${b.start_date} to ${b.end_date}</span>
+                <span class="font-bold text-slate-700">${b.enrolled_count}/${b.capacity} Seats</span>
+              </div>
+            </div>
+          `;
+        });
+      } catch (e) {
+        console.error("Error fetching batches:", e);
+      }
+    }
+
+    // CERTIFICATE MODAL
+    function openCertificateModal() {
+      const emp = employeesData.find(e => e.id == selectedEmpId) || employeesData[0];
+      const levelTitle = emp.current_level >= 3 ? 'Level 3 - TPS Champion' : 'Level 2 - TPS Practitioner';
+      displayCertificateDetails(emp.name, emp.emp_no, emp.working_area, levelTitle, `TIEI/TPS/2026/${emp.emp_no}`, '2026-06-15', 'Antony John Sudhakar P (VP)');
+    }
+
+    function displayCertificateDetails(name, empNo, area, level, certNo, date, signatory) {
+      document.getElementById('cert-emp-name').innerText = name;
+      document.getElementById('cert-emp-meta').innerText = `Emp No: ${empNo} • Department: GD ${area}`;
+      document.getElementById('cert-level-name').innerText = level;
+      document.getElementById('cert-no-display').innerText = `Cert No: ${certNo}`;
+      document.getElementById('cert-date-display').innerText = `Date: ${date}`;
+      document.getElementById('cert-signatory-name').innerText = signatory;
+      document.getElementById('certificate-modal').classList.remove('hidden');
+    }
+
+    function closeCertificateModal() {
+      document.getElementById('certificate-modal').classList.add('hidden');
+    }
+  </script>
+</body>
+</html>
