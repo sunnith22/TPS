@@ -1,5 +1,45 @@
-# Ignore all documents, spreadsheets, zip archives, and scripts in root
-/*
+# Root ignore - ignore raw source documents, spreadsheets, and archives
+*.xlsx
+*.xls
+*.pdf
+*.zip
+*.docx
+*.doc
+*.pptx
+*.ppt
+*.csv
+001_*
+Claude-*
+*.sql
+run_prototype.bat
+
+# Allow specific code project folders
 !/prototype/
 !/prototype/**
+!/client/
+!/client/**
+!/server/
+!/server/**
 !/.gitignore
+!/README.md
+!/run_fullstack.bat
+
+# Ignore build artifacts and dependencies
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+build/
+**/build/
+.env
+**/.env
+.DS_Store
+Thumbs.db
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+__pycache__/
+*.pyc
+*.db
+pgdata/
