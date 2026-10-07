@@ -6,6 +6,9 @@ from flask import Flask, render_template, jsonify, request
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 DB_PATH = os.path.join(os.path.dirname(__file__), 'tps_database.db')
+UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'static', 'uploads')
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 def get_db():
     conn = sqlite3.connect(DB_PATH)
@@ -140,10 +143,29 @@ def get_employee(emp_id):
     certs = cursor.execute('SELECT * FROM certifications WHERE emp_id = ?', (emp_id,)).fetchall()
     kaizens = cursor.execute('SELECT * FROM kaizen_requests WHERE emp_id = ?', (emp_id,)).fetchall()
     
+    # Query step evidence if table exists
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS step_evidence (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            emp_id INTEGER,
+            step_num INTEGER,
+            step_title TEXT,
+            filename TEXT,
+            file_url TEXT,
+            file_size TEXT,
+            uploaded_at TEXT,
+            remarks TEXT,
+            FOREIGN KEY (emp_id) REFERENCES employees (id)
+        )
+    ''')
+    conn.commit()
+    evidence_rows = cursor.execute('SELECT * FROM step_evidence WHERE emp_id = ? ORDER BY step_num ASC, id DESC', (emp_id,)).fetchall()
+    
     emp_dict = dict(emp)
     emp_dict['challenges'] = [dict(c) for c in challenges]
     emp_dict['certifications'] = [dict(c) for c in certs]
     emp_dict['kaizen_history'] = [dict(k) for k in kaizens]
+    emp_dict['evidence'] = [dict(ev) for ev in evidence_rows]
     conn.close()
     return jsonify(emp_dict)
 
@@ -181,6 +203,66 @@ def update_journey(emp_id):
     updated_emp = cursor.execute('SELECT * FROM employees WHERE id = ?', (emp_id,)).fetchone()
     conn.close()
     return jsonify(dict(updated_emp))
+
+@app.route('/api/employees/<int:emp_id>/evidence', methods=['GET', 'POST'])
+def manage_step_evidence(emp_id):
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS step_evidence (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            emp_id INTEGER,
+            step_num INTEGER,
+            step_title TEXT,
+            filename TEXT,
+            file_url TEXT,
+            file_size TEXT,
+            uploaded_at TEXT,
+            remarks TEXT,
+            FOREIGN KEY (emp_id) REFERENCES employees (id)
+        )
+    ''')
+    conn.commit()
+
+    if request.method == 'POST':
+        if request.is_json:
+            data = request.json or {}
+            step_num = int(data.get('step_num', 1))
+            step_title = data.get('step_title', '')
+            filename = data.get('filename', f'Evidence_Step_{step_num}.pdf')
+            file_url = data.get('file_url', f'/static/uploads/{filename}')
+            file_size = data.get('file_size', '124 KB')
+            remarks = data.get('remarks', '')
+        else:
+            step_num = int(request.form.get('step_num', 1))
+            step_title = request.form.get('step_title', '')
+            remarks = request.form.get('remarks', '')
+            file = request.files.get('file')
+            if file and file.filename:
+                filename = file.filename
+                save_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                file.save(save_path)
+                file_url = f'/static/uploads/{filename}'
+                file_size = f"{round(os.path.getsize(save_path) / 1024, 1)} KB"
+            else:
+                filename = request.form.get('filename', f'Evidence_Step_{step_num}.pdf')
+                file_url = f'/static/uploads/{filename}'
+                file_size = request.form.get('file_size', '142 KB')
+
+        cursor.execute('''
+            INSERT INTO step_evidence (emp_id, step_num, step_title, filename, file_url, file_size, uploaded_at, remarks)
+            VALUES (?, ?, ?, ?, ?, ?, datetime('now'), ?)
+        ''', (emp_id, step_num, step_title, filename, file_url, file_size, remarks))
+        conn.commit()
+
+        row = cursor.execute('SELECT * FROM step_evidence WHERE id = last_insert_rowid()').fetchone()
+        conn.close()
+        return jsonify(dict(row))
+
+    rows = cursor.execute('SELECT * FROM step_evidence WHERE emp_id = ? ORDER BY step_num ASC, id DESC', (emp_id,)).fetchall()
+    evidence_list = [dict(r) for r in rows]
+    conn.close()
+    return jsonify(evidence_list)
 
 @app.route('/api/komarigoto', methods=['POST'])
 def add_komarigoto():

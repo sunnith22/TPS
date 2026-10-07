@@ -1,18 +1,34 @@
 import sqlite3
 import openpyxl
 import os
+import sys
 import random
 
 DB_PATH = os.path.join(os.path.dirname(__file__), 'tps_database.db')
 EXCEL_PATH = os.path.join(os.path.dirname(__file__), '..', '001_TPS Journey Visualisation.xlsx')
 
-def init_db():
-    if os.path.exists(DB_PATH) and not os.path.exists(EXCEL_PATH):
-        print(f"Database already exists at {DB_PATH} and Excel source is not present. Preserving database.")
+def init_db(reset=False):
+    reset = reset or ('--reset' in sys.argv)
+    if os.path.exists(DB_PATH) and not reset:
+        print(f"Database already exists at {DB_PATH}. Preserving existing database and uploaded evidence.")
+        conn = sqlite3.connect(DB_PATH)
+        conn.execute('''
+        CREATE TABLE IF NOT EXISTS step_evidence (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            emp_id INTEGER,
+            step_num INTEGER,
+            step_title TEXT,
+            filename TEXT,
+            file_url TEXT,
+            file_size TEXT,
+            uploaded_at TEXT,
+            remarks TEXT,
+            FOREIGN KEY (emp_id) REFERENCES employees (id)
+        )
+        ''')
+        conn.commit()
+        conn.close()
         return
-
-    if os.path.exists(DB_PATH):
-        os.remove(DB_PATH)
 
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
@@ -113,6 +129,21 @@ def init_db():
         total_cost REAL,
         status TEXT,
         request_date TEXT
+    )
+    ''')
+
+    cursor.execute('''
+    CREATE TABLE step_evidence (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        emp_id INTEGER,
+        step_num INTEGER,
+        step_title TEXT,
+        filename TEXT,
+        file_url TEXT,
+        file_size TEXT,
+        uploaded_at TEXT,
+        remarks TEXT,
+        FOREIGN KEY (emp_id) REFERENCES employees (id)
     )
     ''')
 
@@ -241,6 +272,18 @@ def init_db():
     ('KAIZEN-2026-094', 1, 'ARUNA D R', 'Polycarbonate Splash Guard with Drain', 'Safety', 'GD HEAD', 'SURFACE GRINDING', 2800.0, 950.0, 600.0, 4350.0, 'Approved', '2026-08-25'),
     ('KAIZEN-2026-102', 2, 'KARTHIKEYAN', 'Gravity Roller Chute for Cylinder Head Transfer', 'Productivity', 'GD HEAD', 'WELDING', 6200.0, 2400.0, 1800.0, 10400.0, 'Approved', '2026-09-02'),
     ('KAIZEN-2026-110', 4, 'KIRAN GOWDA', 'Ergonomic Magnetic Tool Retractor', 'Moral improvement', 'GD CRANK', 'LATHE', 1500.0, 600.0, 400.0, 2500.0, 'Under Review', '2026-09-28')
+    ''')
+
+    # Seed Step Evidence
+    cursor.execute('''
+    INSERT INTO step_evidence (emp_id, step_num, step_title, filename, file_url, file_size, uploaded_at, remarks)
+    VALUES
+    (1, 1, 'Identify & Plan Training', 'ARUNA_DR_Step1_training_slip.pdf', '/static/uploads/ARUNA_DR_Step1_training_slip.pdf', '142 KB', '2026-05-10 09:30:00', 'Nomination signed by HOD'),
+    (1, 2, 'Pre-Training Test Score', 'ARUNA_DR_Step2_pre_test.pdf', '/static/uploads/ARUNA_DR_Step2_pre_test.pdf', '118 KB', '2026-05-15 14:00:00', 'Baseline diagnostic assessment score 58%'),
+    (1, 3, 'Post-Training Test Score', 'ARUNA_DR_Step3_post_test.pdf', '/static/uploads/ARUNA_DR_Step3_post_test.pdf', '125 KB', '2026-05-18 16:30:00', 'Official post-training score 88% verified'),
+    (1, 4, 'Post-Training Assignment', 'ARUNA_DR_Step4_a3_komarigoto.xlsx', '/static/uploads/ARUNA_DR_Step4_a3_komarigoto.xlsx', '340 KB', '2026-05-28 11:15:00', 'A3 Action learning sheet & 21 KVP analysis submitted'),
+    (1, 5, 'Presentation (MGR & Trainer)', 'ARUNA_DR_Step5_mgr_review.pdf', '/static/uploads/ARUNA_DR_Step5_mgr_review.pdf', '512 KB', '2026-06-05 15:45:00', 'Manager sign-off completed on Gemba'),
+    (1, 6, 'Presentation (VP & DMD)', 'ARUNA_DR_Step6_vp_review.pdf', '/static/uploads/ARUNA_DR_Step6_vp_review.pdf', '890 KB', '2026-06-12 10:20:00', 'VP Executive presentation deck and sign-off')
     ''')
 
     conn.commit()

@@ -10,6 +10,7 @@
 *.csv
 001_*
 Claude-*
+claude_chat*
 *.sql
 run_prototype.bat
 
