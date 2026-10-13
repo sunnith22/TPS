@@ -44,227 +44,151 @@
 <body class="bg-slate-100 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
 
   <!-- ============================================== -->
-  <!-- 1. PLANT HIERARCHY LOGIN SCREEN (6 TIERS)      -->
+  <!-- 1. OFFICIAL TIEI INDIA SIGN-IN SCREEN          -->
+  <!-- Exactly matching reference design (tiei.veris.in) -->
   <!-- ============================================== -->
-  <div id="login-screen" class="fixed inset-0 z-50 bg-slate-900/95 backdrop-blur-md overflow-y-auto custom-scrollbar flex items-center justify-center p-3 sm:p-6 transition-all duration-300">
-    <div class="bg-white rounded-2xl max-w-4xl w-full shadow-2xl border border-slate-200 overflow-hidden my-auto">
-      <!-- Modal Top Branding Bar -->
-      <div class="bg-gradient-to-r from-slate-950 via-slate-900 to-indigo-950 text-white p-5 sm:p-6 border-b border-slate-800">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-          <div class="flex items-center space-x-3">
-            <div class="w-12 h-12 rounded-xl bg-toyota-red text-white flex items-center justify-center font-black text-2xl shadow-lg ring-2 ring-white/20">
-              T
-            </div>
-            <div>
-              <div class="flex items-center space-x-2">
-                <span class="font-extrabold text-lg sm:text-xl tracking-tight text-white">TIEI</span>
-                <span class="text-[10px] bg-red-600/80 text-white font-bold px-2 py-0.5 rounded uppercase tracking-wider">Manufacturing Excellence</span>
-                <span class="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 px-2 py-0.5 rounded font-mono">Gemba Security</span>
-              </div>
-              <p class="text-xs text-slate-300 mt-0.5">Toyota Production System (TPS) Competency & Learning Management Portal</p>
-            </div>
-          </div>
-          <div class="text-left sm:text-right">
-            <span class="text-[11px] font-mono text-slate-400 block">Plant Code: TIEI-GD-01</span>
-            <span class="text-xs text-emerald-400 font-bold flex items-center gap-1 sm:justify-end">
-              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> 6-Tier Hierarchy Active
+  <div id="login-screen" class="fixed inset-0 z-50 flex flex-col justify-between overflow-y-auto custom-scrollbar transition-all duration-300" style="background: linear-gradient(135deg, #f4edfb 0%, #fbf9fd 45%, #e1effa 100%);">
+    
+    <!-- Top White Navigation Bar with Official TIEI India Logo -->
+    <header class="w-full bg-white border-b border-slate-200/90 px-6 sm:px-12 py-3.5 flex items-center justify-between shadow-2xs shrink-0">
+      <div class="flex items-center space-x-4">
+        <!-- TIEI India Logo -->
+        <div class="pr-5 sm:pr-8 border-r border-slate-200/80 flex items-center">
+          <div class="flex items-center select-none">
+            <span class="text-3xl sm:text-4xl font-black italic tracking-tighter text-[#0060AA]" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; letter-spacing: -2px;">
+              TIEI
+            </span>
+            <span class="text-2xl sm:text-3xl font-extrabold italic text-[#EA7625] ml-0.5" style="font-family: 'Brush Script MT', 'Segoe Script', cursive, sans-serif;">
+              India
             </span>
           </div>
         </div>
+        <div class="hidden md:flex flex-col text-[11px] leading-tight text-slate-500 font-medium">
+          <span class="font-bold text-slate-700">TOYOTA INDUSTRIES ENGINE INDIA PVT. LTD.</span>
+          <span class="text-slate-400">Toyota Production System (TPS) Competency & Learning Management Portal</span>
+        </div>
       </div>
 
-      <div class="p-5 sm:p-8 space-y-6">
-        <!-- Sign-In Form Area -->
-        <div class="max-w-xl mx-auto text-center space-y-2">
-          <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">Plant Hierarchy Sign-In</h2>
-          <p class="text-xs sm:text-sm text-slate-500">
-            Log in with your Employee ID to access your tailored operational portal based on our 6-Level Plant Hierarchy:
+      <div class="flex items-center space-x-3 text-xs text-slate-500 font-medium">
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-50 border border-slate-200 text-slate-600 font-mono text-[11px]">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span>tiei.veris.in</span>
+        </span>
+      </div>
+    </header>
+
+    <!-- Centered Login Card -->
+    <main class="flex-1 flex items-center justify-center p-4 sm:p-6 my-auto">
+      <div class="bg-white rounded-2xl max-w-[460px] w-full p-8 sm:p-10 shadow-xl border border-slate-200/70 space-y-6 my-auto">
+        
+        <!-- Header Text -->
+        <div>
+          <h1 class="text-[22px] sm:text-[23px] font-normal text-slate-800 tracking-tight leading-snug">
+            Sign in to TOYOTA INDUSTRIES ENGINE INDIA PVT. LTD.
+          </h1>
+          <p class="text-xs sm:text-sm text-slate-400 mt-1">
+            tiei.veris.in
           </p>
-          <div class="inline-flex items-center space-x-1.5 bg-slate-100 px-3 py-1.5 rounded-full text-[11px] font-bold text-slate-700 mt-1 flex-wrap justify-center gap-y-1">
-            <span class="text-rose-600 font-black">1. Manager</span>
-            <span class="text-slate-400">→</span>
-            <span class="text-indigo-600 font-black">2. AM</span>
-            <span class="text-slate-400">→</span>
-            <span class="text-blue-600 font-black">3. GL</span>
-            <span class="text-slate-400">→</span>
-            <span class="text-emerald-600 font-black">4. TL</span>
-            <span class="text-slate-400">→</span>
-            <span class="text-amber-600 font-black">5. GAT</span>
-            <span class="text-slate-400">→</span>
-            <span class="text-purple-600 font-black">6. WT</span>
-          </div>
         </div>
 
         <!-- Login Form -->
-        <form id="login-form" onsubmit="submitLogin(event)" class="max-w-md mx-auto space-y-3.5 bg-slate-50 p-5 rounded-xl border border-slate-200">
+        <form id="login-form" onsubmit="submitLogin(event)" class="space-y-4">
           <!-- Error alert -->
           <div id="login-error-box" class="hidden p-3 rounded-lg bg-rose-50 border border-rose-300 text-rose-800 text-xs font-semibold flex items-center space-x-2">
             <i class="fa-solid fa-circle-exclamation text-rose-600 text-sm flex-shrink-0"></i>
-            <span id="login-error-text">Employee ID not found.</span>
+            <span id="login-error-text">Employee ID or account not found.</span>
           </div>
 
-          <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">
-              <i class="fa-solid fa-id-card text-slate-400 mr-1"></i>Employee ID (Emp No):
-            </label>
-            <div class="relative">
-              <input type="text" id="login-emp-input" placeholder="e.g. MGR001, AM001, GL001, 50031, 60101, 70201" class="w-full text-xs font-mono font-bold bg-white border border-slate-300 rounded-lg p-2.5 pl-3 pr-8 uppercase focus:ring-2 focus:ring-toyota-red focus:border-toyota-red" required>
-              <button type="button" onclick="document.getElementById('login-emp-input').value=''" class="absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-600 text-xs">
-                <i class="fa-solid fa-times"></i>
+          <!-- Field 1: email/phone / Employee ID -->
+          <div class="space-y-1.5">
+            <div class="flex justify-between items-center text-xs">
+              <label class="font-normal text-slate-700">
+                Your email/phone <span class="text-[#E07A22] font-bold">*</span>
+              </label>
+              <button type="button" onclick="quickFillWT()" class="text-slate-500 hover:text-blue-600 font-normal transition cursor-pointer">
+                Sign in with OTP?
               </button>
             </div>
-            <p class="text-[10px] text-slate-400 mt-1">Enter your assigned TIEI badge number or click a role card below</p>
+            <input 
+              type="text" 
+              id="login-emp-input" 
+              placeholder="Enter your email or phone" 
+              class="w-full text-sm text-slate-800 bg-white border border-slate-300 rounded-lg px-3.5 py-2.5 focus:outline-none focus:ring-1 focus:ring-[#E07A22] focus:border-[#E07A22] transition"
+              required
+            >
+            <p class="text-[10px] text-slate-400">Enter Employee ID (e.g. 70201 for WT Boy, 50031 for TL, MGR001 for Manager) or email</p>
           </div>
 
-          <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">
-              <i class="fa-solid fa-lock text-slate-400 mr-1"></i>Security PIN / Password:
+          <!-- Field 2: Password -->
+          <div class="space-y-1.5">
+            <label class="block text-xs font-normal text-slate-700">
+              Your password
             </label>
-            <input type="password" id="login-pwd-input" value="tiei123" placeholder="Default: tiei123" class="w-full text-xs bg-white border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-toyota-red focus:border-toyota-red">
+            <div class="relative">
+              <input 
+                type="password" 
+                id="login-pwd-input" 
+                value="tiei123" 
+                placeholder="Enter password" 
+                class="w-full text-sm text-slate-800 bg-white border border-slate-300 rounded-lg px-3.5 py-2.5 pr-10 focus:outline-none focus:ring-1 focus:ring-[#E07A22] focus:border-[#E07A22] transition"
+              >
+              <button 
+                type="button" 
+                onclick="togglePasswordVisibility()" 
+                class="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-sm cursor-pointer"
+                title="Toggle password visibility"
+              >
+                <i id="pwd-toggle-icon" class="fa-regular fa-eye-slash"></i>
+              </button>
+            </div>
           </div>
 
-          <button type="submit" id="btn-login-submit" class="w-full bg-toyota-red hover:bg-toyota-dark text-white font-bold py-2.5 px-4 rounded-lg text-xs shadow-md transition flex items-center justify-center space-x-2 cursor-pointer">
-            <i class="fa-solid fa-arrow-right-to-bracket"></i>
-            <span>Sign In to Plant LMS</span>
-          </button>
+          <!-- Action Button: Continue -->
+          <div class="pt-1">
+            <button 
+              type="submit" 
+              id="btn-login-submit" 
+              class="w-full bg-[#E07A22] hover:bg-[#CF6E1B] text-white font-medium py-3 px-4 rounded-lg text-sm sm:text-base shadow-xs transition flex items-center justify-center space-x-2 cursor-pointer"
+            >
+              <span>Continue</span>
+            </button>
+          </div>
+
+          <!-- Forgot Password -->
+          <div class="text-right pt-0.5">
+            <a href="#" onclick="alert('Please contact TIEI IT Helpdesk or your Section Leader for PIN reset.'); return false;" class="text-xs text-blue-600 hover:underline">
+              Forgot Password?
+            </a>
+          </div>
         </form>
 
-        <!-- Quick 1-Click Demo Hierarchy Logins Section -->
-        <div class="pt-4 border-t border-slate-200">
-          <div class="flex items-center justify-between mb-3">
-            <div>
-              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
-                <i class="fa-solid fa-bolt text-amber-500"></i>
-                <span>Fast 1-Click Hierarchy Logins (Demo Profiles)</span>
-              </h3>
-              <p class="text-[11px] text-slate-500">Test how each level in your hierarchy sees and monitors their subordinates:</p>
-            </div>
-            <span class="text-[10px] font-mono bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-semibold hidden sm:inline">
-              Single-System Terminal Simulation
-            </span>
+        <!-- Discreet Demo 1-Click Role Switcher -->
+        <div class="mt-4 pt-4 border-t border-slate-100 text-center">
+          <div class="text-[11px] text-slate-400 mb-2 font-medium flex items-center justify-center gap-1">
+            <i class="fa-solid fa-bolt text-amber-500 text-[10px]"></i>
+            <span>Demo 1-Click Hierarchy Access:</span>
           </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            
-            <!-- 1) MANAGER CARD -->
-            <div onclick="quickLogin('MGR001')" class="p-3.5 rounded-xl border border-rose-200 bg-rose-50/50 hover:bg-rose-100/70 hover:border-rose-400 transition cursor-pointer group shadow-2xs">
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-rose-600 text-white">1) Manager</span>
-                <span class="text-[10px] font-mono font-bold text-rose-800">#MGR001</span>
-              </div>
-              <div class="flex items-center space-x-2.5">
-                <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=120&q=80" class="w-10 h-10 rounded-full object-cover ring-2 ring-rose-400 shrink-0" alt="Manager">
-                <div class="min-w-0">
-                  <div class="font-bold text-xs text-slate-900 group-hover:text-rose-700 truncate">MANUKUMAR G</div>
-                  <div class="text-[10px] text-slate-500 truncate">Section Manager / HOD</div>
-                </div>
-              </div>
-              <div class="mt-2.5 pt-2 border-t border-rose-200/60 text-[10px] text-slate-600 flex items-center justify-between">
-                <span><i class="fa-solid fa-users text-rose-600 mr-1"></i>All <b>90</b> Plant Associates</span>
-                <span class="font-bold text-rose-700 group-hover:translate-x-0.5 transition">Login <i class="fa-solid fa-arrow-right text-[9px]"></i></span>
-              </div>
-            </div>
-
-            <!-- 2) AM CARD -->
-            <div onclick="quickLogin('AM001')" class="p-3.5 rounded-xl border border-indigo-200 bg-indigo-50/50 hover:bg-indigo-100/70 hover:border-indigo-400 transition cursor-pointer group shadow-2xs">
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-indigo-600 text-white">2) AM (Asst Mgr)</span>
-                <span class="text-[10px] font-mono font-bold text-indigo-800">#AM001</span>
-              </div>
-              <div class="flex items-center space-x-2.5">
-                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&q=80" class="w-10 h-10 rounded-full object-cover ring-2 ring-indigo-400 shrink-0" alt="AM">
-                <div class="min-w-0">
-                  <div class="font-bold text-xs text-slate-900 group-hover:text-indigo-700 truncate">GOVINDA R</div>
-                  <div class="text-[10px] text-slate-500 truncate">Assistant Manager (Lines)</div>
-                </div>
-              </div>
-              <div class="mt-2.5 pt-2 border-t border-indigo-200/60 text-[10px] text-slate-600 flex items-center justify-between">
-                <span><i class="fa-solid fa-users text-indigo-600 mr-1"></i><b>88</b> Line Personnel (GL, TL, GAT, WT)</span>
-                <span class="font-bold text-indigo-700 group-hover:translate-x-0.5 transition">Login <i class="fa-solid fa-arrow-right text-[9px]"></i></span>
-              </div>
-            </div>
-
-            <!-- 3) GL CARD -->
-            <div onclick="quickLogin('GL001')" class="p-3.5 rounded-xl border border-blue-200 bg-blue-50/50 hover:bg-blue-100/70 hover:border-blue-400 transition cursor-pointer group shadow-2xs">
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-blue-600 text-white">3) GL (Group Leader)</span>
-                <span class="text-[10px] font-mono font-bold text-blue-800">#GL001</span>
-              </div>
-              <div class="flex items-center space-x-2.5">
-                <img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=120&q=80" class="w-10 h-10 rounded-full object-cover ring-2 ring-blue-400 shrink-0" alt="GL">
-                <div class="min-w-0">
-                  <div class="font-bold text-xs text-slate-900 group-hover:text-blue-700 truncate">BINDUKUMAR S</div>
-                  <div class="text-[10px] text-slate-500 truncate">Group Leader (HEAD Line)</div>
-                </div>
-              </div>
-              <div class="mt-2.5 pt-2 border-t border-blue-200/60 text-[10px] text-slate-600 flex items-center justify-between">
-                <span><i class="fa-solid fa-users text-blue-600 mr-1"></i><b>75</b> Shift Associates (TL, GAT, WT)</span>
-                <span class="font-bold text-blue-700 group-hover:translate-x-0.5 transition">Login <i class="fa-solid fa-arrow-right text-[9px]"></i></span>
-              </div>
-            </div>
-
-            <!-- 4) TL CARD -->
-            <div onclick="quickLogin('50031')" class="p-3.5 rounded-xl border border-emerald-200 bg-emerald-50/50 hover:bg-emerald-100/70 hover:border-emerald-400 transition cursor-pointer group shadow-2xs">
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-emerald-600 text-white">4) TL (Team Leader)</span>
-                <span class="text-[10px] font-mono font-bold text-emerald-800">#50031</span>
-              </div>
-              <div class="flex items-center space-x-2.5">
-                <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=120&q=80" class="w-10 h-10 rounded-full object-cover ring-2 ring-emerald-400 shrink-0" alt="TL">
-                <div class="min-w-0">
-                  <div class="font-bold text-xs text-slate-900 group-hover:text-emerald-700 truncate">ARUNA D R</div>
-                  <div class="text-[10px] text-slate-500 truncate">Team Leader (HEAD Cell)</div>
-                </div>
-              </div>
-              <div class="mt-2.5 pt-2 border-t border-emerald-200/60 text-[10px] text-slate-600 flex items-center justify-between">
-                <span><i class="fa-solid fa-users text-emerald-600 mr-1"></i><b>5</b> Associates (2 GATs + 3 WTs)</span>
-                <span class="font-bold text-emerald-700 group-hover:translate-x-0.5 transition">Login <i class="fa-solid fa-arrow-right text-[9px]"></i></span>
-              </div>
-            </div>
-
-            <!-- 5) GAT CARD -->
-            <div onclick="quickLogin('60101')" class="p-3.5 rounded-xl border border-amber-200 bg-amber-50/50 hover:bg-amber-100/70 hover:border-amber-400 transition cursor-pointer group shadow-2xs">
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-amber-600 text-white">5) GAT (Grad Apprentice)</span>
-                <span class="text-[10px] font-mono font-bold text-amber-800">#60101</span>
-              </div>
-              <div class="flex items-center space-x-2.5">
-                <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=120&q=80" class="w-10 h-10 rounded-full object-cover ring-2 ring-amber-400 shrink-0" alt="GAT">
-                <div class="min-w-0">
-                  <div class="font-bold text-xs text-slate-900 group-hover:text-amber-700 truncate">VINAY KUMAR</div>
-                  <div class="text-[10px] text-slate-500 truncate">Graduate Apprentice Trainee</div>
-                </div>
-              </div>
-              <div class="mt-2.5 pt-2 border-t border-amber-200/60 text-[10px] text-slate-600 flex items-center justify-between">
-                <span><i class="fa-solid fa-users text-amber-600 mr-1"></i><b>2</b> Assigned WT Boys</span>
-                <span class="font-bold text-amber-700 group-hover:translate-x-0.5 transition">Login <i class="fa-solid fa-arrow-right text-[9px]"></i></span>
-              </div>
-            </div>
-
-            <!-- 6) WT CARD -->
-            <div onclick="quickLogin('70201')" class="p-3.5 rounded-xl border border-purple-200 bg-purple-50/50 hover:bg-purple-100/70 hover:border-purple-400 transition cursor-pointer group shadow-2xs">
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-purple-600 text-white">6) WT (Working Trainee)</span>
-                <span class="text-[10px] font-mono font-bold text-purple-800">#70201</span>
-              </div>
-              <div class="flex items-center space-x-2.5">
-                <img src="https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=120&q=80" class="w-10 h-10 rounded-full object-cover ring-2 ring-purple-400 shrink-0" alt="WT">
-                <div class="min-w-0">
-                  <div class="font-bold text-xs text-slate-900 group-hover:text-purple-700 truncate">RAMESH K</div>
-                  <div class="text-[10px] text-slate-500 truncate">Working Trainee (WT Boy)</div>
-                </div>
-              </div>
-              <div class="mt-2.5 pt-2 border-t border-purple-200/60 text-[10px] text-slate-600 flex items-center justify-between">
-                <span><i class="fa-solid fa-user-check text-purple-600 mr-1"></i>Personal WT Portal (11 Steps)</span>
-                <span class="font-bold text-purple-700 group-hover:translate-x-0.5 transition">Login <i class="fa-solid fa-arrow-right text-[9px]"></i></span>
-              </div>
-            </div>
-
+          <div class="grid grid-cols-3 gap-1.5 text-[11px]">
+            <button type="button" onclick="quickLogin('MGR001')" class="px-2 py-1 rounded bg-rose-50 hover:bg-rose-100 text-rose-800 font-bold border border-rose-200 transition">1. Manager</button>
+            <button type="button" onclick="quickLogin('AM001')" class="px-2 py-1 rounded bg-indigo-50 hover:bg-indigo-100 text-indigo-800 font-bold border border-indigo-200 transition">2. AM</button>
+            <button type="button" onclick="quickLogin('GL001')" class="px-2 py-1 rounded bg-blue-50 hover:bg-blue-100 text-blue-800 font-bold border border-blue-200 transition">3. GL</button>
+            <button type="button" onclick="quickLogin('50031')" class="px-2 py-1 rounded bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold border border-emerald-200 transition">4. TL</button>
+            <button type="button" onclick="quickLogin('60101')" class="px-2 py-1 rounded bg-amber-50 hover:bg-amber-100 text-amber-800 font-bold border border-amber-200 transition">5. GAT</button>
+            <button type="button" onclick="quickLogin('70201')" class="px-2 py-1 rounded bg-purple-50 hover:bg-purple-100 text-purple-800 font-bold border border-purple-200 transition">6. WT Boy</button>
           </div>
         </div>
 
       </div>
+    </main>
+
+    <!-- Floating "Need Support" Pill Button (Bottom Right) -->
+    <div class="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50">
+      <button type="button" onclick="alert('TIEI Help & Support Desk:\n\nToyota Industries Engine India Pvt. Ltd.\nTPS Digital Secretariat / IT Helpdesk: Ext #4102\nSupport: tps.support@tiei.veris.in');" class="bg-[#004FCF] hover:bg-[#0042B0] text-white text-xs sm:text-sm font-semibold px-4 py-2.5 rounded-full shadow-lg flex items-center space-x-2 transition cursor-pointer hover:shadow-xl">
+        <i class="fa-solid fa-circle-question text-base"></i>
+        <span>Need Support</span>
+      </button>
     </div>
+
   </div>
 
   <!-- ============================================== -->
@@ -1558,6 +1482,33 @@
       const empInput = document.getElementById('login-emp-input');
       if (empInput) empInput.value = empNo;
       await submitLogin();
+    }
+
+    function togglePasswordVisibility() {
+      const pwdInput = document.getElementById('login-pwd-input');
+      const icon = document.getElementById('pwd-toggle-icon');
+      if (!pwdInput) return;
+      if (pwdInput.type === 'password') {
+        pwdInput.type = 'text';
+        if (icon) {
+          icon.classList.remove('fa-eye-slash');
+          icon.classList.add('fa-eye');
+        }
+      } else {
+        pwdInput.type = 'password';
+        if (icon) {
+          icon.classList.remove('fa-eye');
+          icon.classList.add('fa-eye-slash');
+        }
+      }
+    }
+
+    function quickFillWT() {
+      const empInput = document.getElementById('login-emp-input');
+      if (empInput) {
+        empInput.value = '70201'; // Default WT Boy ID (RAMESH K)
+      }
+      submitLogin();
     }
 
     function logoutUser() {

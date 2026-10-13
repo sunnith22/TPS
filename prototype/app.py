@@ -124,14 +124,15 @@ def api_login():
 
     conn = get_db()
     cursor = conn.cursor()
-    emp = cursor.execute('SELECT * FROM employees WHERE UPPER(emp_no) = ?', (emp_no,)).fetchone()
+    clean_id = emp_no.split('@')[0].strip()
+    emp = cursor.execute('SELECT * FROM employees WHERE UPPER(emp_no) = ? OR UPPER(emp_no) = ?', (emp_no, clean_id)).fetchone()
     if not emp:
         # Also try matching by name substring
-        emp = cursor.execute('SELECT * FROM employees WHERE UPPER(name) LIKE ?', (f'%{emp_no}%',)).fetchone()
+        emp = cursor.execute('SELECT * FROM employees WHERE UPPER(name) LIKE ?', (f'%{clean_id}%',)).fetchone()
 
     if not emp:
         conn.close()
-        return jsonify({"success": False, "error": f"Employee ID '{emp_no}' not found in TIEI plant records"}), 404
+        return jsonify({"success": False, "error": f"Employee ID or account '{emp_no}' not found in TIEI plant records"}), 404
 
     emp_dict = dict(emp)
 
