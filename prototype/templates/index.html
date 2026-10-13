@@ -43,48 +43,307 @@
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
 
-  <!-- TOP HEADER -->
-  <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex flex-col md:flex-row justify-between py-2.5 md:py-0 md:h-16 items-start md:items-center gap-2.5 md:gap-4">
-        <!-- Brand & System Name -->
-        <div class="flex items-center space-x-3">
-          <div class="w-10 h-10 rounded-lg bg-toyota-red text-white flex items-center justify-center font-black text-xl shadow-md flex-shrink-0">
-            T
-          </div>
-          <div>
-            <div class="flex items-center space-x-2">
-              <span class="font-extrabold text-base sm:text-lg tracking-tight text-slate-900">TIEI</span>
-              <span class="text-[10px] sm:text-xs bg-red-100 text-toyota-red font-bold px-2 py-0.5 rounded uppercase tracking-wider">Manufacturing Excellence</span>
+  <!-- ============================================== -->
+  <!-- 1. PLANT HIERARCHY LOGIN SCREEN (6 TIERS)      -->
+  <!-- ============================================== -->
+  <div id="login-screen" class="fixed inset-0 z-50 bg-slate-900/95 backdrop-blur-md overflow-y-auto custom-scrollbar flex items-center justify-center p-3 sm:p-6 transition-all duration-300">
+    <div class="bg-white rounded-2xl max-w-4xl w-full shadow-2xl border border-slate-200 overflow-hidden my-auto">
+      <!-- Modal Top Branding Bar -->
+      <div class="bg-gradient-to-r from-slate-950 via-slate-900 to-indigo-950 text-white p-5 sm:p-6 border-b border-slate-800">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+          <div class="flex items-center space-x-3">
+            <div class="w-12 h-12 rounded-xl bg-toyota-red text-white flex items-center justify-center font-black text-2xl shadow-lg ring-2 ring-white/20">
+              T
             </div>
-            <p class="text-[11px] sm:text-xs text-slate-500 font-medium">TPS Competency, Certification & Learning Management System</p>
-          </div>
-        </div>
-
-        <!-- Role Switcher & User Profile -->
-        <div class="flex items-center justify-between sm:justify-end w-full md:w-auto space-x-3">
-          <!-- Role selector simulation -->
-          <div class="flex items-center space-x-2 bg-slate-50 px-2.5 sm:px-3 py-1.5 rounded-lg border border-slate-300 flex-1 sm:flex-initial">
-            <i class="fa-solid fa-user-gear text-slate-500 text-xs sm:text-sm"></i>
-            <span class="text-[11px] sm:text-xs font-semibold text-slate-600 hidden xs:inline">Role:</span>
-            <select id="role-select" onchange="switchRole(this.value)" class="text-xs bg-transparent font-bold text-slate-800 focus:outline-none cursor-pointer w-full sm:w-auto">
-              <option value="TL">Team Leader (ARUNA D R)</option>
-              <option value="MGR">Section Manager / HOD (MANUKUMAR G)</option>
-              <option value="TRAINER">Master Trainer (Dilip R / Rakshith P)</option>
-              <option value="TPS_OFFICE" selected>TPS Office / System Admin</option>
-              <option value="LEADERSHIP">Plant Leadership (VP / DMD)</option>
-            </select>
-          </div>
-
-          <div class="flex items-center space-x-2.5 border-l border-slate-200 pl-3 flex-shrink-0">
-            <img class="h-8 w-8 sm:h-9 sm:w-9 rounded-full ring-2 ring-toyota-red/20 object-cover" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80" alt="Avatar">
-            <div class="hidden sm:block text-left leading-tight">
-              <div id="user-display-name" class="text-xs font-bold text-slate-800">Dilip R</div>
-              <div id="user-display-role" class="text-[10px] text-slate-500">TPS Office / Digital Captain</div>
+            <div>
+              <div class="flex items-center space-x-2">
+                <span class="font-extrabold text-lg sm:text-xl tracking-tight text-white">TIEI</span>
+                <span class="text-[10px] bg-red-600/80 text-white font-bold px-2 py-0.5 rounded uppercase tracking-wider">Manufacturing Excellence</span>
+                <span class="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 px-2 py-0.5 rounded font-mono">Gemba Security</span>
+              </div>
+              <p class="text-xs text-slate-300 mt-0.5">Toyota Production System (TPS) Competency & Learning Management Portal</p>
             </div>
+          </div>
+          <div class="text-left sm:text-right">
+            <span class="text-[11px] font-mono text-slate-400 block">Plant Code: TIEI-GD-01</span>
+            <span class="text-xs text-emerald-400 font-bold flex items-center gap-1 sm:justify-end">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> 6-Tier Hierarchy Active
+            </span>
           </div>
         </div>
       </div>
+
+      <div class="p-5 sm:p-8 space-y-6">
+        <!-- Sign-In Form Area -->
+        <div class="max-w-xl mx-auto text-center space-y-2">
+          <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">Plant Hierarchy Sign-In</h2>
+          <p class="text-xs sm:text-sm text-slate-500">
+            Log in with your Employee ID to access your tailored operational portal based on our 6-Level Plant Hierarchy:
+          </p>
+          <div class="inline-flex items-center space-x-1.5 bg-slate-100 px-3 py-1.5 rounded-full text-[11px] font-bold text-slate-700 mt-1 flex-wrap justify-center gap-y-1">
+            <span class="text-rose-600 font-black">1. Manager</span>
+            <span class="text-slate-400">→</span>
+            <span class="text-indigo-600 font-black">2. AM</span>
+            <span class="text-slate-400">→</span>
+            <span class="text-blue-600 font-black">3. GL</span>
+            <span class="text-slate-400">→</span>
+            <span class="text-emerald-600 font-black">4. TL</span>
+            <span class="text-slate-400">→</span>
+            <span class="text-amber-600 font-black">5. GAT</span>
+            <span class="text-slate-400">→</span>
+            <span class="text-purple-600 font-black">6. WT</span>
+          </div>
+        </div>
+
+        <!-- Login Form -->
+        <form id="login-form" onsubmit="submitLogin(event)" class="max-w-md mx-auto space-y-3.5 bg-slate-50 p-5 rounded-xl border border-slate-200">
+          <!-- Error alert -->
+          <div id="login-error-box" class="hidden p-3 rounded-lg bg-rose-50 border border-rose-300 text-rose-800 text-xs font-semibold flex items-center space-x-2">
+            <i class="fa-solid fa-circle-exclamation text-rose-600 text-sm flex-shrink-0"></i>
+            <span id="login-error-text">Employee ID not found.</span>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">
+              <i class="fa-solid fa-id-card text-slate-400 mr-1"></i>Employee ID (Emp No):
+            </label>
+            <div class="relative">
+              <input type="text" id="login-emp-input" placeholder="e.g. MGR001, AM001, GL001, 50031, 60101, 70201" class="w-full text-xs font-mono font-bold bg-white border border-slate-300 rounded-lg p-2.5 pl-3 pr-8 uppercase focus:ring-2 focus:ring-toyota-red focus:border-toyota-red" required>
+              <button type="button" onclick="document.getElementById('login-emp-input').value=''" class="absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-600 text-xs">
+                <i class="fa-solid fa-times"></i>
+              </button>
+            </div>
+            <p class="text-[10px] text-slate-400 mt-1">Enter your assigned TIEI badge number or click a role card below</p>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">
+              <i class="fa-solid fa-lock text-slate-400 mr-1"></i>Security PIN / Password:
+            </label>
+            <input type="password" id="login-pwd-input" value="tiei123" placeholder="Default: tiei123" class="w-full text-xs bg-white border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-toyota-red focus:border-toyota-red">
+          </div>
+
+          <button type="submit" id="btn-login-submit" class="w-full bg-toyota-red hover:bg-toyota-dark text-white font-bold py-2.5 px-4 rounded-lg text-xs shadow-md transition flex items-center justify-center space-x-2 cursor-pointer">
+            <i class="fa-solid fa-arrow-right-to-bracket"></i>
+            <span>Sign In to Plant LMS</span>
+          </button>
+        </form>
+
+        <!-- Quick 1-Click Demo Hierarchy Logins Section -->
+        <div class="pt-4 border-t border-slate-200">
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
+                <i class="fa-solid fa-bolt text-amber-500"></i>
+                <span>Fast 1-Click Hierarchy Logins (Demo Profiles)</span>
+              </h3>
+              <p class="text-[11px] text-slate-500">Test how each level in your hierarchy sees and monitors their subordinates:</p>
+            </div>
+            <span class="text-[10px] font-mono bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-semibold hidden sm:inline">
+              Single-System Terminal Simulation
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            
+            <!-- 1) MANAGER CARD -->
+            <div onclick="quickLogin('MGR001')" class="p-3.5 rounded-xl border border-rose-200 bg-rose-50/50 hover:bg-rose-100/70 hover:border-rose-400 transition cursor-pointer group shadow-2xs">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-rose-600 text-white">1) Manager</span>
+                <span class="text-[10px] font-mono font-bold text-rose-800">#MGR001</span>
+              </div>
+              <div class="flex items-center space-x-2.5">
+                <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=120&q=80" class="w-10 h-10 rounded-full object-cover ring-2 ring-rose-400 shrink-0" alt="Manager">
+                <div class="min-w-0">
+                  <div class="font-bold text-xs text-slate-900 group-hover:text-rose-700 truncate">MANUKUMAR G</div>
+                  <div class="text-[10px] text-slate-500 truncate">Section Manager / HOD</div>
+                </div>
+              </div>
+              <div class="mt-2.5 pt-2 border-t border-rose-200/60 text-[10px] text-slate-600 flex items-center justify-between">
+                <span><i class="fa-solid fa-users text-rose-600 mr-1"></i>All <b>90</b> Plant Associates</span>
+                <span class="font-bold text-rose-700 group-hover:translate-x-0.5 transition">Login <i class="fa-solid fa-arrow-right text-[9px]"></i></span>
+              </div>
+            </div>
+
+            <!-- 2) AM CARD -->
+            <div onclick="quickLogin('AM001')" class="p-3.5 rounded-xl border border-indigo-200 bg-indigo-50/50 hover:bg-indigo-100/70 hover:border-indigo-400 transition cursor-pointer group shadow-2xs">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-indigo-600 text-white">2) AM (Asst Mgr)</span>
+                <span class="text-[10px] font-mono font-bold text-indigo-800">#AM001</span>
+              </div>
+              <div class="flex items-center space-x-2.5">
+                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&q=80" class="w-10 h-10 rounded-full object-cover ring-2 ring-indigo-400 shrink-0" alt="AM">
+                <div class="min-w-0">
+                  <div class="font-bold text-xs text-slate-900 group-hover:text-indigo-700 truncate">GOVINDA R</div>
+                  <div class="text-[10px] text-slate-500 truncate">Assistant Manager (Lines)</div>
+                </div>
+              </div>
+              <div class="mt-2.5 pt-2 border-t border-indigo-200/60 text-[10px] text-slate-600 flex items-center justify-between">
+                <span><i class="fa-solid fa-users text-indigo-600 mr-1"></i><b>88</b> Line Personnel (GL, TL, GAT, WT)</span>
+                <span class="font-bold text-indigo-700 group-hover:translate-x-0.5 transition">Login <i class="fa-solid fa-arrow-right text-[9px]"></i></span>
+              </div>
+            </div>
+
+            <!-- 3) GL CARD -->
+            <div onclick="quickLogin('GL001')" class="p-3.5 rounded-xl border border-blue-200 bg-blue-50/50 hover:bg-blue-100/70 hover:border-blue-400 transition cursor-pointer group shadow-2xs">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-blue-600 text-white">3) GL (Group Leader)</span>
+                <span class="text-[10px] font-mono font-bold text-blue-800">#GL001</span>
+              </div>
+              <div class="flex items-center space-x-2.5">
+                <img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=120&q=80" class="w-10 h-10 rounded-full object-cover ring-2 ring-blue-400 shrink-0" alt="GL">
+                <div class="min-w-0">
+                  <div class="font-bold text-xs text-slate-900 group-hover:text-blue-700 truncate">BINDUKUMAR S</div>
+                  <div class="text-[10px] text-slate-500 truncate">Group Leader (HEAD Line)</div>
+                </div>
+              </div>
+              <div class="mt-2.5 pt-2 border-t border-blue-200/60 text-[10px] text-slate-600 flex items-center justify-between">
+                <span><i class="fa-solid fa-users text-blue-600 mr-1"></i><b>75</b> Shift Associates (TL, GAT, WT)</span>
+                <span class="font-bold text-blue-700 group-hover:translate-x-0.5 transition">Login <i class="fa-solid fa-arrow-right text-[9px]"></i></span>
+              </div>
+            </div>
+
+            <!-- 4) TL CARD -->
+            <div onclick="quickLogin('50031')" class="p-3.5 rounded-xl border border-emerald-200 bg-emerald-50/50 hover:bg-emerald-100/70 hover:border-emerald-400 transition cursor-pointer group shadow-2xs">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-emerald-600 text-white">4) TL (Team Leader)</span>
+                <span class="text-[10px] font-mono font-bold text-emerald-800">#50031</span>
+              </div>
+              <div class="flex items-center space-x-2.5">
+                <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=120&q=80" class="w-10 h-10 rounded-full object-cover ring-2 ring-emerald-400 shrink-0" alt="TL">
+                <div class="min-w-0">
+                  <div class="font-bold text-xs text-slate-900 group-hover:text-emerald-700 truncate">ARUNA D R</div>
+                  <div class="text-[10px] text-slate-500 truncate">Team Leader (HEAD Cell)</div>
+                </div>
+              </div>
+              <div class="mt-2.5 pt-2 border-t border-emerald-200/60 text-[10px] text-slate-600 flex items-center justify-between">
+                <span><i class="fa-solid fa-users text-emerald-600 mr-1"></i><b>5</b> Associates (2 GATs + 3 WTs)</span>
+                <span class="font-bold text-emerald-700 group-hover:translate-x-0.5 transition">Login <i class="fa-solid fa-arrow-right text-[9px]"></i></span>
+              </div>
+            </div>
+
+            <!-- 5) GAT CARD -->
+            <div onclick="quickLogin('60101')" class="p-3.5 rounded-xl border border-amber-200 bg-amber-50/50 hover:bg-amber-100/70 hover:border-amber-400 transition cursor-pointer group shadow-2xs">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-amber-600 text-white">5) GAT (Grad Apprentice)</span>
+                <span class="text-[10px] font-mono font-bold text-amber-800">#60101</span>
+              </div>
+              <div class="flex items-center space-x-2.5">
+                <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=120&q=80" class="w-10 h-10 rounded-full object-cover ring-2 ring-amber-400 shrink-0" alt="GAT">
+                <div class="min-w-0">
+                  <div class="font-bold text-xs text-slate-900 group-hover:text-amber-700 truncate">VINAY KUMAR</div>
+                  <div class="text-[10px] text-slate-500 truncate">Graduate Apprentice Trainee</div>
+                </div>
+              </div>
+              <div class="mt-2.5 pt-2 border-t border-amber-200/60 text-[10px] text-slate-600 flex items-center justify-between">
+                <span><i class="fa-solid fa-users text-amber-600 mr-1"></i><b>2</b> Assigned WT Boys</span>
+                <span class="font-bold text-amber-700 group-hover:translate-x-0.5 transition">Login <i class="fa-solid fa-arrow-right text-[9px]"></i></span>
+              </div>
+            </div>
+
+            <!-- 6) WT CARD -->
+            <div onclick="quickLogin('70201')" class="p-3.5 rounded-xl border border-purple-200 bg-purple-50/50 hover:bg-purple-100/70 hover:border-purple-400 transition cursor-pointer group shadow-2xs">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-purple-600 text-white">6) WT (Working Trainee)</span>
+                <span class="text-[10px] font-mono font-bold text-purple-800">#70201</span>
+              </div>
+              <div class="flex items-center space-x-2.5">
+                <img src="https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=120&q=80" class="w-10 h-10 rounded-full object-cover ring-2 ring-purple-400 shrink-0" alt="WT">
+                <div class="min-w-0">
+                  <div class="font-bold text-xs text-slate-900 group-hover:text-purple-700 truncate">RAMESH K</div>
+                  <div class="text-[10px] text-slate-500 truncate">Working Trainee (WT Boy)</div>
+                </div>
+              </div>
+              <div class="mt-2.5 pt-2 border-t border-purple-200/60 text-[10px] text-slate-600 flex items-center justify-between">
+                <span><i class="fa-solid fa-user-check text-purple-600 mr-1"></i>Personal WT Portal (11 Steps)</span>
+                <span class="font-bold text-purple-700 group-hover:translate-x-0.5 transition">Login <i class="fa-solid fa-arrow-right text-[9px]"></i></span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- 2. MAIN APP SHELL                              -->
+  <!-- ============================================== -->
+  <div id="app-shell" class="min-h-screen flex flex-col">
+
+    <!-- TOP HEADER -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col md:flex-row justify-between py-2.5 md:py-0 md:h-16 items-start md:items-center gap-2.5 md:gap-4">
+          <!-- Brand & System Name -->
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-lg bg-toyota-red text-white flex items-center justify-center font-black text-xl shadow-md flex-shrink-0">
+              T
+            </div>
+            <div>
+              <div class="flex items-center space-x-2">
+                <span class="font-extrabold text-base sm:text-lg tracking-tight text-slate-900">TIEI</span>
+                <span class="text-[10px] sm:text-xs bg-red-100 text-toyota-red font-bold px-2 py-0.5 rounded uppercase tracking-wider">Manufacturing Excellence</span>
+              </div>
+              <p class="text-[11px] sm:text-xs text-slate-500 font-medium">TPS Competency, Certification & Learning Management System</p>
+            </div>
+          </div>
+
+          <!-- Active User Profile & Actions -->
+          <div class="flex items-center justify-between sm:justify-end w-full md:w-auto space-x-3">
+            <!-- Active Logged In User Pill -->
+            <div class="flex items-center space-x-2.5 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200">
+              <img id="user-display-avatar" class="h-9 w-9 rounded-full ring-2 ring-toyota-red/40 object-cover shrink-0" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=120&q=80" alt="Avatar">
+              <div class="text-left leading-tight">
+                <div class="flex items-center space-x-1.5">
+                  <span id="user-display-name" class="text-xs font-bold text-slate-900">MANUKUMAR G</span>
+                  <span id="user-display-role-badge" class="px-1.5 py-0.2 rounded text-[9px] font-black uppercase bg-rose-600 text-white">1. Manager</span>
+                </div>
+                <div class="text-[10px] text-slate-500 flex items-center space-x-1 mt-0.5">
+                  <span id="user-display-emp-no" class="font-mono font-bold text-slate-700">#MGR001</span>
+                  <span>•</span>
+                  <span id="user-display-boss" class="truncate max-w-[150px]">Reports to: VP</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Switch Hierarchy Role Button -->
+            <button onclick="openSwitchUserModal()" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold flex items-center space-x-1.5 transition border border-slate-300" title="Switch between the 6 hierarchy roles">
+              <i class="fa-solid fa-users-gear text-slate-500"></i>
+              <span class="hidden sm:inline">Switch Role</span>
+            </button>
+
+            <!-- Logout Button -->
+            <button onclick="logoutUser()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-bold flex items-center space-x-1.5 transition shadow-xs" title="Sign out and return to Login Screen">
+              <i class="fa-solid fa-arrow-right-from-bracket"></i>
+              <span class="hidden sm:inline">Sign Out</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 6-Tier Hierarchy Breadcrumb Bar -->
+        <div class="py-1.5 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1.5 text-[11px]">
+          <div class="flex items-center space-x-1 flex-wrap gap-y-1 font-semibold text-slate-500">
+            <span class="text-[10px] text-slate-400 uppercase tracking-wider font-bold mr-1">Plant Hierarchy:</span>
+            <span id="crumb-Manager" class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-600">1. Manager</span>
+            <span class="text-slate-300">›</span>
+            <span id="crumb-AM" class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-600">2. AM</span>
+            <span class="text-slate-300">›</span>
+            <span id="crumb-GL" class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-600">3. GL</span>
+            <span class="text-slate-300">›</span>
+            <span id="crumb-TL" class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-600">4. TL</span>
+            <span class="text-slate-300">›</span>
+            <span id="crumb-GAT" class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-600">5. GAT</span>
+            <span class="text-slate-300">›</span>
+            <span id="crumb-WT" class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-600">6. WT</span>
+          </div>
+
+          <!-- Active Scope Indicator -->
+          <div id="hierarchy-scope-text" class="text-[11px] font-bold text-toyota-red bg-red-50 px-2.5 py-0.5 rounded border border-red-200">
+            Section Head: Managing all 90 plant associates across GD Section
+          </div>
+        </div>
 
       <!-- MAIN NAVIGATION TABS -->
       <nav class="flex space-x-1 sm:space-x-2 overflow-x-auto py-2 -mb-px text-xs font-semibold custom-scrollbar whitespace-nowrap">
@@ -252,6 +511,136 @@
             <p class="text-slate-600 leading-relaxed">
               Top implemented Komarigoto countermeasures on Tool Changeover (OP-100) and Splash Guard (OP-120) ready for lateral deployment across Block & Crank.
             </p>
+          </div>
+        </div>
+      <!-- ============================================== -->
+      <!-- SUBORDINATES HIERARCHY PERFORMANCE MATRIX       -->
+      <!-- Visible for Manager, AM, GL, TL, GAT            -->
+      <!-- ============================================== -->
+      <div id="subordinates-matrix-section" class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden space-y-4 p-4 sm:p-6">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+          <div>
+            <div class="flex items-center space-x-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              <h3 class="font-extrabold text-slate-900 text-sm sm:text-base">Reporting Team & Subordinate Performance Matrix</h3>
+              <span id="subordinates-count-badge" class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-indigo-50 text-indigo-700 border border-indigo-200">
+                0 Reporting Associates
+              </span>
+            </div>
+            <p class="text-xs text-slate-500 mt-0.5">
+              Live shop-floor performance, test scores, action learning submissions, and kaizens of people reporting under <b id="sub-manager-name" class="text-slate-800">Your Account</b>
+            </p>
+          </div>
+
+          <!-- Hierarchy Role Filter Pills -->
+          <div class="flex items-center space-x-1.5 flex-wrap gap-y-1 text-xs">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mr-1">Filter Role:</span>
+            <button onclick="filterSubordinatesByRole('ALL')" id="sub-filter-ALL" class="sub-role-filter-btn px-2.5 py-1 rounded-lg font-bold text-[11px] bg-slate-800 text-white shadow-2xs">All</button>
+            <button onclick="filterSubordinatesByRole('AM')" id="sub-filter-AM" class="sub-role-filter-btn px-2.5 py-1 rounded-lg font-bold text-[11px] bg-slate-100 text-slate-700 hover:bg-slate-200">AM</button>
+            <button onclick="filterSubordinatesByRole('GL')" id="sub-filter-GL" class="sub-role-filter-btn px-2.5 py-1 rounded-lg font-bold text-[11px] bg-slate-100 text-slate-700 hover:bg-slate-200">GL</button>
+            <button onclick="filterSubordinatesByRole('TL')" id="sub-filter-TL" class="sub-role-filter-btn px-2.5 py-1 rounded-lg font-bold text-[11px] bg-slate-100 text-slate-700 hover:bg-slate-200">TL</button>
+            <button onclick="filterSubordinatesByRole('GAT')" id="sub-filter-GAT" class="sub-role-filter-btn px-2.5 py-1 rounded-lg font-bold text-[11px] bg-slate-100 text-slate-700 hover:bg-slate-200">GAT</button>
+            <button onclick="filterSubordinatesByRole('WT')" id="sub-filter-WT" class="sub-role-filter-btn px-2.5 py-1 rounded-lg font-bold text-[11px] bg-slate-100 text-slate-700 hover:bg-slate-200">WT (Trainees)</button>
+          </div>
+        </div>
+
+        <!-- Subordinates Table -->
+        <div class="overflow-x-auto border border-slate-200 rounded-xl custom-scrollbar">
+          <table class="w-full text-left text-xs whitespace-nowrap">
+            <thead class="bg-slate-900 text-white uppercase text-[10px] tracking-wider">
+              <tr>
+                <th class="p-3">Reporting Associate</th>
+                <th class="p-3 text-center">Hierarchy Tier</th>
+                <th class="p-3">Shop Area & Desig</th>
+                <th class="p-3">Direct Supervisor</th>
+                <th class="p-3 text-center">Current Level</th>
+                <th class="p-3 text-center">Training</th>
+                <th class="p-3 text-center">Post-Test</th>
+                <th class="p-3 text-center">Assignment (A3)</th>
+                <th class="p-3 text-center">Kaizens / Savings</th>
+                <th class="p-3 text-center">Gemba KPI</th>
+                <th class="p-3 text-center">Action</th>
+              </tr>
+            </thead>
+            <tbody id="subordinates-tbody" class="bg-white divide-y divide-slate-100">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ============================================== -->
+      <!-- WORKING TRAINEE (WT BOY) PERSONAL PORTAL       -->
+      <!-- Dedicated Dashboard when Logged In as WT       -->
+      <!-- ============================================== -->
+      <div id="wt-personal-dashboard-section" class="hidden space-y-4">
+        <!-- WT Hero Card -->
+        <div class="bg-gradient-to-r from-purple-950 via-slate-900 to-indigo-950 text-white rounded-2xl p-5 sm:p-6 shadow-md border border-purple-800">
+          <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div class="flex items-center space-x-3.5">
+              <div class="w-14 h-14 rounded-2xl bg-purple-600/30 border border-purple-400 text-purple-300 flex items-center justify-center text-2xl font-black shrink-0">
+                <i class="fa-solid fa-helmet-safety"></i>
+              </div>
+              <div>
+                <div class="flex items-center space-x-2">
+                  <h3 id="wt-dash-name" class="text-lg sm:text-xl font-black text-white">RAMESH K</h3>
+                  <span id="wt-dash-code" class="text-xs bg-purple-500/30 text-purple-200 border border-purple-400/30 px-2 py-0.5 rounded font-mono">#70201</span>
+                  <span class="text-[10px] bg-purple-600 text-white font-black px-2 py-0.5 rounded uppercase">6. Working Trainee (WT Boy)</span>
+                </div>
+                <p class="text-xs text-purple-200 mt-1">
+                  Shopfloor Area: <b id="wt-dash-area" class="text-white">HEAD (GD)</b> • Direct Reporting Boss: <b id="wt-dash-boss" class="text-white">VINAY KUMAR (GAT) / ARUNA D R (TL)</b>
+                </p>
+                <div class="flex items-center space-x-2 mt-2 text-xs">
+                  <span class="px-2.5 py-0.5 rounded bg-slate-800 text-slate-300 font-bold border border-slate-700">Current Level: Level 1 - Foundation</span>
+                  <span class="text-purple-400 font-bold">➔</span>
+                  <span class="px-2.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-400/30">Target Level: Level 2 - TPS Practitioner</span>
+                </div>
+              </div>
+            </div>
+
+            <button onclick="showTab('journey')" class="px-4 py-2.5 bg-toyota-red hover:bg-toyota-dark text-white rounded-xl font-bold text-xs shadow-md transition flex items-center space-x-2 self-stretch md:self-auto justify-center">
+              <i class="fa-solid fa-route"></i>
+              <span>Open My 11-Step TPS Journey & Upload Evidence</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- WT Performance Tiles -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs text-center">
+            <span class="text-[10px] font-bold text-slate-400 uppercase">Pre-Test Baseline</span>
+            <div id="wt-dash-pre-score" class="text-lg font-black text-slate-800 mt-1 font-mono">58%</div>
+            <span class="text-[10px] text-slate-500">Diagnostic Score</span>
+          </div>
+
+          <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs text-center">
+            <span class="text-[10px] font-bold text-slate-400 uppercase">Post-Test Knowledge</span>
+            <div id="wt-dash-post-score" class="text-lg font-black text-emerald-600 mt-1 font-mono">82%</div>
+            <span class="text-[10px] text-emerald-600 font-bold">Passed (≥70%)</span>
+          </div>
+
+          <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs text-center">
+            <span class="text-[10px] font-bold text-slate-400 uppercase">Action Learning (A3)</span>
+            <div id="wt-dash-asgn" class="text-xs font-bold text-indigo-700 mt-2 truncate">Submitted</div>
+            <span class="text-[10px] text-indigo-500 font-semibold">21 KVP Sheet</span>
+          </div>
+
+          <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs text-center">
+            <span class="text-[10px] font-bold text-slate-400 uppercase">Kaizens via Amrut</span>
+            <div id="wt-dash-kaizens" class="text-lg font-black text-slate-800 mt-1">2 / 3</div>
+            <span class="text-[10px] text-emerald-600 font-bold">Approved</span>
+          </div>
+
+          <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs text-center">
+            <span class="text-[10px] font-bold text-slate-400 uppercase">Cost Savings</span>
+            <div id="wt-dash-savings" class="text-lg font-black text-emerald-700 mt-1 font-mono">₹ 42,000</div>
+            <span class="text-[10px] text-slate-500">INR Generated</span>
+          </div>
+
+          <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs text-center">
+            <span class="text-[10px] font-bold text-slate-400 uppercase">Overall Gemba KPI</span>
+            <div id="wt-dash-kpi" class="text-lg font-black text-toyota-red mt-1 font-mono">78.4</div>
+            <span class="text-[10px] text-slate-500">Performance Index</span>
           </div>
         </div>
       </div>
@@ -955,8 +1344,104 @@
     </div>
   </div>
 
+  <!-- ============================================== -->
+  <!-- 4. MODAL: SWITCH USER / HIERARCHY ROLE         -->
+  <!-- ============================================== -->
+  <div id="switch-user-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-xl w-full p-5 sm:p-6 shadow-2xl border border-slate-200 space-y-4 my-auto">
+      <div class="flex justify-between items-center pb-3 border-b border-slate-200">
+        <div>
+          <h3 class="font-extrabold text-base sm:text-lg text-slate-900 flex items-center gap-2">
+            <i class="fa-solid fa-users-gear text-toyota-red"></i>
+            <span>Switch Plant Associate / Hierarchy Role</span>
+          </h3>
+          <p class="text-xs text-slate-500">Shared Terminal Simulation: 1-Click switch between 6 organizational hierarchy tiers</p>
+        </div>
+        <button onclick="closeSwitchUserModal()" class="text-slate-400 hover:text-slate-600 text-lg">
+          <i class="fa-solid fa-times"></i>
+        </button>
+      </div>
+
+      <!-- Quick Role Selection Grid -->
+      <div class="space-y-2">
+        <label class="block text-xs font-bold text-slate-700">Select Active Hierarchy Profile:</label>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+          <!-- Manager -->
+          <button onclick="quickLogin('MGR001'); closeSwitchUserModal();" class="p-2.5 rounded-xl border border-rose-200 bg-rose-50/70 hover:bg-rose-100 text-left flex items-center space-x-2.5 transition group">
+            <span class="w-8 h-8 rounded-full bg-rose-600 text-white flex items-center justify-center font-black text-xs shrink-0">1</span>
+            <div class="min-w-0">
+              <div class="font-bold text-slate-900 group-hover:text-rose-700 truncate">MANUKUMAR G</div>
+              <div class="text-[10px] text-rose-700 font-semibold truncate">1. Manager (90 Subordinates)</div>
+            </div>
+          </button>
+          <!-- AM -->
+          <button onclick="quickLogin('AM001'); closeSwitchUserModal();" class="p-2.5 rounded-xl border border-indigo-200 bg-indigo-50/70 hover:bg-indigo-100 text-left flex items-center space-x-2.5 transition group">
+            <span class="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-black text-xs shrink-0">2</span>
+            <div class="min-w-0">
+              <div class="font-bold text-slate-900 group-hover:text-indigo-700 truncate">GOVINDA R</div>
+              <div class="text-[10px] text-indigo-700 font-semibold truncate">2. AM (88 Subordinates)</div>
+            </div>
+          </button>
+          <!-- GL -->
+          <button onclick="quickLogin('GL001'); closeSwitchUserModal();" class="p-2.5 rounded-xl border border-blue-200 bg-blue-50/70 hover:bg-blue-100 text-left flex items-center space-x-2.5 transition group">
+            <span class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-black text-xs shrink-0">3</span>
+            <div class="min-w-0">
+              <div class="font-bold text-slate-900 group-hover:text-blue-700 truncate">BINDUKUMAR S</div>
+              <div class="text-[10px] text-blue-700 font-semibold truncate">3. GL (75 Subordinates)</div>
+            </div>
+          </button>
+          <!-- TL -->
+          <button onclick="quickLogin('50031'); closeSwitchUserModal();" class="p-2.5 rounded-xl border border-emerald-200 bg-emerald-50/70 hover:bg-emerald-100 text-left flex items-center space-x-2.5 transition group">
+            <span class="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center font-black text-xs shrink-0">4</span>
+            <div class="min-w-0">
+              <div class="font-bold text-slate-900 group-hover:text-emerald-700 truncate">ARUNA D R</div>
+              <div class="text-[10px] text-emerald-700 font-semibold truncate">4. TL (5 Subordinates)</div>
+            </div>
+          </button>
+          <!-- GAT -->
+          <button onclick="quickLogin('60101'); closeSwitchUserModal();" class="p-2.5 rounded-xl border border-amber-200 bg-amber-50/70 hover:bg-amber-100 text-left flex items-center space-x-2.5 transition group">
+            <span class="w-8 h-8 rounded-full bg-amber-600 text-white flex items-center justify-center font-black text-xs shrink-0">5</span>
+            <div class="min-w-0">
+              <div class="font-bold text-slate-900 group-hover:text-amber-700 truncate">VINAY KUMAR</div>
+              <div class="text-[10px] text-amber-700 font-semibold truncate">5. GAT (2 Subordinates)</div>
+            </div>
+          </button>
+          <!-- WT -->
+          <button onclick="quickLogin('70201'); closeSwitchUserModal();" class="p-2.5 rounded-xl border border-purple-200 bg-purple-50/70 hover:bg-purple-100 text-left flex items-center space-x-2.5 transition group">
+            <span class="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center font-black text-xs shrink-0">6</span>
+            <div class="min-w-0">
+              <div class="font-bold text-slate-900 group-hover:text-purple-700 truncate">RAMESH K</div>
+              <div class="text-[10px] text-purple-700 font-semibold truncate">6. WT Boy (Personal Portal)</div>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Or custom emp no input -->
+      <div class="pt-3 border-t border-slate-200">
+        <label class="block text-xs font-bold text-slate-700 mb-1">Or Enter Any Other Employee ID:</label>
+        <div class="flex space-x-2">
+          <input type="text" id="switch-emp-no-input" placeholder="e.g. 50032, 70202, 60102" class="flex-1 text-xs font-mono font-bold bg-slate-50 border border-slate-300 rounded-lg p-2 uppercase focus:ring-2 focus:ring-toyota-red">
+          <button type="button" onclick="const id = document.getElementById('switch-emp-no-input').value.trim(); if(id){ quickLogin(id); closeSwitchUserModal(); }" class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold rounded-lg transition">
+            Switch
+          </button>
+        </div>
+      </div>
+
+      <div class="flex justify-end pt-2">
+        <button type="button" onclick="closeSwitchUserModal()" class="px-3 py-1.5 border border-slate-300 rounded-lg text-slate-600 text-xs font-semibold hover:bg-slate-100">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- JAVASCRIPT LOGIC -->
   <script>
+    // GLOBAL STATE & DATA
+    let currentUser = null;
+    let subordinatesData = [];
+    let currentSubRoleFilter = 'ALL';
     let employeesData = [];
     let selectedEmpId = 1;
     let kvpData = [];
@@ -964,15 +1449,394 @@
     let chartMaturity = null;
     let chartPipeline = null;
 
-    // INIT
+    // INIT ON DOM LOAD
     document.addEventListener('DOMContentLoaded', async () => {
       await fetchKVP();
-      await fetchStats();
-      await fetchEmployees();
+      await initAuth();
       await fetchKaizens();
       await fetchCertifications();
       await fetchBatches();
     });
+
+    // ==========================================
+    // AUTH & 6-TIER HIERARCHY MANAGEMENT
+    // ==========================================
+    async function initAuth() {
+      const savedUserJson = localStorage.getItem('tiei_current_user');
+      if (savedUserJson) {
+        try {
+          const savedUser = JSON.parse(savedUserJson);
+          if (savedUser && savedUser.emp_no) {
+            const res = await fetch('/api/login', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ emp_no: savedUser.emp_no, password: 'skip_check' })
+            });
+            if (res.ok) {
+              const data = await res.json();
+              currentUser = data.user;
+              currentUser.subordinate_emp_nos = data.subordinate_emp_nos || [];
+              currentUser.subordinates_count = data.subordinates_count || 0;
+              currentUser.boss = data.boss;
+              localStorage.setItem('tiei_current_user', JSON.stringify(currentUser));
+              document.getElementById('login-screen').classList.add('hidden');
+              await applyUserState(currentUser);
+              return;
+            }
+          }
+        } catch (e) {
+          console.warn("Failed restoring session:", e);
+        }
+      }
+
+      // Default: show login screen
+      document.getElementById('login-screen').classList.remove('hidden');
+      // Pre-load default overview in background
+      await fetchStats('MGR001');
+      await fetchEmployees('MGR001');
+    }
+
+    async function submitLogin(e) {
+      if (e) e.preventDefault();
+      const empInput = document.getElementById('login-emp-input');
+      const pwdInput = document.getElementById('login-pwd-input');
+      const empNo = empInput ? empInput.value.trim().toUpperCase() : '';
+      const pwd = pwdInput ? pwdInput.value : '';
+      const errBox = document.getElementById('login-error-box');
+      const errText = document.getElementById('login-error-text');
+      const btn = document.getElementById('btn-login-submit');
+
+      if (!empNo) {
+        if (errBox) {
+          errText.innerText = 'Please enter an Employee ID or select a Demo Profile below.';
+          errBox.classList.remove('hidden');
+        }
+        return;
+      }
+
+      if (errBox) errBox.classList.add('hidden');
+      if (btn) btn.disabled = true;
+
+      try {
+        const res = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ emp_no: empNo, password: pwd })
+        });
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+          if (errBox) {
+            errText.innerText = data.error || `Employee ID "${empNo}" not found.`;
+            errBox.classList.remove('hidden');
+          }
+          if (btn) btn.disabled = false;
+          return;
+        }
+
+        currentUser = data.user;
+        currentUser.subordinate_emp_nos = data.subordinate_emp_nos || [];
+        currentUser.subordinates_count = data.subordinates_count || 0;
+        currentUser.boss = data.boss;
+
+        localStorage.setItem('tiei_current_user', JSON.stringify(currentUser));
+        document.getElementById('login-screen').classList.add('hidden');
+        if (btn) btn.disabled = false;
+
+        await applyUserState(currentUser);
+      } catch (err) {
+        console.error("Login error:", err);
+        if (errBox) {
+          errText.innerText = 'Server error during sign in. Please verify connection.';
+          errBox.classList.remove('hidden');
+        }
+        if (btn) btn.disabled = false;
+      }
+    }
+
+    async function quickLogin(empNo) {
+      const empInput = document.getElementById('login-emp-input');
+      if (empInput) empInput.value = empNo;
+      await submitLogin();
+    }
+
+    function logoutUser() {
+      currentUser = null;
+      localStorage.removeItem('tiei_current_user');
+      document.getElementById('login-screen').classList.remove('hidden');
+    }
+
+    function openSwitchUserModal() {
+      const modal = document.getElementById('switch-user-modal');
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeSwitchUserModal() {
+      const modal = document.getElementById('switch-user-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    async function applyUserState(user) {
+      if (!user) return;
+
+      // 1. Update Header User Profile
+      const avatarEl = document.getElementById('user-display-avatar');
+      if (avatarEl && user.avatar) avatarEl.src = user.avatar;
+
+      const nameEl = document.getElementById('user-display-name');
+      if (nameEl) nameEl.innerText = user.name;
+
+      const empNoEl = document.getElementById('user-display-emp-no');
+      if (empNoEl) empNoEl.innerText = '#' + user.emp_no;
+
+      const bossEl = document.getElementById('user-display-boss');
+      if (bossEl) {
+        bossEl.innerText = user.boss_name ? `Reports to: ${user.boss_name}` : 'Reports to: Management / VP';
+      }
+
+      // Role badge styles
+      const roleBadgeEl = document.getElementById('user-display-role-badge');
+      if (roleBadgeEl) {
+        const roleStyles = {
+          'Manager': 'bg-rose-600 text-white',
+          'AM': 'bg-indigo-600 text-white',
+          'GL': 'bg-blue-600 text-white',
+          'TL': 'bg-emerald-600 text-white',
+          'GAT': 'bg-amber-600 text-white',
+          'WT': 'bg-purple-600 text-white'
+        };
+        const roleRankNames = {
+          'Manager': '1. Manager',
+          'AM': '2. AM',
+          'GL': '3. GL',
+          'TL': '4. TL',
+          'GAT': '5. GAT',
+          'WT': '6. WT'
+        };
+        const rKey = user.hierarchy_role || 'Manager';
+        roleBadgeEl.className = `px-2 py-0.5 rounded text-[10px] font-black uppercase ${roleStyles[rKey] || 'bg-slate-700 text-white'}`;
+        roleBadgeEl.innerText = roleRankNames[rKey] || rKey;
+      }
+
+      // 2. Update 6-Tier Hierarchy Breadcrumb Bar
+      const roles = ['Manager', 'AM', 'GL', 'TL', 'GAT', 'WT'];
+      roles.forEach(r => {
+        const crumb = document.getElementById(`crumb-${r}`);
+        if (!crumb) return;
+        if (r === user.hierarchy_role) {
+          const activeColors = {
+            'Manager': 'bg-rose-100 text-rose-800 border-rose-300 ring-rose-400/40',
+            'AM': 'bg-indigo-100 text-indigo-800 border-indigo-300 ring-indigo-400/40',
+            'GL': 'bg-blue-100 text-blue-800 border-blue-300 ring-blue-400/40',
+            'TL': 'bg-emerald-100 text-emerald-800 border-emerald-300 ring-emerald-400/40',
+            'GAT': 'bg-amber-100 text-amber-800 border-amber-300 ring-amber-400/40',
+            'WT': 'bg-purple-100 text-purple-800 border-purple-300 ring-purple-400/40'
+          };
+          crumb.className = `px-2.5 py-0.5 rounded text-[10px] font-black border ring-2 shadow-xs ${activeColors[r] || 'bg-slate-200 text-slate-800'}`;
+        } else {
+          crumb.className = 'px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-500';
+        }
+      });
+
+      const scopeTextEl = document.getElementById('hierarchy-scope-text');
+      if (scopeTextEl) {
+        const subCount = user.subordinates_count || 0;
+        if (user.hierarchy_role === 'Manager') {
+          scopeTextEl.innerHTML = `<i class="fa-solid fa-crown mr-1"></i> Section Head: Managing all <b>${subCount}</b> plant associates across GD Section`;
+        } else if (user.hierarchy_role === 'AM') {
+          scopeTextEl.innerHTML = `<i class="fa-solid fa-sitemap mr-1"></i> Assistant Manager: Managing <b>${subCount}</b> line personnel under Lines`;
+        } else if (user.hierarchy_role === 'GL') {
+          scopeTextEl.innerHTML = `<i class="fa-solid fa-users mr-1"></i> Group Leader: Managing <b>${subCount}</b> shift associates in HEAD Line`;
+        } else if (user.hierarchy_role === 'TL') {
+          scopeTextEl.innerHTML = `<i class="fa-solid fa-people-group mr-1"></i> Team Leader: Managing <b>${subCount}</b> cell associates (2 GATs + 3 WTs)`;
+        } else if (user.hierarchy_role === 'GAT') {
+          scopeTextEl.innerHTML = `<i class="fa-solid fa-chalkboard-user mr-1"></i> Graduate Apprentice: Mentoring <b>${subCount}</b> assigned WT Boys`;
+        } else if (user.hierarchy_role === 'WT') {
+          scopeTextEl.innerHTML = `<i class="fa-solid fa-user-check mr-1 text-purple-700"></i> Working Trainee Portal: Personal 11-step progress, competency milestones & evidence uploads`;
+        }
+      }
+
+      // 3. Section Visibility: Subordinates Matrix vs WT Personal Dashboard
+      const subMatrixSection = document.getElementById('subordinates-matrix-section');
+      const wtDashboardSection = document.getElementById('wt-personal-dashboard-section');
+
+      if (user.hierarchy_role === 'WT') {
+        if (subMatrixSection) subMatrixSection.classList.add('hidden');
+        if (wtDashboardSection) wtDashboardSection.classList.remove('hidden');
+        renderWTPersonalDashboard(user);
+      } else {
+        if (subMatrixSection) subMatrixSection.classList.remove('hidden');
+        if (wtDashboardSection) wtDashboardSection.classList.add('hidden');
+        const subMgrName = document.getElementById('sub-manager-name');
+        if (subMgrName) subMgrName.innerText = `${user.name} (${user.hierarchy_role})`;
+        const subBadge = document.getElementById('subordinates-count-badge');
+        if (subBadge) subBadge.innerText = `${user.subordinates_count || 0} Reporting Associates`;
+      }
+
+      // 4. Scoped Data Loading
+      await fetchStats(user.emp_no);
+      await fetchEmployees(user.emp_no);
+    }
+
+    // ==========================================
+    // WT PERSONAL DASHBOARD
+    // ==========================================
+    async function renderWTPersonalDashboard(user) {
+      try {
+        const res = await fetch(`/api/employees/${user.id}`);
+        const emp = await res.json();
+
+        const wtName = document.getElementById('wt-dash-name');
+        if (wtName) wtName.innerText = emp.name;
+        const wtCode = document.getElementById('wt-dash-code');
+        if (wtCode) wtCode.innerText = '#' + emp.emp_no;
+        const wtArea = document.getElementById('wt-dash-area');
+        if (wtArea) wtArea.innerText = `${emp.working_area} (${emp.division})`;
+        const wtBoss = document.getElementById('wt-dash-boss');
+        if (wtBoss) wtBoss.innerText = `${emp.boss_name} (${emp.reports_to_emp_no || 'TL'})`;
+        const wtPre = document.getElementById('wt-dash-pre-score');
+        if (wtPre) wtPre.innerText = `${emp.pre_test_score}%`;
+        const wtPost = document.getElementById('wt-dash-post-score');
+        if (wtPost) wtPost.innerText = `${emp.post_test_score}%`;
+        const wtAsgn = document.getElementById('wt-dash-asgn');
+        if (wtAsgn) wtAsgn.innerText = emp.assignment_status >= 2 ? 'Submitted (21 KVP)' : 'In Progress';
+        const wtKaizens = document.getElementById('wt-dash-kaizens');
+        if (wtKaizens) wtKaizens.innerText = `${emp.kaizens_approved}`;
+        const wtSavings = document.getElementById('wt-dash-savings');
+        if (wtSavings) wtSavings.innerText = `₹ ${(emp.kaizens_cost_savings || 0).toLocaleString()}`;
+        const wtKpi = document.getElementById('wt-dash-kpi');
+        if (wtKpi) wtKpi.innerText = `${emp.kpi_score}`;
+      } catch (e) {
+        console.error("Error rendering WT Personal Dashboard:", e);
+      }
+    }
+
+    // ==========================================
+    // SUBORDINATES PERFORMANCE MATRIX
+    // ==========================================
+    function renderSubordinatesTable() {
+      const tbody = document.getElementById('subordinates-tbody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      let list = subordinatesData;
+      if (currentSubRoleFilter !== 'ALL') {
+        list = subordinatesData.filter(s => s.hierarchy_role === currentSubRoleFilter);
+      }
+
+      if (list.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="11" class="p-6 text-center text-slate-400">
+              <i class="fa-solid fa-users-slash text-2xl mb-2 text-slate-300 block"></i>
+              No associates found for filter <b>"${currentSubRoleFilter}"</b> under this user's reporting tree.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      const roleBadgeStyles = {
+        'Manager': 'bg-rose-100 text-rose-800 border border-rose-300',
+        'AM': 'bg-indigo-100 text-indigo-800 border border-indigo-300',
+        'GL': 'bg-blue-100 text-blue-800 border border-blue-300',
+        'TL': 'bg-emerald-100 text-emerald-800 border border-emerald-300',
+        'GAT': 'bg-amber-100 text-amber-800 border border-amber-300',
+        'WT': 'bg-purple-100 text-purple-800 border border-purple-300'
+      };
+
+      list.forEach(s => {
+        let levelTag = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-600">L1 Foundation</span>';
+        if (s.current_level === 2) levelTag = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-800">L2 Practitioner</span>';
+        if (s.current_level === 3) levelTag = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">L3 Champion</span>';
+
+        const trnBadge = s.training_status >= 2 
+          ? '<span class="px-2 py-0.5 rounded font-bold text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200">Done (3 Slips)</span>' 
+          : '<span class="px-2 py-0.5 rounded font-bold text-[10px] bg-amber-50 text-amber-700 border border-amber-200">In Progress</span>';
+
+        const postTestBadge = s.post_test_score >= 70
+          ? `<span class="font-bold text-emerald-600">${s.post_test_score}%</span>`
+          : `<span class="font-bold text-amber-600">${s.post_test_score}%</span>`;
+
+        const asgnBadge = s.assignment_status >= 2
+          ? '<span class="px-2 py-0.5 rounded font-bold text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200">A3 Submitted</span>'
+          : '<span class="px-2 py-0.5 rounded font-bold text-[10px] bg-slate-100 text-slate-500">Drafting</span>';
+
+        const genderBadge = s.gender === 'Female' 
+          ? '<span class="text-[9px] px-1 py-0.2 rounded bg-pink-100 text-pink-700 font-bold ml-1">F</span>'
+          : '<span class="text-[9px] px-1 py-0.2 rounded bg-slate-100 text-slate-600 font-bold ml-1">M</span>';
+
+        const roleStyle = roleBadgeStyles[s.hierarchy_role] || 'bg-slate-100 text-slate-700';
+
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-50 transition cursor-pointer" onclick="inspectSubordinateJourney(${s.id})">
+            <td class="p-3">
+              <div class="flex items-center space-x-2.5">
+                <img src="${s.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&q=80'}" class="w-8 h-8 rounded-full object-cover shrink-0 ring-1 ring-slate-200" alt="${s.name}">
+                <div>
+                  <div class="font-bold text-slate-900 flex items-center">
+                    <span>${s.name}</span>
+                    ${genderBadge}
+                  </div>
+                  <div class="font-mono text-[10px] text-slate-500">#${s.emp_no}</div>
+                </div>
+              </div>
+            </td>
+            <td class="p-3 text-center">
+              <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase ${roleStyle}">${s.hierarchy_role}</span>
+            </td>
+            <td class="p-3">
+              <div class="font-semibold text-slate-800">${s.working_area}</div>
+              <div class="text-[10px] text-slate-500">${s.designation}</div>
+            </td>
+            <td class="p-3">
+              <div class="text-xs text-slate-700 font-medium">${s.boss_name}</div>
+            </td>
+            <td class="p-3 text-center">${levelTag}</td>
+            <td class="p-3 text-center">${trnBadge}</td>
+            <td class="p-3 text-center">${postTestBadge}</td>
+            <td class="p-3 text-center">${asgnBadge}</td>
+            <td class="p-3 text-center">
+              <span class="font-bold text-slate-800">${s.kaizens_approved}</span>
+              <span class="text-[10px] text-slate-400 block font-mono">₹ ${(s.kaizens_cost_savings || 0).toLocaleString()}</span>
+            </td>
+            <td class="p-3 text-center font-bold text-toyota-red font-mono">${s.kpi_score}</td>
+            <td class="p-3 text-center">
+              <button type="button" onclick="event.stopPropagation(); inspectSubordinateJourney(${s.id})" class="px-2.5 py-1 bg-toyota-red/10 hover:bg-toyota-red text-toyota-red hover:text-white rounded font-bold text-[11px] transition flex items-center space-x-1 mx-auto">
+                <i class="fa-solid fa-route text-[10px]"></i>
+                <span>Inspect</span>
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function filterSubordinatesByRole(role) {
+      currentSubRoleFilter = role;
+      document.querySelectorAll('.sub-role-filter-btn').forEach(btn => {
+        btn.classList.remove('bg-slate-800', 'text-white', 'shadow-2xs');
+        btn.classList.add('bg-slate-100', 'text-slate-700');
+      });
+      const activeBtn = document.getElementById(`sub-filter-${role}`);
+      if (activeBtn) {
+        activeBtn.classList.add('bg-slate-800', 'text-white', 'shadow-2xs');
+        activeBtn.classList.remove('bg-slate-100', 'text-slate-700');
+      }
+      renderSubordinatesTable();
+    }
+
+    function inspectSubordinateJourney(id) {
+      selectedEmpId = id;
+      const journeySel = document.getElementById('journey-emp-select');
+      if (journeySel) journeySel.value = id;
+      const promoSel = document.getElementById('promotion-emp-select');
+      if (promoSel) promoSel.value = id;
+      loadEmployeeJourney(id);
+      runGapAnalysis(id);
+      showTab('journey');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 
     // SWITCH TAB
     function showTab(tabId) {
@@ -995,34 +1859,11 @@
       }
     }
 
-    // SWITCH USER ROLE
-    function switchRole(role) {
-      const nameEl = document.getElementById('user-display-name');
-      const roleEl = document.getElementById('user-display-role');
-      if (role === 'TL') {
-        nameEl.innerText = "ARUNA D R";
-        roleEl.innerText = "Team Leader (GD HEAD)";
-        selectedEmpId = 1;
-        loadEmployeeJourney(1);
-      } else if (role === 'MGR') {
-        nameEl.innerText = "MANUKUMAR G";
-        roleEl.innerText = "Section Manager / HOD";
-      } else if (role === 'TRAINER') {
-        nameEl.innerText = "Dilip R";
-        roleEl.innerText = "Master Trainer & Verifier";
-      } else if (role === 'TPS_OFFICE') {
-        nameEl.innerText = "Rakshith Prabhu";
-        roleEl.innerText = "TPS Office / Digital Captain";
-      } else if (role === 'LEADERSHIP') {
-        nameEl.innerText = "Antony John Sudhakar P";
-        roleEl.innerText = "Vice President (VP)";
-      }
-    }
-
-    // FETCH STATS
-    async function fetchStats() {
+    // FETCH STATS (SCOPED TO SUPERVISOR)
+    async function fetchStats(supervisorEmpNo) {
       try {
-        const res = await fetch('/api/stats');
+        const sup = supervisorEmpNo || (currentUser ? currentUser.emp_no : 'MGR001');
+        const res = await fetch(`/api/stats?supervisor=${sup}`);
         statsData = await res.json();
         document.getElementById('stat-total-emps').innerText = statsData.total_employees;
         document.getElementById('stat-trained-emps').innerText = statsData.trained_employees;
@@ -1052,7 +1893,7 @@
           data: {
             labels: labels,
             datasets: [
-              { label: 'Total Team Leaders', data: totals, backgroundColor: '#94A3B8' },
+              { label: 'Total Team Associates', data: totals, backgroundColor: '#94A3B8' },
               { label: 'Certified Practitioners', data: certs, backgroundColor: '#D71920' }
             ]
           },
@@ -1068,10 +1909,10 @@
       const pipeCtx = document.getElementById('chart-level-pipeline');
       if (pipeCtx) {
         if (chartPipeline) chartPipeline.destroy();
-        const l1 = statsData.level_stats[1] || 0;
-        const l2 = statsData.level_stats[2] || 0;
-        const l3 = statsData.level_stats[3] || 0;
-        const l4 = statsData.level_stats[4] || 0;
+        const l1 = (statsData.level_stats && statsData.level_stats[1]) || 0;
+        const l2 = (statsData.level_stats && statsData.level_stats[2]) || 0;
+        const l3 = (statsData.level_stats && statsData.level_stats[3]) || 0;
+        const l4 = (statsData.level_stats && statsData.level_stats[4]) || 0;
 
         chartPipeline = new Chart(pipeCtx, {
           type: 'doughnut',
@@ -1091,33 +1932,59 @@
       }
     }
 
-    // FETCH EMPLOYEES
-    async function fetchEmployees() {
+    // FETCH EMPLOYEES (SCOPED TO SUPERVISOR'S SUBORDINATES)
+    async function fetchEmployees(supervisorEmpNo) {
       try {
-        const res = await fetch('/api/employees');
+        const sup = supervisorEmpNo || (currentUser ? currentUser.emp_no : 'MGR001');
+        const res = await fetch(`/api/employees?supervisor=${sup}&include_self=true`);
         employeesData = await res.json();
+
+        // Subordinates list (excluding supervisor self for the table, or full list if WT)
+        if (currentUser && currentUser.hierarchy_role === 'WT') {
+          subordinatesData = [];
+        } else if (currentUser) {
+          subordinatesData = employeesData.filter(e => e.emp_no !== currentUser.emp_no);
+        } else {
+          subordinatesData = employeesData.slice(1);
+        }
+
+        renderSubordinatesTable();
         
-        // Populate Selects
+        // Populate Selects in Journey, Promotion, and Komarigoto
         const journeySel = document.getElementById('journey-emp-select');
         const promoSel = document.getElementById('promotion-emp-select');
         const modalSel = document.getElementById('modal-komarigoto-emp');
         
-        journeySel.innerHTML = '';
-        promoSel.innerHTML = '';
-        modalSel.innerHTML = '';
+        if (journeySel) journeySel.innerHTML = '';
+        if (promoSel) promoSel.innerHTML = '';
+        if (modalSel) modalSel.innerHTML = '';
 
         employeesData.forEach(e => {
-          const opt = `<option value="${e.id}">${e.name} (${e.emp_no}) - ${e.working_area}</option>`;
-          journeySel.innerHTML += opt;
-          promoSel.innerHTML += opt;
-          modalSel.innerHTML += opt;
+          const isMe = (currentUser && e.emp_no === currentUser.emp_no) ? ' [YOU]' : '';
+          const opt = `<option value="${e.id}">${e.name} (${e.emp_no}) - ${e.hierarchy_role} [${e.working_area}]${isMe}</option>`;
+          if (journeySel) journeySel.innerHTML += opt;
+          if (promoSel) promoSel.innerHTML += opt;
+          if (modalSel) modalSel.innerHTML += opt;
         });
 
-        // Load default employee (ARUNA D R)
+        // Determine default associate to load in Journey tab
         if (employeesData.length > 0) {
-          loadEmployeeJourney(employeesData[0].id);
+          let targetEmp = null;
+          if (currentUser && currentUser.hierarchy_role === 'WT') {
+            targetEmp = employeesData.find(e => e.emp_no === currentUser.emp_no) || employeesData[0];
+          } else if (subordinatesData.length > 0) {
+            targetEmp = subordinatesData[0];
+          } else {
+            targetEmp = employeesData[0];
+          }
+
+          selectedEmpId = targetEmp.id;
+          if (journeySel) journeySel.value = selectedEmpId;
+          if (promoSel) promoSel.value = selectedEmpId;
+
+          loadEmployeeJourney(selectedEmpId);
           renderSkillMatrix(employeesData);
-          runGapAnalysis(employeesData[0].id);
+          runGapAnalysis(selectedEmpId);
         }
       } catch (e) {
         console.error("Error fetching employees:", e);

@@ -1,8 +1,11 @@
 import sqlite3
 import os
+import sys
 import json
 import random
+sys.path.insert(0, os.path.dirname(__file__))
 from flask import Flask, render_template, jsonify, request
+from init_db import upgrade_and_seed_hierarchy
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 DB_PATH = os.path.join(os.path.dirname(__file__), 'tps_database.db')
@@ -14,6 +17,23 @@ def get_db():
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
+
+# Helper: Find all recursive subordinates for an employee in the plant hierarchy
+def get_subordinate_emp_nos(cursor, supervisor_emp_no):
+    subordinates = []
+    current_layer = [supervisor_emp_no]
+    while current_layer:
+        placeholders = ','.join(['?'] * len(current_layer))
+        rows = cursor.execute(
+            f"SELECT emp_no FROM employees WHERE reports_to_emp_no IN ({placeholders})",
+            current_layer
+        ).fetchall()
+        next_layer = [r[0] for r in rows if r[0] not in subordinates and r[0] != supervisor_emp_no]
+        if not next_layer:
+            break
+        subordinates.extend(next_layer)
+        current_layer = next_layer
+    return subordinates
 
 # 21 Kaizen Viewpoints Master Data
 KVP_MASTER = [
@@ -40,6 +60,46 @@ KVP_MASTER = [
     {"id": 21, "category": "Others", "subcategory": "Environment", "name": "Others (Gemba 5S & Environment)", "desc": "Lighting, noise, oil mist, chip accumulation, general worksite improvements"}
 ]
 
+# 6 Hierarchy Roles Master
+HIERARCHY_CONFIG = [
+    {
+        "rank": 1, "role": "Manager", "title": "1) Section Manager / HOD",
+        "description": "Full Section Oversight: Evaluates all AMs, GLs, TLs, GATs, and WTs",
+        "demo_emp_no": "MGR001", "demo_name": "MANUKUMAR G", "icon": "fa-user-tie",
+        "color": "rose", "badge_bg": "bg-rose-600"
+    },
+    {
+        "rank": 2, "role": "AM", "title": "2) Assistant Manager",
+        "description": "Area Operations: Supervises Group Leaders, Team Leaders, and Trainees across lines",
+        "demo_emp_no": "AM001", "demo_name": "GOVINDA R", "icon": "fa-award",
+        "color": "indigo", "badge_bg": "bg-indigo-600"
+    },
+    {
+        "rank": 3, "role": "GL", "title": "3) Group Leader",
+        "description": "Shift & Line In-charge: Guides Team Leaders, GATs, and WT Boys across cell shifts",
+        "demo_emp_no": "GL001", "demo_name": "BINDUKUMAR S", "icon": "fa-users-gear",
+        "color": "blue", "badge_bg": "bg-blue-600"
+    },
+    {
+        "rank": 4, "role": "TL", "title": "4) Team Leader",
+        "description": "Cell & Station Lead: Directly oversees GATs and WT Boys + Manages own TPS Pathway",
+        "demo_emp_no": "50031", "demo_name": "ARUNA D R", "icon": "fa-screwdriver-wrench",
+        "color": "emerald", "badge_bg": "bg-emerald-600"
+    },
+    {
+        "rank": 5, "role": "GAT", "title": "5) Graduate Apprentice Trainee",
+        "description": "Trainee Engineer: Mentors assigned WT Boys on Gemba Kaizens + Completes A3 learning",
+        "demo_emp_no": "60101", "demo_name": "VINAY KUMAR", "icon": "fa-graduation-cap",
+        "color": "amber", "badge_bg": "bg-amber-600"
+    },
+    {
+        "rank": 6, "role": "WT", "title": "6) Working Trainee (WT Boy)",
+        "description": "Shopfloor Trainee: Dedicated Personal Portal (Level, 11-Step Pathway, Evidence Upload & Progress)",
+        "demo_emp_no": "70201", "demo_name": "RAMESH K", "icon": "fa-helmet-safety",
+        "color": "purple", "badge_bg": "bg-purple-600"
+    }
+]
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -48,44 +108,125 @@ def index():
 def get_viewpoints():
     return jsonify(KVP_MASTER)
 
+@app.route('/api/hierarchy_roles')
+def get_hierarchy_roles():
+    return jsonify(HIERARCHY_CONFIG)
+
+# Authentication & Hierarchy Sign-In
+@app.route('/api/login', methods=['POST'])
+def api_login():
+    data = request.json or {}
+    emp_no = str(data.get('emp_no', '')).strip().upper()
+    password = str(data.get('password', '')).strip()
+
+    if not emp_no:
+        return jsonify({"success": False, "error": "Please enter an Employee ID"}), 400
+
+    conn = get_db()
+    cursor = conn.cursor()
+    emp = cursor.execute('SELECT * FROM employees WHERE UPPER(emp_no) = ?', (emp_no,)).fetchone()
+    if not emp:
+        # Also try matching by name substring
+        emp = cursor.execute('SELECT * FROM employees WHERE UPPER(name) LIKE ?', (f'%{emp_no}%',)).fetchone()
+
+    if not emp:
+        conn.close()
+        return jsonify({"success": False, "error": f"Employee ID '{emp_no}' not found in TIEI plant records"}), 404
+
+    emp_dict = dict(emp)
+
+    # Fetch recursive subordinates for this user
+    sub_emp_nos = get_subordinate_emp_nos(cursor, emp_dict['emp_no'])
+
+    # Fetch direct boss information if exists
+    boss_info = None
+    if emp_dict.get('reports_to_emp_no'):
+        b = cursor.execute('SELECT emp_no, name, designation, hierarchy_role, avatar FROM employees WHERE emp_no = ?', (emp_dict['reports_to_emp_no'],)).fetchone()
+        if b:
+            boss_info = dict(b)
+
+    conn.close()
+    return jsonify({
+        "success": True,
+        "user": emp_dict,
+        "subordinate_emp_nos": sub_emp_nos,
+        "subordinates_count": len(sub_emp_nos),
+        "boss": boss_info
+    })
+
+# Subordinate-Aware Stats Endpoint
 @app.route('/api/stats')
 def get_stats():
+    supervisor = request.args.get('supervisor') or request.args.get('current_user')
     conn = get_db()
     cursor = conn.cursor()
 
-    total_emps = cursor.execute('SELECT COUNT(*) FROM employees').fetchone()[0]
-    trained_emps = cursor.execute('SELECT COUNT(*) FROM employees WHERE training_status >= 2').fetchone()[0]
-    assignments_sub = cursor.execute('SELECT COUNT(*) FROM employees WHERE assignment_status >= 1').fetchone()[0]
-    practitioner_certs = cursor.execute('SELECT COUNT(*) FROM employees WHERE practitioner_certified = 1').fetchone()[0]
-    champion_certs = cursor.execute('SELECT COUNT(*) FROM employees WHERE champion_certified = 1').fetchone()[0]
-    
+    allowed_emp_nos = None
+    if supervisor:
+        sub_nos = get_subordinate_emp_nos(cursor, supervisor)
+        if sub_nos:
+            allowed_emp_nos = sub_nos
+        else:
+            # If user has no subordinates (e.g. WT), stats reflect their own personal performance
+            allowed_emp_nos = [supervisor]
+
+    scope_where = ""
+    params = []
+    if allowed_emp_nos is not None:
+        placeholders = ','.join(['?'] * len(allowed_emp_nos))
+        scope_where = f" WHERE emp_no IN ({placeholders})"
+        params = list(allowed_emp_nos)
+
+    total_emps = cursor.execute(f'SELECT COUNT(*) FROM employees{scope_where}', params).fetchone()[0]
+
+    trn_where = f" WHERE training_status >= 2" + (f" AND emp_no IN ({','.join(['?']*len(allowed_emp_nos))})" if allowed_emp_nos else "")
+    trained_emps = cursor.execute(f'SELECT COUNT(*) FROM employees{trn_where}', params if allowed_emp_nos else []).fetchone()[0]
+
+    asgn_where = f" WHERE assignment_status >= 1" + (f" AND emp_no IN ({','.join(['?']*len(allowed_emp_nos))})" if allowed_emp_nos else "")
+    assignments_sub = cursor.execute(f'SELECT COUNT(*) FROM employees{asgn_where}', params if allowed_emp_nos else []).fetchone()[0]
+
+    prac_where = f" WHERE practitioner_certified = 1" + (f" AND emp_no IN ({','.join(['?']*len(allowed_emp_nos))})" if allowed_emp_nos else "")
+    practitioner_certs = cursor.execute(f'SELECT COUNT(*) FROM employees{prac_where}', params if allowed_emp_nos else []).fetchone()[0]
+
+    champ_where = f" WHERE champion_certified = 1" + (f" AND emp_no IN ({','.join(['?']*len(allowed_emp_nos))})" if allowed_emp_nos else "")
+    champion_certs = cursor.execute(f'SELECT COUNT(*) FROM employees{champ_where}', params if allowed_emp_nos else []).fetchone()[0]
+
     # Kaizen and cost metrics
-    kaizen_totals = cursor.execute('''
-        SELECT SUM(kaizens_submitted), SUM(kaizens_approved), SUM(cost_savings_inr) 
-        FROM employees
-    ''').fetchone()
+    kaizen_totals = cursor.execute(f'''
+        SELECT SUM(kaizens_submitted), SUM(kaizens_approved), SUM(cost_savings_inr), AVG(kpi_score)
+        FROM employees{scope_where}
+    ''', params).fetchone()
     total_kaizens_sub = kaizen_totals[0] or 0
     total_kaizens_app = kaizen_totals[1] or 0
     total_savings = kaizen_totals[2] or 0
+    avg_kpi = round(kaizen_totals[3] or 75.0, 1)
 
     # Area distribution
-    area_rows = cursor.execute('''
+    area_rows = cursor.execute(f'''
         SELECT working_area, 
                COUNT(*) as total,
                SUM(CASE WHEN practitioner_certified = 1 THEN 1 ELSE 0 END) as certified,
                AVG(kpi_score) as avg_kpi
-        FROM employees 
+        FROM employees{scope_where}
         GROUP BY working_area
-    ''').fetchall()
+    ''', params).fetchall()
     area_stats = [dict(r) for r in area_rows]
 
     # Level distribution
-    level_rows = cursor.execute('''
+    level_rows = cursor.execute(f'''
         SELECT current_level, COUNT(*) as count 
-        FROM employees 
+        FROM employees{scope_where}
         GROUP BY current_level
-    ''').fetchall()
+    ''', params).fetchall()
     level_stats = {r['current_level']: r['count'] for r in level_rows}
+
+    # Hierarchy Role breakdown
+    role_rows = cursor.execute(f'''
+        SELECT hierarchy_role, COUNT(*) as count 
+        FROM employees{scope_where}
+        GROUP BY hierarchy_role
+    ''', params).fetchall()
+    role_stats = {r['hierarchy_role']: r['count'] for r in role_rows}
 
     conn.close()
 
@@ -98,33 +239,58 @@ def get_stats():
         "total_kaizens_submitted": total_kaizens_sub,
         "total_kaizens_approved": total_kaizens_app,
         "total_cost_savings_inr": total_savings,
-        "manhours_saved_per_day": 4.0, # From the approved digitalization form
+        "avg_kpi_score": avg_kpi,
+        "manhours_saved_per_day": 4.0,
         "area_stats": area_stats,
-        "level_stats": level_stats
+        "level_stats": level_stats,
+        "role_stats": role_stats
     })
 
+# Subordinate-Aware Employees List Endpoint
 @app.route('/api/employees')
 def get_employees():
+    supervisor = request.args.get('supervisor') or request.args.get('current_user')
+    include_self = request.args.get('include_self', 'true').lower() == 'true'
     area = request.args.get('area')
     search = request.args.get('search')
     level = request.args.get('level')
-    
+    role = request.args.get('role')
+
     conn = get_db()
     cursor = conn.cursor()
+
+    allowed_emp_nos = None
+    if supervisor:
+        sub_nos = get_subordinate_emp_nos(cursor, supervisor)
+        if include_self and supervisor not in sub_nos:
+            sub_nos.insert(0, supervisor)
+        allowed_emp_nos = sub_nos
+
     query = 'SELECT * FROM employees WHERE 1=1'
     params = []
-    
+
+    if allowed_emp_nos is not None:
+        if not allowed_emp_nos:
+            conn.close()
+            return jsonify([])
+        placeholders = ','.join(['?'] * len(allowed_emp_nos))
+        query += f' AND emp_no IN ({placeholders})'
+        params.extend(allowed_emp_nos)
+
     if area and area != 'ALL':
         query += ' AND working_area = ?'
         params.append(area)
     if level and level != 'ALL':
         query += ' AND current_level = ?'
         params.append(int(level))
+    if role and role != 'ALL':
+        query += ' AND hierarchy_role = ?'
+        params.append(role)
     if search:
         query += ' AND (name LIKE ? OR emp_no LIKE ? OR boss_name LIKE ?)'
         params.extend([f'%{search}%', f'%{search}%', f'%{search}%'])
-        
-    query += ' ORDER BY id ASC'
+
+    query += ' ORDER BY hierarchy_rank ASC, id ASC'
     rows = cursor.execute(query, params).fetchall()
     emps = [dict(r) for r in rows]
     conn.close()
@@ -138,11 +304,13 @@ def get_employee(emp_id):
     if not emp:
         conn.close()
         return jsonify({"error": "Not found"}), 404
-    
+
+    emp_dict = dict(emp)
+
     challenges = cursor.execute('SELECT * FROM komarigoto WHERE emp_id = ?', (emp_id,)).fetchall()
     certs = cursor.execute('SELECT * FROM certifications WHERE emp_id = ?', (emp_id,)).fetchall()
     kaizens = cursor.execute('SELECT * FROM kaizen_requests WHERE emp_id = ?', (emp_id,)).fetchall()
-    
+
     # Query step evidence if table exists
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS step_evidence (
@@ -160,8 +328,12 @@ def get_employee(emp_id):
     ''')
     conn.commit()
     evidence_rows = cursor.execute('SELECT * FROM step_evidence WHERE emp_id = ? ORDER BY step_num ASC, id DESC', (emp_id,)).fetchall()
-    
-    emp_dict = dict(emp)
+
+    # Subordinates count
+    sub_nos = get_subordinate_emp_nos(cursor, emp_dict['emp_no'])
+    emp_dict['subordinates_count'] = len(sub_nos)
+    emp_dict['subordinate_emp_nos'] = sub_nos
+
     emp_dict['challenges'] = [dict(c) for c in challenges]
     emp_dict['certifications'] = [dict(c) for c in certs]
     emp_dict['kaizen_history'] = [dict(k) for k in kaizens]
@@ -174,7 +346,7 @@ def update_journey(emp_id):
     data = request.json or {}
     field = data.get('field')
     val = data.get('value')
-    
+
     allowed_fields = [
         'training_status', 'pre_test_score', 'post_test_score', 'assignment_status',
         'presentation_mgr', 'presentation_vp', 'presentation_dmd',
@@ -183,22 +355,21 @@ def update_journey(emp_id):
     ]
     if field not in allowed_fields:
         return jsonify({"error": "Invalid field"}), 400
-        
+
     conn = get_db()
     cursor = conn.cursor()
     cursor.execute(f'UPDATE employees SET {field} = ? WHERE id = ?', (val, emp_id))
-    
+
     # Auto logic check: If presentation_mgr and presentation_vp are completed, award practitioner cert
     emp = cursor.execute('SELECT * FROM employees WHERE id = ?', (emp_id,)).fetchone()
     if emp['presentation_mgr'] == 2 and emp['presentation_vp'] == 2 and emp['practitioner_certified'] == 0:
         cursor.execute('UPDATE employees SET practitioner_certified = 1, current_level = 2, target_level = 3 WHERE id = ?', (emp_id,))
-        # Also auto create cert record if not exists
         cert_no = f"TIEI/TPS/2026/{str(emp_id).zfill(3)}"
         cursor.execute('''
             INSERT OR IGNORE INTO certifications (cert_no, emp_id, emp_name, level_name, issue_date, signatory, status)
             VALUES (?, ?, ?, 'Level 2 - TPS Practitioner', date('now'), 'Antony John Sudhakar P (VP)', 'Active')
         ''', (cert_no, emp_id, emp['name']))
-        
+
     conn.commit()
     updated_emp = cursor.execute('SELECT * FROM employees WHERE id = ?', (emp_id,)).fetchone()
     conn.close()
@@ -288,8 +459,7 @@ def add_komarigoto():
             impact, priority, viewpoints_21, countermeasures, feasibility, unfeasible_reason, status
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ''', (emp_id, challenge, category, current_cond, target_cond, impact, priority, viewpoints, countermeasures, feasibility, unfeasible_reason, status))
-    
-    # Also update employee assignment status to 'Draft' or 'Submitted'
+
     cursor.execute('UPDATE employees SET assignment_status = 2 WHERE id = ? AND assignment_status < 2', (emp_id,))
     conn.commit()
     new_id = cursor.lastrowid
@@ -316,20 +486,20 @@ def issue_certification():
     emp_id = data.get('emp_id')
     level_name = data.get('level_name', 'Level 2 - TPS Practitioner')
     signatory = data.get('signatory', 'Antony John Sudhakar P (VP)')
-    
+
     conn = get_db()
     cursor = conn.cursor()
     emp = cursor.execute('SELECT * FROM employees WHERE id = ?', (emp_id,)).fetchone()
     if not emp:
         conn.close()
         return jsonify({"error": "Employee not found"}), 404
-        
+
     cert_no = f"TIEI/TPS/2026/{str(emp_id).zfill(3)}-{random.randint(10,99)}"
     cursor.execute('''
         INSERT INTO certifications (cert_no, emp_id, emp_name, level_name, issue_date, signatory, status)
         VALUES (?, ?, ?, ?, date('now'), ?, 'Active')
     ''', (cert_no, emp_id, emp['name'], level_name, signatory))
-    
+
     if 'Level 2' in level_name:
         cursor.execute('UPDATE employees SET practitioner_certified = 1, current_level = 2, target_level = 3 WHERE id = ?', (emp_id,))
     elif 'Level 3' in level_name:
