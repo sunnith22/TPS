@@ -752,20 +752,17 @@
     <!-- ======================================================== -->
     <div id="tab-content-presentation-board" class="tab-content hidden space-y-3">
       
-      <!-- Board Header -->
-      <div class="bg-white rounded-xl p-3 sm:p-3.5 border border-slate-200 shadow-xs flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+      <!-- Board Header (Minimal wording) -->
+      <div class="bg-white rounded-xl p-3 border border-slate-200 shadow-xs flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
         <div>
           <h2 class="text-sm sm:text-base font-bold text-slate-900">TPS Action Learning Presentation Board</h2>
-          <p class="text-xs text-slate-500 mt-0.5">
-            Gemba Problem Solving (Komarigoto) & 21 Kaizen Viewpoints
-          </p>
+          <p class="text-xs text-slate-500">Gemba Problem Solving (Komarigoto) & 21 Kaizen Viewpoints</p>
         </div>
         <div class="flex items-center space-x-2 shrink-0">
-          <!-- 1-Slide Presentation Launch Button -->
-          <button onclick="openOneSlidePresentationModal()" class="bg-[#0067B1] hover:bg-[#004F8A] text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold shadow-xs transition flex items-center space-x-1.5">
+          <button onclick="openOneSlidePresentationModal()" class="bg-[#0067B1] hover:bg-[#004F8A] text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow-xs transition flex items-center space-x-1.5">
             <i class="fa-solid fa-file-powerpoint text-amber-300"></i>
             <span>1-Slide Presentation</span>
-            <span id="selected-kvp-badge-count" class="bg-white/20 text-white text-[10px] px-1.5 py-0.2 rounded-full font-bold">3 selected</span>
+            <span id="selected-kvp-badge-count" class="bg-white/20 text-white text-[10px] px-1.5 py-0.2 rounded-full font-bold">0 selected</span>
           </button>
           <button onclick="openAddKomarigotoModal()" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow-xs transition flex items-center space-x-1">
             <i class="fa-solid fa-plus text-[10px]"></i>
@@ -774,60 +771,12 @@
         </div>
       </div>
 
-      <!-- Quick Helper Banner -->
-      <div class="bg-sky-50 border border-sky-100 rounded-xl p-2.5 flex items-center justify-between text-xs text-sky-900">
-        <div class="flex items-center space-x-2">
-          <i class="fa-solid fa-lightbulb text-amber-500 text-sm"></i>
-          <span>Check any of the <strong>21 Kaizen Viewpoints</strong> below — they will automatically flow into a management-ready <strong>1-Slide Presentation</strong> for your review with supervisors.</span>
-        </div>
-        <button onclick="openOneSlidePresentationModal()" class="text-[#0067B1] font-bold hover:underline shrink-0 ml-2">Preview Slide &rarr;</button>
-      </div>
-
-      <!-- 6 Presentation Blocks -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5">
-        <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-xs space-y-1.5">
-          <h4 class="font-bold text-slate-900 text-xs uppercase text-slate-500">1-2. Classroom Learning</h4>
-          <div class="text-xs space-y-1 text-slate-600">
-            <div class="p-1.5 bg-slate-50 rounded border border-slate-200">
-              <span class="font-semibold text-slate-800">Module:</span> Intermediate Training (Z10-Z12)
-            </div>
-            <div class="p-1.5 bg-slate-50 rounded border border-slate-200">
-              <span class="font-semibold text-slate-800">Topics:</span> Standardized Work 3 Slips, Takt Time, 3M Elimination
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-xs space-y-1.5">
-          <h4 class="font-bold text-slate-900 text-xs uppercase text-slate-500">3-4. Worksite Komarigoto</h4>
-          <div class="text-xs space-y-1 text-slate-600">
-            <div class="p-1.5 bg-slate-50 rounded border border-slate-200">
-              <span class="font-semibold text-slate-800">Area:</span> GD Head Machining (OP-100/120)
-            </div>
-            <div class="p-1.5 bg-slate-50 rounded border border-slate-200">
-              <span class="font-semibold text-slate-800">Issue:</span> Tool changeover delay & manual wrench reaching
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-xs space-y-1.5">
-          <h4 class="font-bold text-slate-900 text-xs uppercase text-slate-500">5-6. Countermeasure Applied</h4>
-          <div class="text-xs space-y-1 text-slate-600">
-            <div class="p-1.5 bg-slate-50 rounded border border-slate-200">
-              <span class="font-semibold text-slate-800">21 KVP #3 & #8:</span> Magnetic tool holster at fixture (14m &rarr; 0m)
-            </div>
-            <div class="p-1.5 bg-slate-50 rounded border border-slate-200">
-              <span class="font-semibold text-slate-800">21 KVP #12:</span> Cam-toggle quick clamping (-24s cycle time)
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 21 Kaizen Viewpoints Grid -->
-      <div class="bg-white p-3 sm:p-3.5 rounded-xl border border-slate-200 shadow-xs">
-        <div class="flex justify-between items-center mb-2.5">
+      <!-- 21 Kaizen Viewpoints Grid (Checklist) -->
+      <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-xs space-y-2">
+        <div class="flex justify-between items-center">
           <div>
-            <h3 class="font-bold text-slate-900 text-xs sm:text-sm">21 Kaizen Viewpoints (Select to Add into 1-Slide Deck)</h3>
-            <p class="text-[11px] text-slate-500">Muri (Overburden) &bull; Mura (Unevenness) &bull; Muda (Waste)</p>
+            <h3 class="font-bold text-slate-900 text-xs sm:text-sm">21 Kaizen Viewpoints</h3>
+            <p class="text-[11px] text-slate-500">Select viewpoints to include in your 1-Slide Presentation</p>
           </div>
           <div class="flex items-center space-x-2">
             <button onclick="clearKvpSelections()" class="text-[11px] text-slate-500 hover:text-slate-700 underline">Clear All</button>
@@ -841,27 +790,23 @@
         </div>
       </div>
 
-      <!-- Komarigoto Table -->
+      <!-- Worksite Komarigoto Log Table -->
       <div class="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
-        <div class="p-2.5 border-b border-slate-200 flex justify-between items-center">
-          <div>
-            <h3 class="font-bold text-slate-900 text-xs">Worksite Komarigoto Log</h3>
-            <p class="text-[11px] text-slate-500">Recorded Gemba struggles & Kaizen actions</p>
-          </div>
+        <div class="p-2.5 border-b border-slate-200 flex justify-between items-center bg-slate-50/50">
+          <h3 class="font-bold text-slate-900 text-xs sm:text-sm">Worksite Komarigoto Log</h3>
           <span class="text-[10px] text-slate-400">Shopfloor Records</span>
         </div>
         <div class="overflow-x-auto">
           <table class="w-full text-left text-xs whitespace-nowrap">
             <thead class="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase text-[10px]">
               <tr>
-                <th class="p-2">ID</th>
-                <th class="p-2">Associate</th>
-                <th class="p-2">Area & Machine</th>
-                <th class="p-2">Challenge</th>
-                <th class="p-2">21 KVP</th>
-                <th class="p-2">Status</th>
-                <th class="p-2 text-right">Savings</th>
-                <th class="p-2 text-center">Presentation</th>
+                <th class="p-2.5">ID</th>
+                <th class="p-2.5">Associate</th>
+                <th class="p-2.5">Station</th>
+                <th class="p-2.5">Challenge</th>
+                <th class="p-2.5">Status</th>
+                <th class="p-2.5 text-right">Savings</th>
+                <th class="p-2.5 text-center">Presentation</th>
               </tr>
             </thead>
             <tbody id="komarigoto-table-body" class="divide-y divide-slate-100">
@@ -880,31 +825,37 @@
       <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-xs space-y-2">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
           <div>
-            <h3 id="skill-matrix-header" class="font-bold text-slate-900 text-xs sm:text-sm">Department Skill Matrix & Competency Heatmap</h3>
-            <p id="skill-matrix-subheader" class="text-[11px] text-slate-500">Evaluation against 4 core TPS certification criteria</p>
+            <h3 class="font-bold text-slate-900 text-xs sm:text-sm">Department Skill Matrix</h3>
+            <p class="text-[11px] text-slate-500">Evaluation against core TPS certification criteria</p>
           </div>
-          <div class="flex items-center space-x-1.5 text-xs text-slate-600">
-            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span><span>Certified</span>
-            <span class="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block ml-2"></span><span>In Progress</span>
-            <span class="w-2.5 h-2.5 rounded-full bg-slate-300 inline-block ml-2"></span><span>Not Started</span>
+          <div class="flex items-center space-x-2 text-xs text-slate-600">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span><span>Certified</span>
+            <span class="w-2 h-2 rounded-full bg-amber-400 inline-block ml-1"></span><span>In Progress</span>
+            <span class="w-2 h-2 rounded-full bg-slate-300 inline-block ml-1"></span><span>Not Started</span>
           </div>
         </div>
 
-        <div class="overflow-x-auto">
+        <div class="overflow-x-auto border border-slate-200 rounded-lg">
           <table class="w-full text-left text-xs whitespace-nowrap">
             <thead class="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase text-[10px]">
               <tr>
-                <th class="p-2">Associate</th>
-                <th class="p-2">Area</th>
-                <th class="p-2">Current Level</th>
-                <th class="p-2 text-center">Standardized Work</th>
-                <th class="p-2 text-center">21 KVP Spotting</th>
-                <th class="p-2 text-center">A3 Problem Solving</th>
-                <th class="p-2 text-center">Kaizen Implementation</th>
-                <th class="p-2 text-center">Certification</th>
+                <th class="p-2.5">Emp ID</th>
+                <th class="p-2.5">Associate Name</th>
+                <th class="p-2.5">Working Area</th>
+                <th class="p-2.5">Designation</th>
+                <th class="p-2.5">Supervisor</th>
+                <th class="p-2.5 text-center">Level</th>
+                <th class="p-2.5 text-center">Training</th>
+                <th class="p-2.5 text-center">Post-Test</th>
+                <th class="p-2.5 text-center">Assignment</th>
+                <th class="p-2.5 text-center">Presentation</th>
+                <th class="p-2.5 text-center">Certified</th>
+                <th class="p-2.5 text-center">Jishuken</th>
+                <th class="p-2.5 text-center">Kaizens</th>
+                <th class="p-2.5 text-center">Action</th>
               </tr>
             </thead>
-            <tbody id="skill-matrix-body" class="divide-y divide-slate-100">
+            <tbody id="skill-matrix-tbody" class="divide-y divide-slate-100">
               <!-- Populated via JS -->
             </tbody>
           </table>
@@ -919,14 +870,31 @@
       <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-xs space-y-2">
         <div class="flex justify-between items-center">
           <div>
-            <h3 id="kaizen-tab-header" class="font-bold text-slate-900 text-xs sm:text-sm">Kaizen & Amrut Integration</h3>
-            <p id="kaizen-tab-subheader" class="text-[11px] text-slate-500">Directly synchronized with plant Amrut continuous improvement portal</p>
+            <h3 class="font-bold text-slate-900 text-xs sm:text-sm">Kaizen & Amrut Integration</h3>
+            <p class="text-[11px] text-slate-500">Synchronized with plant Amrut continuous improvement database</p>
           </div>
           <span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded text-[10px] font-bold">Amrut Sync Active</span>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5" id="kaizen-cards-grid">
-          <!-- Populated via JS -->
+        <div class="overflow-x-auto border border-slate-200 rounded-lg">
+          <table class="w-full text-left text-xs whitespace-nowrap">
+            <thead class="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase text-[10px]">
+              <tr>
+                <th class="p-2.5">Control No</th>
+                <th class="p-2.5">Associate</th>
+                <th class="p-2.5">Kaizen Title</th>
+                <th class="p-2.5">Category</th>
+                <th class="p-2.5">Line</th>
+                <th class="p-2.5">Machine</th>
+                <th class="p-2.5 text-right">Cost (₹)</th>
+                <th class="p-2.5 text-center">Status</th>
+                <th class="p-2.5 text-right">Date</th>
+              </tr>
+            </thead>
+            <tbody id="kaizens-tbody" class="divide-y divide-slate-100">
+              <!-- Populated via JS -->
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
@@ -942,13 +910,14 @@
             <p class="text-[11px] text-slate-500">Automated verification against TPS career milestones</p>
           </div>
           <div class="flex items-center space-x-2">
-            <select id="promotion-candidate-select" onchange="runGapAnalysis(this.value)" class="text-xs border border-slate-200 rounded-lg p-1.5 bg-slate-50 font-medium">
+            <label class="text-xs font-semibold text-slate-700">Select Candidate:</label>
+            <select id="promotion-candidate-select" onchange="runGapAnalysis(this.value)" class="text-xs border border-slate-300 rounded-lg p-1.5 bg-slate-50 font-medium focus:ring-1 focus:ring-[#0067B1]">
               <!-- Populated via JS -->
             </select>
           </div>
         </div>
 
-        <div id="promotion-audit-results" class="space-y-3">
+        <div id="gap-analysis-results" class="space-y-3">
           <!-- Populated via JS -->
         </div>
       </div>
@@ -966,8 +935,25 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5" id="certificates-grid">
-          <!-- Populated via JS -->
+        <div class="overflow-x-auto border border-slate-200 rounded-lg">
+          <table class="w-full text-left text-xs whitespace-nowrap">
+            <thead class="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase text-[10px]">
+              <tr>
+                <th class="p-2.5">Cert No</th>
+                <th class="p-2.5">Associate Name</th>
+                <th class="p-2.5">Emp ID</th>
+                <th class="p-2.5">Working Area</th>
+                <th class="p-2.5">TPS Level</th>
+                <th class="p-2.5">Issue Date</th>
+                <th class="p-2.5">Signatory</th>
+                <th class="p-2.5 text-center">Status</th>
+                <th class="p-2.5 text-center">Action</th>
+              </tr>
+            </thead>
+            <tbody id="certs-tbody" class="divide-y divide-slate-100">
+              <!-- Populated via JS -->
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
@@ -1263,8 +1249,8 @@
             <i class="fa-solid fa-file-powerpoint"></i>
           </div>
           <div>
-            <h3 class="font-bold text-slate-900 text-xs sm:text-sm">1-Slide Management Presentation</h3>
-            <p class="text-[10px] text-slate-500">Toyota A3 Single-Slide Summary for Executive & HOD Review</p>
+            <h3 class="font-bold text-slate-900 text-xs sm:text-sm">1-Slide Management Presentation (6 Steps)</h3>
+            <p class="text-[10px] text-slate-500">Toyota A3 Executive Summary Sheet for HOD & Leadership Review</p>
           </div>
         </div>
         <div class="flex items-center space-x-1.5">
@@ -1291,17 +1277,17 @@
         <div class="flex justify-between items-center border-b border-slate-200 pb-1.5">
           <span class="font-bold text-slate-800 text-xs flex items-center space-x-1">
             <i class="fa-solid fa-sliders text-[#0067B1]"></i>
-            <span>Customize Presentation Details (No PPT skills needed!)</span>
+            <span>Customize Presentation Details</span>
           </span>
           <button type="button" onclick="toggleSlideEditDrawer()" class="text-slate-400 hover:text-slate-600 text-xs">Close Edit</button>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
           <div>
             <label class="block font-semibold text-slate-700 text-[11px] mb-0.5">Presentation Title</label>
-            <input type="text" id="edit-slide-title" class="w-full bg-slate-50 border border-slate-300 rounded p-1.5 text-xs focus:ring-1 focus:ring-[#0067B1]" value="Standardized Work & Waste Elimination at OP-120 Fixture Clamping">
+            <input type="text" id="edit-slide-title" class="w-full bg-slate-50 border border-slate-300 rounded p-1.5 text-xs focus:ring-1 focus:ring-[#0067B1]" value="Standardized Work & Waste Elimination at OP-120 Clamping">
           </div>
           <div>
-            <label class="block font-semibold text-slate-700 text-[11px] mb-0.5">Machine / Station</label>
+            <label class="block font-semibold text-slate-700 text-[11px] mb-0.5">Station / Machine</label>
             <input type="text" id="edit-slide-station" class="w-full bg-slate-50 border border-slate-300 rounded p-1.5 text-xs focus:ring-1 focus:ring-[#0067B1]" value="GD HEAD Machining Line • OP-120 Clamping Station">
           </div>
           <div>
@@ -1315,7 +1301,7 @@
             <textarea id="edit-slide-problem" rows="2" class="w-full bg-slate-50 border border-slate-300 rounded p-1.5 text-xs focus:ring-1 focus:ring-[#0067B1]">Operator leaves station envelope and walks 14m to fetch hex wrench on every engine head loading, causing operator fatigue and cycle time bottleneck.</textarea>
           </div>
           <div>
-            <label class="block font-semibold text-slate-700 text-[11px] mb-0.5">Countermeasures Applied (Standardized Work)</label>
+            <label class="block font-semibold text-slate-700 text-[11px] mb-0.5">Countermeasures Applied</label>
             <textarea id="edit-slide-countermeasure" rows="2" class="w-full bg-slate-50 border border-slate-300 rounded p-1.5 text-xs focus:ring-1 focus:ring-[#0067B1]">Fabricated point-of-use magnetic tool holster directly on fixture + installed quick cam-toggle clamp replacing manual 6-turn hex bolt.</textarea>
           </div>
         </div>
@@ -1333,8 +1319,8 @@
             <input type="text" id="edit-slide-savings" class="w-full bg-slate-50 border border-slate-300 rounded p-1.5 text-xs" value="₹ 1,25,000 / annum">
           </div>
           <div>
-            <label class="block font-semibold text-slate-700 text-[11px] mb-0.5">Ergonomic REBA Score</label>
-            <input type="text" id="edit-slide-ergo" class="w-full bg-slate-50 border border-slate-300 rounded p-1.5 text-xs" value="Score 8 (High) → 2 (Low Risk)">
+            <label class="block font-semibold text-slate-700 text-[11px] mb-0.5">Ergonomic Safety</label>
+            <input type="text" id="edit-slide-ergo" class="w-full bg-slate-50 border border-slate-300 rounded p-1.5 text-xs" value="REBA Score: 8 → 2 (Safe)">
           </div>
         </div>
         <div class="flex justify-end space-x-2 pt-1 border-t border-slate-100">
@@ -1342,11 +1328,11 @@
         </div>
       </div>
 
-      <!-- THE 1-SLIDE EXECUTIVE PRESENTATION (A3 / PPT Single Slide Canvas) -->
-      <div id="printable-one-slide" class="bg-white rounded-xl border-2 border-slate-300 shadow-lg p-4 sm:p-6 text-slate-900 space-y-3 font-sans print:p-0 print:border-none print:shadow-none">
+      <!-- THE 1-SLIDE EXECUTIVE PRESENTATION (6-BLOCK CANVASS) -->
+      <div id="printable-one-slide" class="bg-white rounded-xl border-2 border-slate-300 shadow-lg p-4 sm:p-5 text-slate-900 space-y-3 font-sans print:p-0 print:border-none print:shadow-none">
         
         <!-- Slide Header -->
-        <div class="border-b-2 border-slate-900 pb-3 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+        <div class="border-b-2 border-slate-900 pb-2.5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
           <div class="flex items-center space-x-3">
             <img src="/static/img/tiei_logo.png" alt="TIEI Logo" class="h-8 object-contain">
             <div class="border-l border-slate-300 pl-3">
@@ -1361,133 +1347,155 @@
           </div>
         </div>
 
-        <!-- 4-Quadrant Management Canvas -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+        <!-- 6-BLOCK MANAGEMENT CANVAS (2 Rows x 3 Columns) -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5 text-xs">
           
-          <!-- Quadrant 1: Problem Identification & Selected 21 KVP -->
-          <div class="bg-slate-50/70 p-3 rounded-lg border border-slate-300 flex flex-col justify-between space-y-2">
+          <!-- Block 1: Standardized Work Slips (Step 1-2) -->
+          <div class="bg-slate-50/70 p-2.5 rounded-lg border border-slate-300 space-y-1.5 flex flex-col justify-between">
             <div>
-              <div class="flex justify-between items-center border-b border-slate-200 pb-1 mb-1.5">
-                <span class="font-black text-slate-900 text-xs uppercase tracking-wider text-[#0067B1]">1. Worksite Problem (Komarigoto) & 21 KVP</span>
-                <span class="text-[10px] font-bold text-slate-400">Step 3-4</span>
+              <div class="flex justify-between items-center border-b border-slate-200 pb-1 mb-1">
+                <span class="font-black text-slate-900 text-[11px] uppercase text-[#0067B1]">1. Standardized Work Slips</span>
+                <span class="text-[9px] font-mono text-slate-400">Step 1-2</span>
               </div>
-              <div class="space-y-1">
-                <div class="text-[11px] font-bold text-slate-700">Station / Process:</div>
-                <div id="slide-display-station" class="text-xs text-slate-800 font-semibold bg-white p-1.5 rounded border border-slate-200">GD HEAD Machining Line • OP-120 Clamping Station</div>
-              </div>
-              <div class="mt-2 space-y-1">
-                <div class="text-[11px] font-bold text-slate-700">Gemba Struggle Observed:</div>
-                <div id="slide-display-problem" class="text-xs text-slate-700 bg-white p-2 rounded border border-slate-200 leading-relaxed">
-                  Operator leaves station envelope and walks 14m to fetch hex wrench on every engine head loading, causing operator fatigue and cycle time bottleneck.
+              <div class="space-y-1 text-[11px] text-slate-700">
+                <div class="p-1 bg-white rounded border border-slate-200">
+                  <span class="font-bold text-slate-800">Slip 1:</span> Process Capacity Sheet (PCS)
+                </div>
+                <div class="p-1 bg-white rounded border border-slate-200">
+                  <span class="font-bold text-slate-800">Slip 2:</span> Standard Work Combination Sheet (SWCS)
+                </div>
+                <div class="p-1 bg-white rounded border border-slate-200">
+                  <span class="font-bold text-slate-800">Slip 3:</span> Standard Work Sheet (SWS)
                 </div>
               </div>
             </div>
-            <div>
-              <div class="text-[11px] font-bold text-slate-700 mb-1">Selected 21 Kaizen Viewpoints (Observation Checklist):</div>
-              <div id="slide-selected-kvp-chips" class="flex flex-wrap gap-1">
-                <!-- Populated dynamically via JS -->
-              </div>
+            <div class="text-[10px] text-slate-500 pt-1 border-t border-slate-200">
+              Baseline: Takt time 60s &bull; Manual cycle 64s
             </div>
           </div>
 
-          <!-- Quadrant 2: Root Cause Analysis (5-Why Method) -->
-          <div class="bg-slate-50/70 p-3 rounded-lg border border-slate-300 space-y-2">
-            <div class="flex justify-between items-center border-b border-slate-200 pb-1 mb-1.5">
-              <span class="font-black text-slate-900 text-xs uppercase tracking-wider text-[#0067B1]">2. Root Cause Analysis (5-Why)</span>
-              <span class="text-[10px] font-bold text-slate-400">Step 5-6</span>
-            </div>
-            <div class="space-y-1.5 bg-white p-2.5 rounded border border-slate-200 text-xs">
-              <div class="flex items-start space-x-1.5">
-                <span class="font-bold text-slate-500 shrink-0">Why 1:</span>
-                <span class="text-slate-800">Operator cycle time exceeds takt by 14 seconds? &rarr; Operator leaves station envelope to find clamping tool.</span>
-              </div>
-              <div class="flex items-start space-x-1.5">
-                <span class="font-bold text-slate-500 shrink-0">Why 2:</span>
-                <span class="text-slate-800">Why leave station envelope? &rarr; Tool stored on general shared rack 7 meters away.</span>
-              </div>
-              <div class="flex items-start space-x-1.5">
-                <span class="font-bold text-slate-500 shrink-0">Why 3:</span>
-                <span class="text-slate-800">Why stored away? &rarr; No dedicated station-mounted tool presentation holster.</span>
-              </div>
-              <div class="flex items-start space-x-1.5">
-                <span class="font-bold text-slate-500 shrink-0">Why 4:</span>
-                <span class="text-slate-800">Why manual hex wrench used? &rarr; Standard work relied on 6-turn threaded bolt fixture.</span>
-              </div>
-              <div class="flex items-start space-x-1.5 pt-1 border-t border-slate-200 text-[#0067B1] font-semibold">
-                <span class="font-black shrink-0">Root Cause:</span>
-                <span>Absence of point-of-use Standardized Work tool placement and slow mechanical fastening.</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Quadrant 3: Implemented Countermeasures & Standardized Work -->
-          <div class="bg-slate-50/70 p-3 rounded-lg border border-slate-300 space-y-2">
-            <div class="flex justify-between items-center border-b border-slate-200 pb-1 mb-1.5">
-              <span class="font-black text-slate-900 text-xs uppercase tracking-wider text-[#EA7625]">3. Implemented Countermeasure (Kaizen)</span>
-              <span class="text-[10px] font-bold text-slate-400">Step 7-8</span>
-            </div>
-            <div class="space-y-1.5">
-              <div id="slide-display-countermeasure" class="text-xs text-slate-800 bg-white p-2 rounded border border-slate-200 leading-relaxed font-medium">
-                Fabricated point-of-use magnetic tool holster directly on fixture + installed quick cam-toggle clamp replacing manual 6-turn hex bolt.
-              </div>
-              <div class="grid grid-cols-2 gap-2 text-[11px]">
-                <div class="p-2 bg-rose-50 border border-rose-200 rounded">
-                  <div class="font-bold text-rose-800 uppercase text-[10px]">Before Kaizen</div>
-                  <div class="text-slate-700 mt-0.5">&bull; Walking distance: 14m/cycle<br>&bull; Tool search delay: 28 sec<br>&bull; Operator posture: bending/strain</div>
-                </div>
-                <div class="p-2 bg-emerald-50 border border-emerald-200 rounded">
-                  <div class="font-bold text-emerald-800 uppercase text-[10px]">After Kaizen</div>
-                  <div class="text-slate-700 mt-0.5">&bull; Walking distance: 0m (100% eliminated)<br>&bull; Clamping time: 4 sec (-24s)<br>&bull; Operator posture: neutral & safe</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Quadrant 4: Operational Results & Management Sign-off -->
-          <div class="bg-slate-50/70 p-3 rounded-lg border border-slate-300 flex flex-col justify-between space-y-2">
+          <!-- Block 2: Worksite Komarigoto (Step 3) -->
+          <div class="bg-slate-50/70 p-2.5 rounded-lg border border-slate-300 space-y-1.5 flex flex-col justify-between">
             <div>
-              <div class="flex justify-between items-center border-b border-slate-200 pb-1 mb-1.5">
-                <span class="font-black text-slate-900 text-xs uppercase tracking-wider text-emerald-700">4. Tangible Results & Horizontal Deployment</span>
-                <span class="text-[10px] font-bold text-slate-400">Step 9-11</span>
+              <div class="flex justify-between items-center border-b border-slate-200 pb-1 mb-1">
+                <span class="font-black text-slate-900 text-[11px] uppercase text-[#0067B1]">2. Worksite Komarigoto</span>
+                <span class="text-[9px] font-mono text-slate-400">Step 3</span>
               </div>
-              
-              <!-- Metric Cards -->
-              <div class="grid grid-cols-2 gap-1.5 text-center">
-                <div class="bg-white p-1.5 rounded border border-slate-200">
-                  <span class="text-[10px] text-slate-500 font-semibold block uppercase">Cycle Time Reduction</span>
-                  <span id="slide-display-cycletime" class="font-black text-xs text-[#0067B1]">64s &rarr; 40s (-24s / 37.5%)</span>
+              <div class="space-y-1 text-[11px]">
+                <div id="slide-display-station" class="font-bold text-slate-800 bg-white p-1 rounded border border-slate-200">OP-120 Clamping Station</div>
+                <div id="slide-display-problem" class="text-slate-700 bg-white p-1.5 rounded border border-slate-200 leading-snug">
+                  Operator leaves station envelope and walks 14m to fetch hex wrench on every engine head loading, causing fatigue and delay.
                 </div>
-                <div class="bg-white p-1.5 rounded border border-slate-200">
-                  <span class="text-[10px] text-slate-500 font-semibold block uppercase">Walking Distance Saved</span>
-                  <span id="slide-display-walking" class="font-black text-xs text-indigo-700">14m &rarr; 0m (100% saved)</span>
+              </div>
+            </div>
+            <div class="text-[10px] text-rose-700 font-semibold pt-1 border-t border-slate-200">
+              <i class="fa-solid fa-triangle-exclamation mr-0.5"></i> Cycle Delay: +14 sec over Takt
+            </div>
+          </div>
+
+          <!-- Block 3: Selected 21 Kaizen Viewpoints (Step 4) -->
+          <div class="bg-slate-50/70 p-2.5 rounded-lg border border-slate-300 space-y-1.5 flex flex-col justify-between">
+            <div>
+              <div class="flex justify-between items-center border-b border-slate-200 pb-1 mb-1">
+                <span class="font-black text-slate-900 text-[11px] uppercase text-[#0067B1]">3. 21 KVP Observed</span>
+                <span id="slide-kvp-count-pill" class="text-[9px] font-mono px-1.5 py-0.2 bg-[#0067B1] text-white rounded font-bold">0 Selected</span>
+              </div>
+              <div id="slide-selected-kvp-chips" class="space-y-1 max-h-36 overflow-y-auto pr-1">
+                <!-- Dynamically filled with ALL selected viewpoints! -->
+              </div>
+            </div>
+            <div class="text-[10px] text-slate-500 pt-1 border-t border-slate-200">
+              Categorized into Muri &bull; Mura &bull; Muda
+            </div>
+          </div>
+
+          <!-- Block 4: Root Cause (5-Why Analysis) (Step 5-6) -->
+          <div class="bg-slate-50/70 p-2.5 rounded-lg border border-slate-300 space-y-1.5 flex flex-col justify-between">
+            <div>
+              <div class="flex justify-between items-center border-b border-slate-200 pb-1 mb-1">
+                <span class="font-black text-slate-900 text-[11px] uppercase text-[#EA7625]">4. Root Cause (5-Why)</span>
+                <span class="text-[9px] font-mono text-slate-400">Step 5-6</span>
+              </div>
+              <div class="space-y-1 text-[11px] bg-white p-1.5 rounded border border-slate-200">
+                <div><span class="font-bold text-slate-500">1:</span> Cycle bottleneck &rarr; Operator leaves envelope</div>
+                <div><span class="font-bold text-slate-500">2:</span> Leaves envelope &rarr; Tool kept 7m away on rack</div>
+                <div><span class="font-bold text-slate-500">3:</span> Kept on rack &rarr; No station holster mounted</div>
+                <div><span class="font-bold text-slate-500">4:</span> Hex wrench used &rarr; Fixture needed 6 turns</div>
+              </div>
+            </div>
+            <div class="text-[10px] text-[#EA7625] font-bold pt-1 border-t border-slate-200">
+              Root Cause: Lack of point-of-use tool presentation
+            </div>
+          </div>
+
+          <!-- Block 5: Implemented Countermeasure (Step 7-8) -->
+          <div class="bg-slate-50/70 p-2.5 rounded-lg border border-slate-300 space-y-1.5 flex flex-col justify-between">
+            <div>
+              <div class="flex justify-between items-center border-b border-slate-200 pb-1 mb-1">
+                <span class="font-black text-slate-900 text-[11px] uppercase text-[#EA7625]">5. Countermeasure Applied</span>
+                <span class="text-[9px] font-mono text-slate-400">Step 7-8</span>
+              </div>
+              <div id="slide-display-countermeasure" class="text-[11px] text-slate-800 bg-white p-1.5 rounded border border-slate-200 leading-snug">
+                Fabricated point-of-use magnetic tool holster directly on fixture + quick cam-toggle clamp replacing manual hex bolt.
+              </div>
+              <div class="grid grid-cols-2 gap-1 text-[10px] mt-1">
+                <div class="p-1 bg-rose-50 border border-rose-200 rounded">
+                  <span class="font-bold text-rose-800 block">Before</span>
+                  Walking: 14m/cycle<br>Manual wrench: 28s
                 </div>
-                <div class="bg-white p-1.5 rounded border border-slate-200">
-                  <span class="text-[10px] text-slate-500 font-semibold block uppercase">Annual Cost Savings</span>
-                  <span id="slide-display-savings" class="font-black text-xs text-emerald-600">&inr; 1,25,000 / annum</span>
+                <div class="p-1 bg-emerald-50 border border-emerald-200 rounded">
+                  <span class="font-bold text-emerald-800 block">After</span>
+                  Walking: 0m (saved)<br>Cam clamp: 4s (-24s)
                 </div>
-                <div class="bg-white p-1.5 rounded border border-slate-200">
-                  <span class="text-[10px] text-slate-500 font-semibold block uppercase">Ergonomic Safety</span>
-                  <span id="slide-display-ergo" class="font-black text-xs text-amber-600">REBA Score: 8 &rarr; 2 (Safe)</span>
+              </div>
+            </div>
+            <div class="text-[10px] text-emerald-700 font-semibold pt-1 border-t border-slate-200">
+              Standardized Work Sheet (SWS) revised
+            </div>
+          </div>
+
+          <!-- Block 6: Tangible Results & Horizontal Deployment (Step 9-11) -->
+          <div class="bg-slate-50/70 p-2.5 rounded-lg border border-slate-300 space-y-1.5 flex flex-col justify-between">
+            <div>
+              <div class="flex justify-between items-center border-b border-slate-200 pb-1 mb-1">
+                <span class="font-black text-slate-900 text-[11px] uppercase text-emerald-700">6. Tangible Results</span>
+                <span class="text-[9px] font-mono text-slate-400">Step 9-11</span>
+              </div>
+              <div class="grid grid-cols-2 gap-1 text-[10px] text-center">
+                <div class="bg-white p-1 rounded border border-slate-200">
+                  <span class="text-slate-400 block uppercase text-[8px]">Cycle Time</span>
+                  <span id="slide-display-cycletime" class="font-bold text-[#0067B1]">64s &rarr; 40s (-24s)</span>
+                </div>
+                <div class="bg-white p-1 rounded border border-slate-200">
+                  <span class="text-slate-400 block uppercase text-[8px]">Walking Saved</span>
+                  <span id="slide-display-walking" class="font-bold text-indigo-700">14m &rarr; 0m (100%)</span>
+                </div>
+                <div class="bg-white p-1 rounded border border-slate-200">
+                  <span class="text-slate-400 block uppercase text-[8px]">Cost Savings</span>
+                  <span id="slide-display-savings" class="font-bold text-emerald-600">₹ 1,25,000 / yr</span>
+                </div>
+                <div class="bg-white p-1 rounded border border-slate-200">
+                  <span class="text-slate-400 block uppercase text-[8px]">Safety / REBA</span>
+                  <span id="slide-display-ergo" class="font-bold text-amber-600">Score: 8 &rarr; 2</span>
                 </div>
               </div>
             </div>
 
             <!-- Sign-off Matrix -->
-            <div class="grid grid-cols-3 gap-1.5 text-center text-[10px] border-t border-slate-200 pt-1.5">
-              <div class="bg-white p-1 rounded border border-slate-200">
-                <div class="text-slate-400 uppercase font-bold text-[9px]">Prepared By</div>
-                <div id="slide-sign-prepared" class="font-bold text-slate-800">Associate</div>
+            <div class="grid grid-cols-3 gap-1 text-center text-[9px] border-t border-slate-200 pt-1">
+              <div class="bg-white p-0.5 rounded border border-slate-200">
+                <div class="text-slate-400 font-bold">Prepared</div>
+                <div id="slide-sign-prepared" class="font-bold text-slate-800 truncate">Associate</div>
               </div>
-              <div class="bg-white p-1 rounded border border-slate-200">
-                <div class="text-slate-400 uppercase font-bold text-[9px]">Verified By</div>
-                <div id="slide-sign-verified" class="font-bold text-slate-800">GL / AM</div>
+              <div class="bg-white p-0.5 rounded border border-slate-200">
+                <div class="text-slate-400 font-bold">Verified</div>
+                <div id="slide-sign-verified" class="font-bold text-slate-800 truncate">GL / AM</div>
               </div>
-              <div class="bg-white p-1 rounded border border-slate-200">
-                <div class="text-slate-400 uppercase font-bold text-[9px]">TPS Office Approved</div>
-                <div class="font-bold text-emerald-700"><i class="fa-solid fa-circle-check text-[9px] mr-0.5"></i> Certified</div>
+              <div class="bg-white p-0.5 rounded border border-slate-200">
+                <div class="text-slate-400 font-bold">TPS Office</div>
+                <div class="font-bold text-emerald-700">Certified</div>
               </div>
             </div>
-
           </div>
 
         </div>
@@ -1496,8 +1504,6 @@
 
     </div>
   </div>
-
-  <!-- ============================================== -->
   <!-- MODAL 6: VIEW ENROLLED BATCH MEMBERS           -->
   <!-- ============================================== -->
   <div id="batch-members-modal" class="fixed inset-0 bg-black/60 hidden z-50 flex items-center justify-center p-3 sm:p-4">
@@ -2015,6 +2021,46 @@
         } else if (employeesData && employeesData.length > 0) {
           loadEmployeeJourney(employeesData[0].id);
         }
+      } else if (tabId === 'presentation-board') {
+        if (!kvpData || kvpData.length === 0) fetchKVP();
+      } else if (tabId === 'skill-matrix') {
+        loadSkillMatrixTab();
+      } else if (tabId === 'kaizen-amrut') {
+        fetchKaizens();
+      } else if (tabId === 'promotion') {
+        loadPromotionTab();
+      } else if (tabId === 'certificates') {
+        fetchCertifications();
+      } else if (tabId === 'batches') {
+        fetchBatches();
+      }
+    }
+
+    async function loadSkillMatrixTab() {
+      if (!employeesData || employeesData.length === 0) {
+        await fetchEmployees(currentUser ? currentUser.emp_no : 'MGR001');
+      }
+      renderSkillMatrix(employeesData);
+    }
+
+    async function loadPromotionTab() {
+      if (!employeesData || employeesData.length === 0) {
+        await fetchEmployees(currentUser ? currentUser.emp_no : 'MGR001');
+      }
+      const candSelect = document.getElementById('promotion-candidate-select');
+      if (candSelect) {
+        candSelect.innerHTML = '';
+        const list = (employeesData && employeesData.length > 0) ? employeesData : (currentUser ? [currentUser] : []);
+        list.forEach(e => {
+          candSelect.innerHTML += `<option value="${e.id}">${e.name} (${e.emp_no}) - Level ${e.current_level} → ${e.target_level}</option>`;
+        });
+        if (list.length > 0) {
+          const targetId = (selectedEmpId && list.some(e => e.id == selectedEmpId)) ? selectedEmpId : list[0].id;
+          candSelect.value = targetId;
+          runGapAnalysis(targetId);
+        }
+      }
+    }
       } else if (tabId === 'presentation-board') {
         if (!kvpData || kvpData.length === 0) fetchKVP();
       } else if (tabId === 'skill-matrix') {
@@ -2593,7 +2639,7 @@
     // ==========================================
     // 21 KAIZEN VIEWPOINTS
     // ==========================================
-        let selectedKvpIds = new Set([3, 8, 12]);
+        let selectedKvpIds = new Set();
     let currentSelectedKomarigoto = null;
     let isSlideFullscreen = false;
 
@@ -2670,26 +2716,29 @@
       }
     }
 
-    function renderSlideKvpChips() {
+        function renderSlideKvpChips() {
       const container = document.getElementById('slide-selected-kvp-chips');
-      if (!container || !kvpData) return;
+      const countPill = document.getElementById('slide-kvp-count-pill');
+      if (countPill) countPill.innerText = `${selectedKvpIds.size} Selected`;
+      if (!container) return;
       container.innerHTML = '';
 
-      if (selectedKvpIds.size === 0) {
-        container.innerHTML = '<span class="text-[10px] text-slate-400 italic">No viewpoints selected. Check items in the 21 KVP grid to add them to this slide.</span>';
+      if (!kvpData || selectedKvpIds.size === 0) {
+        container.innerHTML = '<div class="text-[10px] text-slate-400 italic p-1">No viewpoints selected yet. Check items from the 21 KVP grid to add them.</div>';
         return;
       }
 
-      kvpData.filter(k => selectedKvpIds.has(k.id)).forEach(k => {
-        let chipColor = 'bg-slate-100 text-slate-700 border-slate-300';
-        if (k.category === 'Muri') chipColor = 'bg-rose-50 text-rose-800 border-rose-300';
-        if (k.category === 'Mura') chipColor = 'bg-amber-50 text-amber-800 border-amber-300';
-        if (k.category === 'Muda') chipColor = 'bg-sky-50 text-sky-800 border-sky-300';
+      const selectedList = kvpData.filter(k => selectedKvpIds.has(k.id));
+      selectedList.forEach(k => {
+        let chipBg = 'bg-slate-100 text-slate-700 border-slate-300';
+        if (k.category === 'Muri') chipBg = 'bg-rose-50 text-rose-800 border-rose-300';
+        if (k.category === 'Mura') chipBg = 'bg-amber-50 text-amber-800 border-amber-300';
+        if (k.category === 'Muda') chipBg = 'bg-sky-50 text-sky-800 border-sky-300';
 
         container.innerHTML += `
-          <div class="px-2 py-0.5 rounded text-[10px] font-bold border ${chipColor} flex items-center space-x-1">
-            <span>#${k.id} [${k.category}]</span>
-            <span class="font-normal text-slate-600 truncate max-w-[150px]">${k.name}</span>
+          <div class="px-1.5 py-0.5 rounded text-[10px] font-bold border ${chipBg} flex items-center justify-between">
+            <span class="font-mono">#${k.id} [${k.category}]</span>
+            <span class="font-medium text-slate-700 truncate max-w-[130px] ml-1">${k.name}</span>
           </div>
         `;
       });
@@ -3150,12 +3199,18 @@
     // ==========================================
     // SKILL MATRIX
     // ==========================================
-    function renderSkillMatrix(employees) {
-      const tbody = document.getElementById('skill-matrix-tbody');
+        function renderSkillMatrix(employees) {
+      const tbody = document.getElementById('skill-matrix-tbody') || document.getElementById('skill-matrix-body');
       if (!tbody) return;
       tbody.innerHTML = '';
 
-      employees.forEach(e => {
+      const list = employees || [];
+      if (list.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="14" class="p-4 text-center text-slate-400 text-xs">No employees found in competency matrix.</td></tr>';
+        return;
+      }
+
+      list.forEach(e => {
         let levelTag = '<span class="px-1.5 py-0.2 rounded text-[10px] font-bold bg-slate-100 text-slate-600">L1</span>';
         if (e.current_level === 2) levelTag = '<span class="px-1.5 py-0.2 rounded text-[10px] font-bold bg-sky-100 text-[#0067B1]">L2</span>';
         if (e.current_level === 3) levelTag = '<span class="px-1.5 py-0.2 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">L3</span>';
@@ -3169,21 +3224,21 @@
 
         tbody.innerHTML += `
           <tr class="hover:bg-slate-50 transition cursor-pointer" onclick="selectEmployeeFromMatrix(${e.id})">
-            <td class="p-2 font-mono font-bold text-slate-800">${e.emp_no}</td>
-            <td class="p-2 font-bold text-slate-900">${e.name}</td>
-            <td class="p-2 font-medium text-slate-700">${e.working_area}</td>
-            <td class="p-2 text-slate-500">${e.designation}</td>
-            <td class="p-2 text-slate-600">${e.boss_name}</td>
-            <td class="p-2 text-center">${levelTag}</td>
-            <td class="p-2 text-center">${trnBadge}</td>
-            <td class="p-2 text-center">${testBadge}</td>
-            <td class="p-2 text-center">${asgnBadge}</td>
-            <td class="p-2 text-center">${presBadge}</td>
-            <td class="p-2 text-center">${certBadge}</td>
-            <td class="p-2 text-center">${jishukenBadge}</td>
-            <td class="p-2 text-center font-bold text-slate-800">${e.kaizens_approved}</td>
-            <td class="p-2 text-center">
-              <button onclick="event.stopPropagation(); viewJourneyFor(${e.id})" class="text-[#0067B1] hover:underline font-bold text-[11px]">View</button>
+            <td class="p-2.5 font-mono font-bold text-slate-800">${e.emp_no}</td>
+            <td class="p-2.5 font-bold text-slate-900">${e.name}</td>
+            <td class="p-2.5 font-medium text-slate-700">${e.working_area || 'GD'}</td>
+            <td class="p-2.5 text-slate-600">${e.designation}</td>
+            <td class="p-2.5 text-slate-500">${e.boss_name ? e.boss_name.split('(')[0].trim() : '-'}</td>
+            <td class="p-2.5 text-center">${levelTag}</td>
+            <td class="p-2.5 text-center">${trnBadge}</td>
+            <td class="p-2.5 text-center">${testBadge}</td>
+            <td class="p-2.5 text-center">${asgnBadge}</td>
+            <td class="p-2.5 text-center">${presBadge}</td>
+            <td class="p-2.5 text-center">${certBadge}</td>
+            <td class="p-2.5 text-center">${jishukenBadge}</td>
+            <td class="p-2.5 text-center font-bold text-slate-800">${e.kaizens_approved || 0}</td>
+            <td class="p-2.5 text-center">
+              <button onclick="event.stopPropagation(); viewJourneyFor(${e.id})" class="text-[#0067B1] hover:underline font-bold text-xs">View</button>
             </td>
           </tr>
         `;
@@ -3223,7 +3278,7 @@
       try {
         const res = await fetch(`/api/promotion_readiness/${empId}`);
         const data = await res.json();
-        const container = document.getElementById('gap-analysis-results');
+        const container = (document.getElementById('gap-analysis-results') || document.getElementById('promotion-audit-results'));
         if (!container) return;
 
         let targetTitle = data.target_level === 2 ? 'Level 2 - Practitioner' : (data.target_level === 3 ? 'Level 3 - Champion' : 'Level 4 - Master');
