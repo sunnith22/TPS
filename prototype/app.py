@@ -97,6 +97,18 @@ HIERARCHY_CONFIG = [
         "description": "Shopfloor Trainee: Dedicated Personal Portal (Level, 11-Step Pathway, Evidence Upload & Progress)",
         "demo_emp_no": "70201", "demo_name": "RAMESH K", "icon": "fa-helmet-safety",
         "color": "purple", "badge_bg": "bg-purple-600"
+    },
+    {
+        "rank": 7, "role": "TRAINER", "title": "7) Master Trainer & Verifier",
+        "description": "Training Batches, Attendance Register & Knowledge Assessments",
+        "demo_emp_no": "TRN001", "demo_name": "DILIP R", "icon": "fa-chalkboard-user",
+        "color": "sky", "badge_bg": "bg-[#0067B1]"
+    },
+    {
+        "rank": 8, "role": "TPS_OFFICE", "title": "8) TPS Office / Digital Captain",
+        "description": "Plant Competency Governance, Department Nominations & Certifications",
+        "demo_emp_no": "TPS001", "demo_name": "RAKSHITH PRABHU", "icon": "fa-laptop-code",
+        "color": "amber", "badge_bg": "bg-[#EA7625]"
     }
 ]
 
@@ -527,6 +539,246 @@ def get_kaizens():
     kaizens = [dict(r) for r in rows]
     conn.close()
     return jsonify(kaizens)
+
+# ==========================================
+# TRAINING ATTENDANCE ENDPOINTS (Mark & Track)
+# ==========================================
+@app.route('/api/attendance', methods=['GET', 'POST'])
+def manage_attendance():
+    conn = get_db()
+    cursor = conn.cursor()
+
+    if request.method == 'POST':
+        data = request.json or {}
+        # Support single mark or batch list
+        items = data if isinstance(data, list) else [data]
+        updated_ids = []
+
+        for item in items:
+            att_id = item.get('id')
+            batch_id = item.get('batch_id')
+            emp_id = item.get('emp_id')
+            status = item.get('status', 'Present')
+            remarks = item.get('remarks', '')
+            session_date = item.get('session_date')
+
+            if att_id:
+                cursor.execute('''
+                    UPDATE training_attendance
+                    SET status = ?, remarks = ?, marked_at = datetime('now')
+                    WHERE id = ?
+                ''', (status, remarks, att_id))
+                updated_ids.append(att_id)
+            elif batch_id and emp_id and session_date:
+                # Find or insert
+                existing = cursor.execute('''
+                    SELECT id FROM training_attendance
+                    WHERE batch_id = ? AND emp_id = ? AND session_date = ?
+                ''', (batch_id, emp_id, session_date)).fetchone()
+                if existing:
+                    cursor.execute('''
+                        UPDATE training_attendance
+                        SET status = ?, remarks = ?, marked_at = datetime('now')
+                        WHERE id = ?
+                    ''', (status, remarks, existing[0]))
+                    updated_ids.append(existing[0])
+                else:
+                    # Lookup emp
+                    emp = cursor.execute('SELECT emp_no, name, working_area FROM employees WHERE id = ?', (emp_id,)).fetchone()
+                    batch = cursor.execute('SELECT batch_code FROM training_batches WHERE id = ?', (batch_id,)).fetchone()
+                    e_no = emp[0] if emp else ''
+                    e_name = emp[1] if emp else ''
+                    e_dept = f"GD {emp[2]} Machining" if emp else 'GD'
+                    b_code = batch[0] if batch else 'BATCH'
+                    cursor.execute('''
+                        INSERT INTO training_attendance (
+                            batch_id, batch_code, emp_id, emp_no, emp_name, department,
+                            session_date, session_topic, status, marked_by, marked_at, remarks
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'Dilip R (Master Trainer)', datetime('now'), ?)
+                    ''', (batch_id, b_code, emp_id, e_no, e_name, e_dept, session_date, item.get('session_topic', 'Training Session'), status, remarks))
+                    updated_ids.append(cursor.lastrowid)
+
+        conn.commit()
+        conn.close()
+        return jsonify({"success": True, "updated_ids": updated_ids})
+
+    # GET: Query attendance
+    batch_id = request.args.get('batch_id')
+    session_date = request.args.get('session_date')
+    emp_no = request.args.get('emp_no')
+
+    query = 'SELECT * FROM training_attendance WHERE 1=1'
+    params = []
+
+    if batch_id and batch_id != 'ALL':
+        query += ' AND (batch_id = ? OR batch_code = ?)'
+        params.extend([batch_id, str(batch_id)])
+    if session_date:
+        query += ' AND session_date = ?'
+        params.append(session_date)
+    if emp_no:
+        query += ' AND UPPER(emp_no) = ?'
+        params.append(emp_no.upper())
+
+    query += ' ORDER BY session_date DESC, emp_name ASC'
+    rows = cursor.execute(query, params).fetchall()
+    results = [dict(r) for r in rows]
+    conn.close()
+    return jsonify(results)
+
+@app.route('/api/attendance/summary')
+def get_attendance_summary():
+    conn = get_db()
+    cursor = conn.cursor()
+    batch_param = request.args.get('batch_id', '1')
+
+    # Candidate-wise summary for batch
+    rows = cursor.execute('''
+        SELECT emp_id, emp_no, emp_name, department,
+               COUNT(*) as total_sessions,
+               SUM(CASE WHEN status = 'Present' THEN 1 ELSE 0 END) as attended_sessions,
+               SUM(CASE WHEN status = 'Absent' THEN 1 ELSE 0 END) as absent_sessions
+        FROM training_attendance
+        WHERE batch_id = ? OR batch_code = ?
+        GROUP BY emp_id, emp_no, emp_name, department
+        ORDER BY emp_name ASC
+    ''', (batch_param, str(batch_param))).fetchall()
+
+    candidates = []
+    total_present = 0
+    total_records = 0
+
+    for r in rows:
+        d = dict(r)
+        pct = round((d['attended_sessions'] / d['total_sessions'] * 100), 1) if d['total_sessions'] > 0 else 0
+        d['attendance_pct'] = pct
+        d['is_eligible'] = pct >= 80.0 # 80% attendance required as per Understanding Doc
+        candidates.append(d)
+        total_present += d['attended_sessions']
+        total_records += d['total_sessions']
+
+    overall_pct = round((total_present / total_records * 100), 1) if total_records > 0 else 94.4
+
+    # List of unique session dates for batch
+    session_rows = cursor.execute('''
+        SELECT DISTINCT session_date, session_topic 
+        FROM training_attendance 
+        WHERE batch_id = ? OR batch_code = ?
+        ORDER BY session_date ASC
+    ''', (batch_param, str(batch_param))).fetchall()
+    sessions = [dict(s) for s in session_rows]
+
+    conn.close()
+    return jsonify({
+        "batch_id": batch_param,
+        "overall_attendance_pct": overall_pct,
+        "total_enrolled": len(candidates),
+        "eligible_count": sum(1 for c in candidates if c['is_eligible']),
+        "sessions": sessions,
+        "candidates": candidates
+    })
+
+# ==========================================
+# DEPARTMENT TPS NOMINATIONS / PROPOSALS
+# ==========================================
+@app.route('/api/department_nominations/stats')
+def get_department_nominations_stats():
+    conn = get_db()
+    cursor = conn.cursor()
+
+    rows = cursor.execute('''
+        SELECT department,
+               COUNT(*) as total_proposed,
+               SUM(CASE WHEN status IN ('Enrolled in Batch', 'Training Completed') THEN 1 ELSE 0 END) as enrolled,
+               SUM(CASE WHEN status = 'Training Completed' THEN 1 ELSE 0 END) as completed,
+               SUM(CASE WHEN status = 'Proposed' THEN 1 ELSE 0 END) as pending_review
+        FROM department_nominations
+        GROUP BY department
+        ORDER BY total_proposed DESC
+    ''').fetchall()
+
+    departments = []
+    proposed = []
+    enrolled = []
+    completed = []
+    pending = []
+
+    for r in rows:
+        departments.append(r['department'])
+        proposed.append(r['total_proposed'])
+        enrolled.append(r['enrolled'])
+        completed.append(r['completed'])
+        pending.append(r['pending_review'])
+
+    total_all_proposed = sum(proposed)
+    total_all_enrolled = sum(enrolled)
+    total_all_completed = sum(completed)
+
+    conn.close()
+    return jsonify({
+        "departments": departments,
+        "proposed": proposed,
+        "enrolled": enrolled,
+        "completed": completed,
+        "pending": pending,
+        "total_proposed": total_all_proposed,
+        "total_enrolled": total_all_enrolled,
+        "total_completed": total_all_completed
+    })
+
+@app.route('/api/department_nominations', methods=['GET', 'POST'])
+def manage_department_nominations():
+    conn = get_db()
+    cursor = conn.cursor()
+
+    if request.method == 'POST':
+        data = request.json or {}
+        emp_no = str(data.get('emp_no', '')).strip().upper()
+        emp_name = str(data.get('emp_name', '')).strip()
+        department = data.get('department', 'GD Head Machining')
+        designation = data.get('designation', 'Team Leader')
+        proposed_level = data.get('proposed_level', 'Level 2 - TPS Practitioner')
+        justification = data.get('justification', 'Proposed for next TPS competency batch')
+        nominated_by = data.get('nominated_by', 'MANUKUMAR G (Section Manager)')
+
+        # Match existing employee id
+        matched = cursor.execute("SELECT id FROM employees WHERE UPPER(emp_no) = ?", (emp_no,)).fetchone()
+        emp_id = matched[0] if matched else None
+
+        cursor.execute('''
+            INSERT INTO department_nominations (
+                emp_id, emp_no, emp_name, department, designation, proposed_level,
+                nominated_by, nomination_date, justification, status, batch_code
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, date('now'), ?, 'Proposed', 'Upcoming Q4 Batch')
+        ''', (emp_id, emp_no, emp_name, department, designation, proposed_level, nominated_by, justification))
+        conn.commit()
+        new_id = cursor.lastrowid
+        conn.close()
+        return jsonify({"success": True, "id": new_id, "message": f"Employee {emp_name} ({emp_no}) nominated successfully!"})
+
+    # GET: Query nominations
+    dept = request.args.get('department')
+    status = request.args.get('status')
+    search = request.args.get('search')
+
+    query = 'SELECT * FROM department_nominations WHERE 1=1'
+    params = []
+
+    if dept and dept != 'ALL':
+        query += ' AND department = ?'
+        params.append(dept)
+    if status and status != 'ALL':
+        query += ' AND status = ?'
+        params.append(status)
+    if search:
+        query += ' AND (emp_name LIKE ? OR emp_no LIKE ? OR justification LIKE ?)'
+        params.extend([f'%{search}%', f'%{search}%', f'%{search}%'])
+
+    query += ' ORDER BY id DESC'
+    rows = cursor.execute(query, params).fetchall()
+    nominations = [dict(r) for r in rows]
+    conn.close()
+    return jsonify(nominations)
 
 @app.route('/api/promotion_readiness/<int:emp_id>')
 def check_promotion_readiness(emp_id):

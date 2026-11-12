@@ -142,6 +142,28 @@ HIERARCHY_LEADERS = [
         "assignment_status": 0, "presentation_mgr": 0, "presentation_vp": 0, "presentation_dmd": 0,
         "practitioner_certified": 0, "jishuken_1": 0, "jishuken_2": 0, "champion_eval": 0.0, "champion_certified": 0,
         "kaizens_submitted": 1, "kaizens_approved": 0, "cost_savings_inr": 0.0, "kpi_score": 66.0
+    },
+    # Level 7: Master Trainer / Verifier
+    {
+        "emp_no": "TRN001", "name": "DILIP R", "division": "GD", "working_area": "TPS DOJO / TRAINING",
+        "designation": "Master Trainer & Verifier", "boss_name": "MANUKUMAR G (Manager)", "hierarchy_role": "TRAINER",
+        "hierarchy_rank": 3, "reports_to_emp_no": "MGR001", "gender": "Male",
+        "avatar": "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=120&q=80",
+        "current_level": 4, "target_level": 4, "training_status": 2, "pre_test_score": 92.0, "post_test_score": 98.0,
+        "assignment_status": 2, "presentation_mgr": 2, "presentation_vp": 2, "presentation_dmd": 2,
+        "practitioner_certified": 1, "jishuken_1": 1, "jishuken_2": 1, "champion_eval": 98.0, "champion_certified": 1,
+        "kaizens_submitted": 25, "kaizens_approved": 24, "cost_savings_inr": 1250000.0, "kpi_score": 98.5
+    },
+    # Level 8: TPS Office / Digital Captain
+    {
+        "emp_no": "TPS001", "name": "RAKSHITH PRABHU", "division": "GD", "working_area": "TPS DIGITAL OFFICE",
+        "designation": "TPS Office / Digital Captain", "boss_name": "Antony John Sudhakar P (VP)", "hierarchy_role": "TPS_OFFICE",
+        "hierarchy_rank": 2, "reports_to_emp_no": "VP001", "gender": "Male",
+        "avatar": "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=120&q=80",
+        "current_level": 3, "target_level": 4, "training_status": 2, "pre_test_score": 88.0, "post_test_score": 96.0,
+        "assignment_status": 2, "presentation_mgr": 2, "presentation_vp": 2, "presentation_dmd": 2,
+        "practitioner_certified": 1, "jishuken_1": 1, "jishuken_2": 1, "champion_eval": 94.0, "champion_certified": 1,
+        "kaizens_submitted": 16, "kaizens_approved": 15, "cost_savings_inr": 720000.0, "kpi_score": 95.0
     }
 ]
 
@@ -283,6 +305,228 @@ def upgrade_and_seed_hierarchy(conn):
                 "Install angled gravity chute bin on workstation apron", "Feasible", "", "Submitted"
             ))
             conn.commit()
+
+    # Seed Attendance & Department Nominations
+    seed_attendance_and_nominations(conn)
+
+def seed_attendance_and_nominations(conn):
+    cursor = conn.cursor()
+
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS training_attendance (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        batch_id INTEGER,
+        batch_code TEXT,
+        emp_id INTEGER,
+        emp_no TEXT,
+        emp_name TEXT,
+        department TEXT,
+        session_date TEXT,
+        session_topic TEXT,
+        status TEXT DEFAULT 'Present',
+        marked_by TEXT DEFAULT 'Dilip R (Master Trainer)',
+        marked_at TEXT DEFAULT (datetime('now')),
+        remarks TEXT DEFAULT ''
+    )
+    ''')
+
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS department_nominations (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        emp_id INTEGER,
+        emp_no TEXT,
+        emp_name TEXT,
+        department TEXT,
+        designation TEXT,
+        proposed_level TEXT DEFAULT 'Level 2 - TPS Practitioner',
+        nominated_by TEXT DEFAULT 'MANUKUMAR G (Section Manager)',
+        nomination_date TEXT DEFAULT (date('now')),
+        justification TEXT DEFAULT '',
+        status TEXT DEFAULT 'Proposed',
+        batch_code TEXT DEFAULT ''
+    )
+    ''')
+    conn.commit()
+
+    # Seed training attendance if empty
+    att_count = cursor.execute("SELECT COUNT(*) FROM training_attendance").fetchone()[0]
+    if att_count == 0:
+        emps = cursor.execute("SELECT id, emp_no, name, working_area FROM employees LIMIT 18").fetchall()
+        sessions = [
+            ("2026-10-15", "Day 1: TPS Foundations & 3 Standardized Work Slips"),
+            ("2026-10-16", "Day 2: 21 Kaizen Viewpoints (KVP) & Waste Spotting"),
+            ("2026-10-17", "Day 3: Action Learning Gemba Practice & A3 Drafting")
+        ]
+        att_rows = []
+        for e in emps:
+            e_id, e_no, e_name, e_area = e[0], e[1], e[2], e[3] or 'HEAD'
+            dept_name = f"GD {e_area} Machining" if 'Machining' not in e_area else e_area
+            for s_idx, (s_date, s_topic) in enumerate(sessions):
+                if e_no in ['70201', '50031', 'MGR001']:
+                    status = 'Present'
+                    remarks = 'Active participation, standard work adhered'
+                elif random.random() < 0.08 and s_idx == 1:
+                    status = 'Absent'
+                    remarks = 'Line breakdown maintenance on Gemba'
+                else:
+                    status = 'Present'
+                    remarks = 'Completed session & quiz'
+                
+                att_rows.append((
+                    1, 'BATCH-2026-Q3-01', e_id, e_no, e_name, dept_name,
+                    s_date, s_topic, status, 'Dilip R (Master Trainer)', '2026-10-15 09:30:00', remarks
+                ))
+
+        cursor.executemany('''
+            INSERT INTO training_attendance (
+                batch_id, batch_code, emp_id, emp_no, emp_name, department,
+                session_date, session_topic, status, marked_by, marked_at, remarks
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', att_rows)
+        conn.commit()
+
+    # Seed department nominations if empty
+    nom_count = cursor.execute("SELECT COUNT(*) FROM department_nominations").fetchone()[0]
+    if nom_count == 0:
+        depts_config = [
+            ("GD Head Machining", [
+                ("50031", "ARUNA D R", "Team Leader", "Level 3 - Champion", "Training Completed", "BATCH-2026-Q3-01", "Identified high potential for line Kaizen leadership"),
+                ("70201", "RAMESH K", "Working Trainee", "Level 2 - Practitioner", "Enrolled in Batch", "BATCH-2026-Q3-01", "Consistent performance on OP-110 station"),
+                ("60101", "VINAY KUMAR", "Graduate Apprentice", "Level 2 - Practitioner", "Enrolled in Batch", "BATCH-2026-Q3-01", "Mentoring WT boys on 21 KVP reduction"),
+                ("70202", "SURESH N", "Working Trainee", "Level 2 - Practitioner", "Enrolled in Batch", "BATCH-2026-Q3-01", "Good safety record and manual dexterity"),
+                ("60102", "POOJA SHARMA", "Graduate Apprentice", "Level 2 - Practitioner", "Enrolled in Batch", "BATCH-2026-Q3-01", "A3 problem solving candidate"),
+                ("50032", "MAHESH B G", "Team Leader", "Level 2 - Practitioner", "Training Completed", "BATCH-2026-Q3-01", "Tool changeover optimization champion"),
+                ("50033", "SHIVAKUMAR C", "Team Leader", "Level 2 - Practitioner", "Approved by HOD", "BATCH-2026-Q3-02", "Standardized work slip implementation"),
+                ("50034", "PRADEEP KUMAR", "Team Leader", "Level 2 - Practitioner", "Approved by HOD", "BATCH-2026-Q3-02", "Cylinder head leak testing specialist"),
+                ("50035", "RAVI M", "Team Leader", "Level 2 - Practitioner", "Proposed", "BATCH-2026-Q3-03", "Valve seat press fit quality improvement"),
+                ("70206", "ANAND R", "Working Trainee", "Level 1 - Foundation", "Proposed", "BATCH-2026-Q3-03", "New WT batch intake baseline development"),
+                ("70207", "BASAVARAJU", "Working Trainee", "Level 1 - Foundation", "Proposed", "BATCH-2026-Q3-03", "5S & workplace safety orientation"),
+                ("50036", "GIRISH N", "Team Leader", "Level 2 - Practitioner", "Approved by HOD", "BATCH-2026-Q3-02", "Autonomous maintenance lead"),
+                ("50037", "CHANDRASHEKAR", "Team Leader", "Level 3 - Champion", "Proposed", "BATCH-2026-Q3-02", "Yokoten Kaizen across lines"),
+                ("70208", "HARISH K", "Working Trainee", "Level 1 - Foundation", "Proposed", "BATCH-2026-Q3-03", "OP-140 deburr station operator"),
+                ("50038", "SANTOSH Y", "Team Leader", "Level 2 - Practitioner", "Training Completed", "BATCH-2026-Q3-01", "Muri waste elimination specialist"),
+                ("50039", "NAGARAJA T", "Team Leader", "Level 2 - Practitioner", "Proposed", "BATCH-2026-Q3-03", "Cycle time reduction candidate"),
+                ("70209", "VENKATESH P", "Working Trainee", "Level 1 - Foundation", "Proposed", "BATCH-2026-Q3-03", "Line supply loading trainee"),
+                ("50040", "PRAKASH S", "Team Leader", "Level 2 - Practitioner", "Training Completed", "BATCH-2026-Q3-01", "Quality circle coordinator")
+            ]),
+            ("GD Crank Machining", [
+                ("GL002", "PRASHANTH K", "Group Leader", "Level 3 - Champion", "Training Completed", "BATCH-2026-Q3-01", "Crank line TPS supervisor"),
+                ("70204", "CHETAN M", "Working Trainee", "Level 2 - Practitioner", "Enrolled in Batch", "BATCH-2026-Q3-01", "Crank pin journal grinding Kaizen"),
+                ("60103", "SNEHA R", "Graduate Apprentice", "Level 2 - Practitioner", "Enrolled in Batch", "BATCH-2026-Q3-01", "Oil hole drill breakage elimination"),
+                ("70205", "PRAVEEN S", "Working Trainee", "Level 1 - Foundation", "Enrolled in Batch", "BATCH-2026-Q3-01", "Workstation 5S and chip clearing"),
+                ("50041", "KIRAN GOWDA", "Team Leader", "Level 2 - Practitioner", "Training Completed", "BATCH-2026-Q3-01", "Magnetic tool retractor Kaizen winner"),
+                ("50042", "VIKRAM J", "Team Leader", "Level 2 - Practitioner", "Approved by HOD", "BATCH-2026-Q3-02", "Balancing machine cycle time study"),
+                ("50043", "DODDANARASAPPA", "Team Leader", "Level 2 - Practitioner", "Approved by HOD", "BATCH-2026-Q3-02", "Rough milling tool wear tracking"),
+                ("50044", "SUBRAMANI", "Team Leader", "Level 2 - Practitioner", "Proposed", "BATCH-2026-Q3-03", "Ergonomic conveyor transfer loading"),
+                ("70210", "SIDDAPPA", "Working Trainee", "Level 1 - Foundation", "Proposed", "BATCH-2026-Q3-03", "Washing machine operator trainee"),
+                ("50045", "JAGADEESH H", "Team Leader", "Level 2 - Practitioner", "Training Completed", "BATCH-2026-Q3-01", "Oil mist filtration standard work"),
+                ("50046", "SHANMUGAM", "Team Leader", "Level 2 - Practitioner", "Proposed", "BATCH-2026-Q3-03", "Chute angle gravity feed Kaizen"),
+                ("70211", "RAVIKUMAR K", "Working Trainee", "Level 1 - Foundation", "Proposed", "BATCH-2026-Q3-03", "Crankshaft buffer stock handling"),
+                ("50047", "VENKATARAMANA", "Team Leader", "Level 2 - Practitioner", "Approved by HOD", "BATCH-2026-Q3-02", "Gage calibration standard lead"),
+                ("50048", "MANJUNATHA R", "Team Leader", "Level 2 - Practitioner", "Proposed", "BATCH-2026-Q3-03", "Waste motion reduction candidate"),
+                ("70212", "LOKESH N", "Working Trainee", "Level 1 - Foundation", "Proposed", "BATCH-2026-Q3-03", "Deburring bench operator")
+            ]),
+            ("GD Block Machining", [
+                ("AM002", "KAILASH NATH", "Assistant Manager", "Level 3 - Champion", "Training Completed", "BATCH-2026-Q3-01", "Block machining lines oversight"),
+                ("50049", "SRINIVASALU", "Team Leader", "Level 2 - Practitioner", "Training Completed", "BATCH-2026-Q3-01", "Boring machine fixture alignment"),
+                ("50050", "ANIL KUMAR M", "Team Leader", "Level 2 - Practitioner", "Enrolled in Batch", "BATCH-2026-Q3-01", "Deep hole drilling tool life monitoring"),
+                ("50051", "RAVI SHANKAR", "Team Leader", "Level 2 - Practitioner", "Enrolled in Batch", "BATCH-2026-Q3-01", "Cylinder liner insertion Pokayoke"),
+                ("50052", "VENUGOPAL", "Team Leader", "Level 2 - Practitioner", "Approved by HOD", "BATCH-2026-Q3-02", "Coolant pressure consistency Kaizen"),
+                ("50053", "MOHAN BABU", "Team Leader", "Level 2 - Practitioner", "Approved by HOD", "BATCH-2026-Q3-02", "Pallet clamp hydraulic sensor check"),
+                ("70213", "KUMARASWAMY", "Working Trainee", "Level 1 - Foundation", "Proposed", "BATCH-2026-Q3-03", "Raw casting visual inspection"),
+                ("50054", "THIMMAPPA", "Team Leader", "Level 2 - Practitioner", "Proposed", "BATCH-2026-Q3-03", "Main bearing cap torque monitoring"),
+                ("70214", "NAGENDRA", "Working Trainee", "Level 1 - Foundation", "Proposed", "BATCH-2026-Q3-03", "Chip conveyor cleaning 5S"),
+                ("50055", "DEVARAJ", "Team Leader", "Level 2 - Practitioner", "Training Completed", "BATCH-2026-Q3-01", "Standard work combination sheet"),
+                ("50056", "SUDHAKAR B", "Team Leader", "Level 2 - Practitioner", "Proposed", "BATCH-2026-Q3-03", "WIP reduction between OP-10 and OP-20"),
+                ("70215", "KRISHNAMURTHY", "Working Trainee", "Level 1 - Foundation", "Proposed", "BATCH-2026-Q3-03", "Cylinder block loading crane"),
+                ("50057", "RAMESH BABU", "Team Leader", "Level 2 - Practitioner", "Approved by HOD", "BATCH-2026-Q3-02", "Air leak testing automation"),
+                ("70216", "SRIKANTHA", "Working Trainee", "Level 1 - Foundation", "Proposed", "BATCH-2026-Q3-03", "Finishing station deburr")
+            ]),
+            ("Engine Assembly", [
+                ("50058", "SURESH BABU", "Team Leader", "Level 3 - Champion", "Training Completed", "BATCH-2026-Q3-01", "Piston sub-assembly takt timing"),
+                ("50059", "RAMAKRISHNA", "Team Leader", "Level 2 - Practitioner", "Training Completed", "BATCH-2026-Q3-01", "Camshaft timing chain setting"),
+                ("50060", "NAGESH K", "Team Leader", "Level 2 - Practitioner", "Training Completed", "BATCH-2026-Q3-01", "Flywheel torque gun calibration"),
+                ("50061", "GOPALAKRISHNA", "Team Leader", "Level 2 - Practitioner", "Enrolled in Batch", "BATCH-2026-Q3-01", "Oil pan robotic sealant dispensing"),
+                ("50062", "PRASANNA", "Team Leader", "Level 2 - Practitioner", "Enrolled in Batch", "BATCH-2026-Q3-01", "Injector harness routing standard work"),
+                ("50063", "DINESH M", "Team Leader", "Level 2 - Practitioner", "Approved by HOD", "BATCH-2026-Q3-02", "Turbocharger fitment ergonomics"),
+                ("50064", "MALLIKARJUNA", "Team Leader", "Level 2 - Practitioner", "Approved by HOD", "BATCH-2026-Q3-02", "Cold test preparation cycle time"),
+                ("50065", "SHIVANNA", "Team Leader", "Level 2 - Practitioner", "Approved by HOD", "BATCH-2026-Q3-02", "Water pump assembly Pokayoke"),
+                ("70217", "RAGHAVENDRA", "Working Trainee", "Level 1 - Foundation", "Proposed", "BATCH-2026-Q3-03", "Assembly line parts kitting tray"),
+                ("70218", "MANJUNATH K", "Working Trainee", "Level 1 - Foundation", "Proposed", "BATCH-2026-Q3-03", "Bolt torquing trainee certification"),
+                ("50066", "CHANDRAKANTH", "Team Leader", "Level 2 - Practitioner", "Proposed", "BATCH-2026-Q3-03", "Oil filter hand-tighten verification"),
+                ("50067", "SATHYANARAYANA", "Team Leader", "Level 2 - Practitioner", "Proposed", "BATCH-2026-Q3-03", "Exhaust manifold heat shield installation"),
+                ("70219", "SUNIL KUMAR", "Working Trainee", "Level 1 - Foundation", "Proposed", "BATCH-2026-Q3-03", "Engine dress line assistant"),
+                ("50068", "VIJAYA KUMAR", "Team Leader", "Level 2 - Practitioner", "Training Completed", "BATCH-2026-Q3-01", "Alternator belt tension standard work"),
+                ("70220", "RAKESH M", "Working Trainee", "Level 1 - Foundation", "Proposed", "BATCH-2026-Q3-03", "Engine lifter hook verification"),
+                ("50069", "YOGESH P", "Team Leader", "Level 2 - Practitioner", "Approved by HOD", "BATCH-2026-Q3-02", "Crank damper pulley bolt fastener"),
+                ("50070", "NARAYANASWAMY", "Team Leader", "Level 2 - Practitioner", "Proposed", "BATCH-2026-Q3-03", "Wiring connector click sound verification"),
+                ("70221", "PRASHANTH M", "Working Trainee", "Level 1 - Foundation", "Proposed", "BATCH-2026-Q3-03", "Valve clearance measurement trainee"),
+                ("50071", "UMESH K", "Team Leader", "Level 2 - Practitioner", "Training Completed", "BATCH-2026-Q3-01", "Gasket positioning pokayoke fixture"),
+                ("70222", "KIRANKUMAR", "Working Trainee", "Level 1 - Foundation", "Proposed", "BATCH-2026-Q3-03", "Sub-assembly kanban card feeder"),
+                ("50072", "SHIVARUDRA", "Team Leader", "Level 2 - Practitioner", "Proposed", "BATCH-2026-Q3-03", "Front cover oil seal pressing"),
+                ("70223", "MADHUSUDHAN", "Working Trainee", "Level 1 - Foundation", "Proposed", "BATCH-2026-Q3-03", "Cold test dock transport operator")
+            ]),
+            ("Quality Assurance", [
+                ("50073", "KRISHNAPPA", "Quality Inspector", "Level 3 - Champion", "Training Completed", "BATCH-2026-Q3-01", "CMM measurement repeatability VSM"),
+                ("50074", "SRIDHAR N", "Quality Inspector", "Level 2 - Practitioner", "Training Completed", "BATCH-2026-Q3-01", "Cleanliness particle inspection (Millipore)"),
+                ("50075", "DAYANANDA", "Quality Inspector", "Level 2 - Practitioner", "Enrolled in Batch", "BATCH-2026-Q3-01", "Borescope cylinder wall crosshatch check"),
+                ("50076", "NARASIMHA", "Quality Inspector", "Level 2 - Practitioner", "Approved by HOD", "BATCH-2026-Q3-02", "Defect root cause 5-Why analysis leader"),
+                ("50077", "RAVEENDRA", "Quality Inspector", "Level 2 - Practitioner", "Approved by HOD", "BATCH-2026-Q3-02", "Torque wrench master verification standard"),
+                ("70224", "ASHOK KUMAR", "QA Technician", "Level 1 - Foundation", "Proposed", "BATCH-2026-Q3-03", "Dock audit sample testing trainee"),
+                ("50078", "BASAVARAJ M", "Quality Inspector", "Level 2 - Practitioner", "Proposed", "BATCH-2026-Q3-03", "First-piece sign-off standard work"),
+                ("70225", "NANDISH", "QA Technician", "Level 1 - Foundation", "Proposed", "BATCH-2026-Q3-03", "Surface roughness tester operator"),
+                ("50079", "CHIDANANDA", "Quality Inspector", "Level 2 - Practitioner", "Approved by HOD", "BATCH-2026-Q3-02", "Statistical process control (Cp/Cpk)"),
+                ("70226", "SHIVAPRASAD", "QA Technician", "Level 1 - Foundation", "Proposed", "BATCH-2026-Q3-03", "Gage R&R verification assistant")
+            ]),
+            ("Production Engineering", [
+                ("50080", "ANANTHA RAO", "PE Engineer", "Level 3 - Champion", "Training Completed", "BATCH-2026-Q3-01", "Line balancing & machine cycle time optimization"),
+                ("50081", "CHETHAN KUMAR", "PE Engineer", "Level 2 - Practitioner", "Training Completed", "BATCH-2026-Q3-01", "Tool layout and quick changeover fixture design"),
+                ("50082", "MOHAMMED Z", "PE Engineer", "Level 2 - Practitioner", "Enrolled in Batch", "BATCH-2026-Q3-01", "Automation chute for gravity parts feed"),
+                ("50083", "HARIPRASAD", "PE Engineer", "Level 2 - Practitioner", "Approved by HOD", "BATCH-2026-Q3-02", "Ergonomics simulation and motion waste reduction"),
+                ("50084", "SHANKAR LAL", "PE Engineer", "Level 2 - Practitioner", "Approved by HOD", "BATCH-2026-Q3-02", "Poka-yoke sensor retrofitting"),
+                ("70227", "SANTHOSH K", "PE Trainee", "Level 1 - Foundation", "Proposed", "BATCH-2026-Q3-03", "Standard work sheet drafting assistant"),
+                ("50085", "SRINIDHI", "PE Engineer", "Level 2 - Practitioner", "Proposed", "BATCH-2026-Q3-03", "Takt time planning for new engine variant"),
+                ("70228", "MANJUNATH V", "PE Trainee", "Level 1 - Foundation", "Proposed", "BATCH-2026-Q3-03", "Plant layout 2D AutoCAD update")
+            ]),
+            ("Maintenance (TPM)", [
+                ("50086", "GURURAJ N", "Maintenance Lead", "Level 3 - Champion", "Training Completed", "BATCH-2026-Q3-01", "Autonomous maintenance (Jishu Hozen) leader"),
+                ("50087", "SHIVANANDA", "Maintenance Tech", "Level 2 - Practitioner", "Training Completed", "BATCH-2026-Q3-01", "Spindle vibration analysis & predictive PM"),
+                ("50088", "SUBHASH C", "Maintenance Tech", "Level 2 - Practitioner", "Enrolled in Batch", "BATCH-2026-Q3-01", "Hydraulic leak elimination 7-step TPM"),
+                ("50089", "PRABHAKAR", "Maintenance Tech", "Level 2 - Practitioner", "Approved by HOD", "BATCH-2026-Q3-02", "Pneumatic valve manifold quick replacement"),
+                ("50090", "RAVINDRA BABU", "Maintenance Tech", "Level 2 - Practitioner", "Approved by HOD", "BATCH-2026-Q3-02", "Sensor wire harness damage prevention"),
+                ("70229", "CHANDRASEKHAR", "TPM Trainee", "Level 1 - Foundation", "Proposed", "BATCH-2026-Q3-03", "Lubrication point color-coding standard"),
+                ("50091", "KUMAR VEL", "Maintenance Tech", "Level 2 - Practitioner", "Proposed", "BATCH-2026-Q3-03", "Mean time between failures (MTBF) tracking"),
+                ("70230", "HEMANTH", "TPM Trainee", "Level 1 - Foundation", "Proposed", "BATCH-2026-Q3-03", "Filter replacement standard time reduction"),
+                ("50092", "MALLIKARJUN", "Maintenance Tech", "Level 2 - Practitioner", "Proposed", "BATCH-2026-Q3-03", "Emergency stop circuit standardization")
+            ]),
+            ("Supply Chain & Logistics", [
+                ("50093", "SRINIVASA RAO", "Logistics Lead", "Level 3 - Champion", "Training Completed", "BATCH-2026-Q3-01", "Mizusumashi (water spider) conveyance route design"),
+                ("50094", "MOHAN KUMAR", "Logistics Tech", "Level 2 - Practitioner", "Training Completed", "BATCH-2026-Q3-01", "Electronic Kanban leveling (Heijunka box)"),
+                ("50095", "VENKATESHA", "Logistics Tech", "Level 2 - Practitioner", "Enrolled in Batch", "BATCH-2026-Q3-01", "Dolly train tugger tow-bar safety Kaizen"),
+                ("50096", "ANANTHAKRISHNA", "Logistics Tech", "Level 2 - Practitioner", "Approved by HOD", "BATCH-2026-Q3-02", "Min-max parts rack visual indicator"),
+                ("70231", "THILAK", "Logistics Trainee", "Level 1 - Foundation", "Proposed", "BATCH-2026-Q3-03", "Raw material dock unloading standard work"),
+                ("70232", "SHANKAR G", "Logistics Trainee", "Level 1 - Foundation", "Proposed", "BATCH-2026-Q3-03", "Empty bin return route optimization")
+            ])
+        ]
+
+        nom_rows = []
+        for dept_name, emps_list in depts_config:
+            for emp in emps_list:
+                e_no, e_name, e_desig, e_level, e_status, e_batch, e_just = emp
+                matched = cursor.execute("SELECT id FROM employees WHERE emp_no = ?", (e_no,)).fetchone()
+                e_id = matched[0] if matched else None
+                nom_rows.append((
+                    e_id, e_no, e_name, dept_name, e_desig, e_level,
+                    "MANUKUMAR G (Section Manager)", "2026-09-15", e_just, e_status, e_batch
+                ))
+
+        cursor.executemany('''
+            INSERT INTO department_nominations (
+                emp_id, emp_no, emp_name, department, designation, proposed_level,
+                nominated_by, nomination_date, justification, status, batch_code
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', nom_rows)
+        conn.commit()
 
 
 def init_db(reset=False):
