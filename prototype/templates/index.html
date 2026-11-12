@@ -2061,22 +2061,7 @@
         }
       }
     }
-      } else if (tabId === 'presentation-board') {
-        if (!kvpData || kvpData.length === 0) fetchKVP();
-      } else if (tabId === 'skill-matrix') {
-        if (employeesData && employeesData.length > 0) {
-          renderSkillMatrix(employeesData);
-        }
-      } else if (tabId === 'kaizen-amrut') {
-        fetchKaizens();
-      } else if (tabId === 'promotion') {
-        if (selectedEmpId) runGapAnalysis(selectedEmpId);
-      } else if (tabId === 'certificates') {
-        fetchCertifications();
-      } else if (tabId === 'batches') {
-        fetchBatches();
-      }
-    }
+
 
     // ==========================================
     // FETCH STATS & CHARTS
