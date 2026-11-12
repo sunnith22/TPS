@@ -443,125 +443,127 @@
       <!-- Attendance Header -->
       <div class="bg-white rounded-xl p-3 sm:p-3.5 border border-slate-200 shadow-xs flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
         <div>
-          <h2 class="text-sm sm:text-base font-bold text-slate-900">Training Attendance</h2>
-          <p class="text-xs text-slate-500 mt-0.5">
-            Record session attendance and track certification eligibility (min. 80% required)
+          <h2 id="att-title" class="text-sm sm:text-base font-bold text-slate-900">Training Attendance Register</h2>
+          <p id="att-subtitle" class="text-xs text-slate-500 mt-0.5">
+            Session attendance register and certification eligibility tracking (min. 80% required)
           </p>
         </div>
         <div class="flex items-center space-x-2 shrink-0">
-          <button onclick="markAllPresent()" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold transition flex items-center space-x-1 shadow-xs">
-            <i class="fa-solid fa-check-double text-[10px]"></i>
-            <span>Mark All Present</span>
-          </button>
-          <button id="btn-save-attendance" onclick="saveAttendanceRegister()" class="px-3 py-1 bg-[#EA7625] hover:bg-[#d8661a] text-white rounded-lg text-xs font-semibold transition flex items-center space-x-1 shadow-xs">
-            <i class="fa-solid fa-floppy-disk text-[10px]"></i>
-            <span>Save</span>
-          </button>
+          <!-- TPS Admin Only Controls -->
+          <div id="att-admin-actions" class="hidden flex items-center space-x-2">
+            <button onclick="markAllPresent()" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold transition flex items-center space-x-1 shadow-xs">
+              <i class="fa-solid fa-check-double text-[10px]"></i>
+              <span>Mark All Present</span>
+            </button>
+            <button id="btn-save-attendance" onclick="saveAttendanceRegister()" class="px-3 py-1 bg-[#EA7625] hover:bg-[#d8661a] text-white rounded-lg text-xs font-semibold transition flex items-center space-x-1 shadow-xs">
+              <i class="fa-solid fa-floppy-disk text-[10px]"></i>
+              <span>Save Attendance</span>
+            </button>
+          </div>
+          <!-- Read-Only Indicator for Non-Admin -->
+          <div id="att-readonly-notice" class="flex items-center space-x-1 text-slate-500 bg-slate-100 border border-slate-200 px-2.5 py-1 rounded-lg text-xs font-medium">
+            <i class="fa-solid fa-shield-halved text-[10px] text-[#0067B1]"></i>
+            <span id="att-readonly-text">Read-Only View • Managed by TPS Office</span>
+          </div>
         </div>
       </div>
 
       <!-- KPI Scorecards -->
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
         <div class="bg-white p-2.5 rounded-xl border border-slate-200 shadow-xs">
-          <span class="text-[10px] font-bold text-slate-500 uppercase">Batch Attendance</span>
-          <div id="att-stat-pct" class="text-base font-bold text-[#0067B1] mt-0.5 font-mono">94.4%</div>
+          <span id="att-stat-pct-label" class="text-[10px] font-bold text-slate-500 uppercase">Batch Attendance</span>
+          <div id="att-stat-pct" class="text-lg font-black text-[#0067B1] mt-0.5">94.4%</div>
+          <span class="text-[10px] text-emerald-600 font-medium">Benchmark ≥ 80%</span>
         </div>
-
         <div class="bg-white p-2.5 rounded-xl border border-slate-200 shadow-xs">
-          <span class="text-[10px] font-bold text-slate-500 uppercase">Enrolled</span>
-          <div id="att-stat-enrolled" class="text-base font-bold text-slate-900 mt-0.5 font-mono">18</div>
+          <span id="att-stat-enrolled-label" class="text-[10px] font-bold text-slate-500 uppercase">Enrolled Trainees</span>
+          <div id="att-stat-enrolled" class="text-lg font-black text-slate-900 mt-0.5">18</div>
+          <span class="text-[10px] text-slate-500">Allocated Candidates</span>
         </div>
-
         <div class="bg-white p-2.5 rounded-xl border border-slate-200 shadow-xs">
-          <span class="text-[10px] font-bold text-slate-500 uppercase">Eligible (≥80%)</span>
-          <div id="att-stat-eligible" class="text-base font-bold text-emerald-600 mt-0.5 font-mono">17 / 18</div>
+          <span id="att-stat-eligible-label" class="text-[10px] font-bold text-slate-500 uppercase">Eligible for Exam</span>
+          <div id="att-stat-eligible" class="text-lg font-black text-emerald-600 mt-0.5">18 / 18</div>
+          <span class="text-[10px] text-emerald-600 font-medium">100% On Track</span>
         </div>
-
         <div class="bg-white p-2.5 rounded-xl border border-slate-200 shadow-xs">
-          <span class="text-[10px] font-bold text-slate-500 uppercase">Below Target</span>
-          <div id="att-stat-atrisk" class="text-base font-bold text-rose-600 mt-0.5 font-mono">1</div>
+          <span id="att-stat-atrisk-label" class="text-[10px] font-bold text-slate-500 uppercase">Action Required</span>
+          <div id="att-stat-atrisk" class="text-lg font-black text-slate-400 mt-0.5">0</div>
+          <span class="text-[10px] text-slate-500">Below 80% threshold</span>
         </div>
       </div>
 
-      <!-- Controls: Batch & Session Selector -->
-      <div class="bg-white p-2.5 rounded-xl border border-slate-200 shadow-xs flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2 text-xs">
-        <div class="flex flex-col sm:flex-row items-stretch sm:items-center space-y-1.5 sm:space-y-0 sm:space-x-3 w-full sm:w-auto">
-          <div class="flex items-center space-x-2">
-            <label class="font-semibold text-slate-700 whitespace-nowrap">Batch:</label>
-            <select id="att-batch-select" onchange="loadAttendanceData(this.value, null)" class="bg-slate-50 border border-slate-300 rounded-lg p-1 text-slate-800 text-xs focus:ring-1 focus:ring-[#0067B1]">
-              <option value="BATCH-2026-Q3-01">BATCH-2026-Q3-01: Level 2 (GD Division)</option>
-              <option value="BATCH-2026-Q2-03">BATCH-2026-Q2-03: Level 1 (Assembly)</option>
-            </select>
-          </div>
-
-          <div class="flex items-center space-x-2">
-            <label class="font-semibold text-slate-700 whitespace-nowrap">Session Date:</label>
-            <select id="att-session-date-select" onchange="loadAttendanceData(null, this.value)" class="bg-slate-50 border border-slate-300 rounded-lg p-1 text-slate-800 text-xs focus:ring-1 focus:ring-[#0067B1]">
-              <option value="2026-07-06">2026-07-06 • Session 1: Standardized Work (3 Slips)</option>
-              <option value="2026-07-07">2026-07-07 • Session 2: Takt Time & Line Balance</option>
-              <option value="2026-07-08">2026-07-08 • Session 3: 3M & 21 KVP Gemba Kaizen</option>
-            </select>
-          </div>
+      <!-- Batch Filter & Session Selector Bar -->
+      <div class="bg-white p-2.5 sm:p-3 rounded-xl border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-2 text-xs">
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="font-bold text-slate-700">Batch:</span>
+          <select id="att-batch-select" onchange="loadAttendanceData(this.value)" class="text-xs border border-slate-200 rounded-lg p-1.5 bg-slate-50 font-medium text-slate-800">
+            <option value="BATCH-2026-Q3-01">BATCH-2026-Q3-01: Level 2 - TPS Practitioner (3 Slips & 21 KVP)</option>
+            <option value="BATCH-2026-Q3-02">BATCH-2026-Q3-02: Level 3 - Advanced Practitioner (VSM & MIFC)</option>
+            <option value="BATCH-2026-Q3-03">BATCH-2026-Q3-03: Level 1 - TPS Foundation (5S & Safety)</option>
+          </select>
         </div>
-
-        <div class="text-[11px] text-slate-500 text-right">
-          Trainer: Dilip R • Venue: TPS Dojo
+        <div class="flex items-center space-x-2">
+          <span class="font-bold text-slate-700">Session Date:</span>
+          <select id="att-session-date-select" onchange="loadAttendanceData(null, this.value)" class="text-xs border border-slate-200 rounded-lg p-1.5 bg-slate-50 font-medium text-slate-800">
+            <option value="">Loading sessions...</option>
+          </select>
         </div>
       </div>
 
-      <!-- Attendance Tables -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-3">
-        
-        <!-- LEFT: Session Attendance -->
-        <div class="lg:col-span-7 bg-white rounded-xl border border-slate-200 shadow-xs p-3 space-y-2">
-          <div class="flex justify-between items-center border-b border-slate-100 pb-1.5">
-            <h3 class="font-bold text-slate-900 text-xs">Session Register</h3>
-            <span class="text-[10px] text-slate-400">Mark Present / Absent</span>
+      <!-- Session Register (Marking / Status Table) -->
+      <div class="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+        <div class="p-2.5 sm:p-3 border-b border-slate-200 flex justify-between items-center bg-slate-50/50">
+          <div>
+            <h3 id="att-table-header" class="font-bold text-slate-900 text-xs sm:text-sm">Daily Session Attendance</h3>
+            <p id="att-table-subheader" class="text-[11px] text-slate-500">Record attendance status for each enrolled associate</p>
           </div>
-
-          <div class="overflow-x-auto border border-slate-200 rounded-lg max-h-[460px] overflow-y-auto custom-scrollbar">
-            <table class="w-full text-left text-xs whitespace-nowrap">
-              <thead class="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase text-[10px] sticky top-0 z-10">
-                <tr>
-                  <th class="p-2">Trainee</th>
-                  <th class="p-2">Dept</th>
-                  <th class="p-2">Topic</th>
-                  <th class="p-2 text-center">Status</th>
-                  <th class="p-2">Remarks</th>
-                </tr>
-              </thead>
-              <tbody id="att-session-tbody" class="divide-y divide-slate-100">
-                <!-- Populated via JS -->
-              </tbody>
-            </table>
-          </div>
+          <span id="att-session-badge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-sky-100 text-[#0067B1]">Session Day</span>
         </div>
-
-        <!-- RIGHT: Trainee Cumulative Attendance -->
-        <div class="lg:col-span-5 bg-white rounded-xl border border-slate-200 shadow-xs p-3 space-y-2">
-          <div class="flex justify-between items-center border-b border-slate-100 pb-1.5">
-            <h3 class="font-bold text-slate-900 text-xs">Trainee Completion Summary</h3>
-            <span class="text-[10px] text-slate-500">Min. 80% to Certify</span>
-          </div>
-
-          <div class="overflow-x-auto border border-slate-200 rounded-lg max-h-[460px] overflow-y-auto custom-scrollbar">
-            <table class="w-full text-left text-xs whitespace-nowrap">
-              <thead class="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase text-[10px] sticky top-0 z-10">
-                <tr>
-                  <th class="p-2">Trainee</th>
-                  <th class="p-2 text-center">Days</th>
-                  <th class="p-2 text-center">Rate</th>
-                  <th class="p-2 text-center">Status</th>
-                  <th class="p-2 text-center">Action</th>
-                </tr>
-              </thead>
-              <tbody id="att-summary-tbody" class="divide-y divide-slate-100">
-                <!-- Populated via JS -->
-              </tbody>
-            </table>
-          </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs whitespace-nowrap">
+            <thead class="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase text-[10px]">
+              <tr>
+                <th class="p-2.5">Emp ID</th>
+                <th class="p-2.5">Trainee Name</th>
+                <th class="p-2.5">Department</th>
+                <th class="p-2.5 text-center">Status</th>
+                <th class="p-2.5">Remarks / Reason</th>
+                <th class="p-2.5">Marked By</th>
+              </tr>
+            </thead>
+            <tbody id="att-session-table-body" class="divide-y divide-slate-100">
+              <!-- Populated via JS -->
+            </tbody>
+          </table>
         </div>
+      </div>
 
+      <!-- Candidate Attendance Summary -->
+      <div class="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+        <div class="p-2.5 sm:p-3 border-b border-slate-200 flex justify-between items-center bg-slate-50/50">
+          <div>
+            <h3 id="att-summary-header" class="font-bold text-slate-900 text-xs sm:text-sm">Batch Trainee Summary & Certification Eligibility</h3>
+            <p class="text-[11px] text-slate-500">Minimum 80% attendance required for TPS Level qualification</p>
+          </div>
+          <span class="text-[11px] text-slate-500 font-medium">80% Threshold</span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs whitespace-nowrap">
+            <thead class="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase text-[10px]">
+              <tr>
+                <th class="p-2.5">Emp ID</th>
+                <th class="p-2.5">Associate Name</th>
+                <th class="p-2.5">Department</th>
+                <th class="p-2.5 text-center">Attended / Total</th>
+                <th class="p-2.5 text-center">Attendance %</th>
+                <th class="p-2.5 text-center">Certification Eligibility</th>
+              </tr>
+            </thead>
+            <tbody id="att-summary-table-body" class="divide-y divide-slate-100">
+              <!-- Populated via JS -->
+            </tbody>
+          </table>
+        </div>
       </div>
 
     </div>
@@ -746,7 +748,7 @@
     </div>
 
     <!-- ======================================================== -->
-    <!-- TAB 5: PRESENTATION BOARD (KOMARIGOTO & 21 KVP)          -->
+    <!-- TAB 4: PRESENTATION BOARD (Komarigoto & 21 KVP)          -->
     <!-- ======================================================== -->
     <div id="tab-content-presentation-board" class="tab-content hidden space-y-3">
       
@@ -755,14 +757,30 @@
         <div>
           <h2 class="text-sm sm:text-base font-bold text-slate-900">TPS Action Learning Presentation Board</h2>
           <p class="text-xs text-slate-500 mt-0.5">
-            Gemba Problem Solving (Komarigoto) and 21 Kaizen Viewpoints
+            Gemba Problem Solving (Komarigoto) & 21 Kaizen Viewpoints
           </p>
         </div>
         <div class="flex items-center space-x-2 shrink-0">
-          <button onclick="openAddKomarigotoModal()" class="bg-[#0067B1] hover:bg-[#004F8A] text-white px-3 py-1 rounded-lg text-xs font-semibold shadow-xs transition flex items-center space-x-1">
-            <i class="fa-solid fa-plus text-[10px]"></i><span>Log Komarigoto</span>
+          <!-- 1-Slide Presentation Launch Button -->
+          <button onclick="openOneSlidePresentationModal()" class="bg-[#0067B1] hover:bg-[#004F8A] text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold shadow-xs transition flex items-center space-x-1.5">
+            <i class="fa-solid fa-file-powerpoint text-amber-300"></i>
+            <span>1-Slide Presentation</span>
+            <span id="selected-kvp-badge-count" class="bg-white/20 text-white text-[10px] px-1.5 py-0.2 rounded-full font-bold">3 selected</span>
+          </button>
+          <button onclick="openAddKomarigotoModal()" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow-xs transition flex items-center space-x-1">
+            <i class="fa-solid fa-plus text-[10px]"></i>
+            <span>Log Komarigoto</span>
           </button>
         </div>
+      </div>
+
+      <!-- Quick Helper Banner -->
+      <div class="bg-sky-50 border border-sky-100 rounded-xl p-2.5 flex items-center justify-between text-xs text-sky-900">
+        <div class="flex items-center space-x-2">
+          <i class="fa-solid fa-lightbulb text-amber-500 text-sm"></i>
+          <span>Check any of the <strong>21 Kaizen Viewpoints</strong> below — they will automatically flow into a management-ready <strong>1-Slide Presentation</strong> for your review with supervisors.</span>
+        </div>
+        <button onclick="openOneSlidePresentationModal()" class="text-[#0067B1] font-bold hover:underline shrink-0 ml-2">Preview Slide &rarr;</button>
       </div>
 
       <!-- 6 Presentation Blocks -->
@@ -786,7 +804,7 @@
               <span class="font-semibold text-slate-800">Area:</span> GD Head Machining (OP-100/120)
             </div>
             <div class="p-1.5 bg-slate-50 rounded border border-slate-200">
-              <span class="font-semibold text-slate-800">Issue:</span> Tool changeover delay & coolant splashing
+              <span class="font-semibold text-slate-800">Issue:</span> Tool changeover delay & manual wrench reaching
             </div>
           </div>
         </div>
@@ -795,10 +813,10 @@
           <h4 class="font-bold text-slate-900 text-xs uppercase text-slate-500">5-6. Countermeasure Applied</h4>
           <div class="text-xs space-y-1 text-slate-600">
             <div class="p-1.5 bg-slate-50 rounded border border-slate-200">
-              <span class="font-semibold text-slate-800">21 KVP #8:</span> Quick-clamping fixture (14m → 3.5m)
+              <span class="font-semibold text-slate-800">21 KVP #3 & #8:</span> Magnetic tool holster at fixture (14m &rarr; 0m)
             </div>
             <div class="p-1.5 bg-slate-50 rounded border border-slate-200">
-              <span class="font-semibold text-slate-800">21 KVP #15:</span> Polycarbonate deflector guard installed
+              <span class="font-semibold text-slate-800">21 KVP #12:</span> Cam-toggle quick clamping (-24s cycle time)
             </div>
           </div>
         </div>
@@ -807,8 +825,16 @@
       <!-- 21 Kaizen Viewpoints Grid -->
       <div class="bg-white p-3 sm:p-3.5 rounded-xl border border-slate-200 shadow-xs">
         <div class="flex justify-between items-center mb-2.5">
-          <h3 class="font-bold text-slate-900 text-xs sm:text-sm">21 Kaizen Viewpoints (Observation Checklist)</h3>
-          <span class="text-[10px] text-slate-400">Muri • Mura • Muda</span>
+          <div>
+            <h3 class="font-bold text-slate-900 text-xs sm:text-sm">21 Kaizen Viewpoints (Select to Add into 1-Slide Deck)</h3>
+            <p class="text-[11px] text-slate-500">Muri (Overburden) &bull; Mura (Unevenness) &bull; Muda (Waste)</p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <button onclick="clearKvpSelections()" class="text-[11px] text-slate-500 hover:text-slate-700 underline">Clear All</button>
+            <button onclick="openOneSlidePresentationModal()" class="px-2.5 py-1 bg-sky-50 text-[#0067B1] hover:bg-sky-100 rounded-lg text-xs font-semibold border border-sky-200">
+              Build Slide &rarr;
+            </button>
+          </div>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2" id="kvp-grid">
           <!-- Populated via JS -->
@@ -818,7 +844,10 @@
       <!-- Komarigoto Table -->
       <div class="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
         <div class="p-2.5 border-b border-slate-200 flex justify-between items-center">
-          <h3 class="font-bold text-slate-900 text-xs">Worksite Komarigoto Log</h3>
+          <div>
+            <h3 class="font-bold text-slate-900 text-xs">Worksite Komarigoto Log</h3>
+            <p class="text-[11px] text-slate-500">Recorded Gemba struggles & Kaizen actions</p>
+          </div>
           <span class="text-[10px] text-slate-400">Shopfloor Records</span>
         </div>
         <div class="overflow-x-auto">
@@ -832,6 +861,7 @@
                 <th class="p-2">21 KVP</th>
                 <th class="p-2">Status</th>
                 <th class="p-2 text-right">Savings</th>
+                <th class="p-2 text-center">Presentation</th>
               </tr>
             </thead>
             <tbody id="komarigoto-table-body" class="divide-y divide-slate-100">
@@ -844,63 +874,37 @@
     </div>
 
     <!-- ========================================== -->
-    <!-- TAB 6: DEPARTMENT SKILL MATRIX             -->
+    <!-- TAB 5: DEPARTMENT SKILL MATRIX             -->
     <!-- ========================================== -->
     <div id="tab-content-skill-matrix" class="tab-content hidden space-y-3">
-      <div class="bg-white p-2.5 rounded-xl border border-slate-200 shadow-xs flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2">
-        <div class="flex flex-col sm:flex-row items-stretch sm:items-center space-y-1.5 sm:space-y-0 sm:space-x-3 w-full sm:w-auto text-xs">
-          <div class="flex items-center space-x-1.5">
-            <label class="font-semibold text-slate-600">Area:</label>
-            <select id="matrix-filter-area" onchange="filterSkillMatrix()" class="bg-slate-50 border border-slate-300 rounded-lg p-1 text-slate-800 text-xs focus:ring-1 focus:ring-[#0067B1]">
-              <option value="ALL">All Areas</option>
-              <option value="HEAD">GD Head Machining</option>
-              <option value="CRANK">GD Crank Machining</option>
-              <option value="BLOCK">GD Block Machining</option>
-              <option value="SUPPLY">Line Supply</option>
-            </select>
+      <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-xs space-y-2">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+          <div>
+            <h3 id="skill-matrix-header" class="font-bold text-slate-900 text-xs sm:text-sm">Department Skill Matrix & Competency Heatmap</h3>
+            <p id="skill-matrix-subheader" class="text-[11px] text-slate-500">Evaluation against 4 core TPS certification criteria</p>
           </div>
-
-          <div class="flex items-center space-x-1.5">
-            <label class="font-semibold text-slate-600">Level:</label>
-            <select id="matrix-filter-level" onchange="filterSkillMatrix()" class="bg-slate-50 border border-slate-300 rounded-lg p-1 text-slate-800 text-xs focus:ring-1 focus:ring-[#0067B1]">
-              <option value="ALL">All Levels</option>
-              <option value="1">Level 1 - Foundation</option>
-              <option value="2">Level 2 - Practitioner</option>
-              <option value="3">Level 3 - Champion</option>
-              <option value="4">Level 4 - Master</option>
-            </select>
+          <div class="flex items-center space-x-1.5 text-xs text-slate-600">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span><span>Certified</span>
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block ml-2"></span><span>In Progress</span>
+            <span class="w-2.5 h-2.5 rounded-full bg-slate-300 inline-block ml-2"></span><span>Not Started</span>
           </div>
-
-          <input type="text" id="matrix-search" oninput="filterSkillMatrix()" placeholder="Search associate..." class="w-full sm:w-44 bg-slate-50 border border-slate-300 rounded-lg p-1 text-slate-800 text-xs focus:outline-none focus:ring-1 focus:ring-[#0067B1]">
         </div>
 
-        <div class="text-[11px] text-slate-400 font-mono text-right">
-          Department Skill Matrix
-        </div>
-      </div>
-
-      <div class="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
         <div class="overflow-x-auto">
           <table class="w-full text-left text-xs whitespace-nowrap">
             <thead class="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase text-[10px]">
               <tr>
-                <th class="p-2">Emp ID</th>
                 <th class="p-2">Associate</th>
                 <th class="p-2">Area</th>
-                <th class="p-2">Designation</th>
-                <th class="p-2">Supervisor</th>
-                <th class="p-2 text-center">Level</th>
-                <th class="p-2 text-center">3 Slips</th>
-                <th class="p-2 text-center">Test</th>
-                <th class="p-2 text-center">A3</th>
-                <th class="p-2 text-center">VP Pres</th>
-                <th class="p-2 text-center">Cert</th>
-                <th class="p-2 text-center">Jishuken</th>
-                <th class="p-2 text-center">Kaizens</th>
-                <th class="p-2 text-center">Action</th>
+                <th class="p-2">Current Level</th>
+                <th class="p-2 text-center">Standardized Work</th>
+                <th class="p-2 text-center">21 KVP Spotting</th>
+                <th class="p-2 text-center">A3 Problem Solving</th>
+                <th class="p-2 text-center">Kaizen Implementation</th>
+                <th class="p-2 text-center">Certification</th>
               </tr>
             </thead>
-            <tbody id="skill-matrix-tbody" class="divide-y divide-slate-100">
+            <tbody id="skill-matrix-body" class="divide-y divide-slate-100">
               <!-- Populated via JS -->
             </tbody>
           </table>
@@ -909,105 +913,74 @@
     </div>
 
     <!-- ========================================== -->
-    <!-- TAB 7: KAIZEN & AMRUT                      -->
+    <!-- TAB 6: KAIZEN & AMRUT INTEGRATION          -->
     <!-- ========================================== -->
     <div id="tab-content-kaizen-amrut" class="tab-content hidden space-y-3">
-      <div class="bg-white rounded-xl p-3 sm:p-3.5 border border-slate-200 shadow-xs flex justify-between items-center">
-        <div>
-          <h2 class="text-sm sm:text-base font-bold text-slate-900">Shop-Floor Kaizens (Amrut Sync)</h2>
-          <p class="text-xs text-slate-500 mt-0.5">Implemented kaizen ideas and verified savings</p>
+      <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-xs space-y-2">
+        <div class="flex justify-between items-center">
+          <div>
+            <h3 id="kaizen-tab-header" class="font-bold text-slate-900 text-xs sm:text-sm">Kaizen & Amrut Integration</h3>
+            <p id="kaizen-tab-subheader" class="text-[11px] text-slate-500">Directly synchronized with plant Amrut continuous improvement portal</p>
+          </div>
+          <span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded text-[10px] font-bold">Amrut Sync Active</span>
         </div>
-      </div>
 
-      <div class="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs whitespace-nowrap">
-            <thead class="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase text-[10px]">
-              <tr>
-                <th class="p-2">Control No</th>
-                <th class="p-2">Associate</th>
-                <th class="p-2">Kaizen Work</th>
-                <th class="p-2">Category</th>
-                <th class="p-2">Line</th>
-                <th class="p-2">Machine</th>
-                <th class="p-2 text-right">Savings</th>
-                <th class="p-2 text-center">Status</th>
-                <th class="p-2">Date</th>
-              </tr>
-            </thead>
-            <tbody id="kaizens-tbody" class="divide-y divide-slate-100">
-              <!-- Populated via JS -->
-            </tbody>
-          </table>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5" id="kaizen-cards-grid">
+          <!-- Populated via JS -->
         </div>
       </div>
     </div>
 
     <!-- ========================================== -->
-    <!-- TAB 8: PROMOTION AUDIT                     -->
+    <!-- TAB 7: PROMOTION READINESS AUDIT           -->
     <!-- ========================================== -->
     <div id="tab-content-promotion" class="tab-content hidden space-y-3">
-      <div class="bg-white p-2.5 rounded-xl border border-slate-200 shadow-xs flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2">
-        <div class="flex items-center space-x-2 text-xs">
-          <label class="font-semibold text-slate-700 whitespace-nowrap">Associate:</label>
-          <select id="promotion-emp-select" onchange="runGapAnalysis(this.value)" class="text-xs bg-slate-50 border border-slate-300 rounded-lg p-1 font-medium text-slate-800 focus:ring-1 focus:ring-[#0067B1] w-full sm:w-72">
-            <!-- Populated via JS -->
-          </select>
+      <div class="bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-xs space-y-3">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+          <div>
+            <h3 class="font-bold text-slate-900 text-xs sm:text-sm">Promotion Readiness Evaluation</h3>
+            <p class="text-[11px] text-slate-500">Automated verification against TPS career milestones</p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <select id="promotion-candidate-select" onchange="runGapAnalysis(this.value)" class="text-xs border border-slate-200 rounded-lg p-1.5 bg-slate-50 font-medium">
+              <!-- Populated via JS -->
+            </select>
+          </div>
         </div>
-        <div class="text-[11px] text-slate-400 font-mono text-right">
-          Promotion Readiness Checklist
-        </div>
-      </div>
 
-      <div id="gap-analysis-results" class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs space-y-2.5">
-        <!-- Rendered dynamically -->
+        <div id="promotion-audit-results" class="space-y-3">
+          <!-- Populated via JS -->
+        </div>
       </div>
     </div>
 
     <!-- ========================================== -->
-    <!-- TAB 9: DIGITAL CERTIFICATES                -->
+    <!-- TAB 8: CERTIFICATES & CREDENTIALS          -->
     <!-- ========================================== -->
     <div id="tab-content-certificates" class="tab-content hidden space-y-3">
-      <div class="bg-white rounded-xl p-3 sm:p-3.5 border border-slate-200 shadow-xs flex justify-between items-center">
-        <div>
-          <h2 class="text-sm sm:text-base font-bold text-slate-900">Digital Certificates</h2>
-          <p class="text-xs text-slate-500 mt-0.5">Accredited certifications for Practitioners & Champions</p>
+      <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-xs space-y-2">
+        <div class="flex justify-between items-center">
+          <div>
+            <h3 class="font-bold text-slate-900 text-xs sm:text-sm">TPS Certification Registry</h3>
+            <p class="text-[11px] text-slate-500">Certified TPS Practitioners and Champions</p>
+          </div>
         </div>
-      </div>
 
-      <div class="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs whitespace-nowrap">
-            <thead class="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase text-[10px]">
-              <tr>
-                <th class="p-2">Cert No</th>
-                <th class="p-2">Associate</th>
-                <th class="p-2">Emp ID</th>
-                <th class="p-2">Area</th>
-                <th class="p-2">Accreditation Level</th>
-                <th class="p-2">Issue Date</th>
-                <th class="p-2">Signatory</th>
-                <th class="p-2 text-center">Status</th>
-                <th class="p-2 text-center">Action</th>
-              </tr>
-            </thead>
-            <tbody id="certs-tbody" class="divide-y divide-slate-100">
-              <!-- Populated via JS -->
-            </tbody>
-          </table>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5" id="certificates-grid">
+          <!-- Populated via JS -->
         </div>
       </div>
     </div>
 
     <!-- ========================================== -->
-    <!-- TAB 10: TRAINING BATCHES                   -->
+    <!-- TAB 9: TRAINING BATCHES                    -->
     <!-- ========================================== -->
     <div id="tab-content-batches" class="tab-content hidden space-y-3">
       <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-xs space-y-2">
         <div class="flex justify-between items-center">
           <div>
             <h3 class="font-bold text-slate-900 text-xs sm:text-sm">TPS Training Batches</h3>
-            <p class="text-[11px] text-slate-500">Scheduled classroom & Gemba modules</p>
+            <p class="text-[11px] text-slate-500">Scheduled classroom & Gemba modules &bull; Click any batch to view enrolled members</p>
           </div>
           <button onclick="showTab('attendance')" class="px-2.5 py-1 bg-[#0067B1] hover:bg-[#004F8A] text-white rounded-lg text-xs font-semibold transition flex items-center space-x-1 shadow-xs">
             <i class="fa-solid fa-clipboard-user text-[11px]"></i>
@@ -1276,6 +1249,331 @@
       </form>
     </div>
   </div>
+
+  <!-- ============================================== -->
+  <!-- MODAL 5: 1-SLIDE MANAGEMENT PRESENTATION (A3)  -->
+  <!-- ============================================== -->
+  <div id="one-slide-presentation-modal" class="fixed inset-0 bg-black/75 hidden z-50 flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
+    <div id="one-slide-container" class="bg-slate-100 rounded-2xl max-w-5xl w-full p-3 sm:p-5 shadow-2xl space-y-3 my-auto transition-all">
+      
+      <!-- Modal Top Action Toolbar (Hidden during Print) -->
+      <div class="flex flex-wrap justify-between items-center bg-white p-2.5 rounded-xl border border-slate-200 shadow-xs gap-2 print:hidden">
+        <div class="flex items-center space-x-2">
+          <div class="w-7 h-7 rounded-lg bg-sky-50 text-[#0067B1] flex items-center justify-center text-sm font-black">
+            <i class="fa-solid fa-file-powerpoint"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-slate-900 text-xs sm:text-sm">1-Slide Management Presentation</h3>
+            <p class="text-[10px] text-slate-500">Toyota A3 Single-Slide Summary for Executive & HOD Review</p>
+          </div>
+        </div>
+        <div class="flex items-center space-x-1.5">
+          <button onclick="toggleSlideEditDrawer()" class="px-2.5 py-1 bg-sky-50 text-[#0067B1] hover:bg-sky-100 border border-sky-200 rounded-lg text-xs font-semibold flex items-center space-x-1 transition">
+            <i class="fa-solid fa-pen-to-square text-[10px]"></i>
+            <span id="btn-slide-edit-label">Edit Slide Content</span>
+          </button>
+          <button onclick="toggleSlideFullscreen()" class="px-2.5 py-1 bg-slate-800 text-white hover:bg-black rounded-lg text-xs font-semibold flex items-center space-x-1 transition">
+            <i class="fa-solid fa-expand text-[10px]"></i>
+            <span id="btn-slide-fullscreen-label">Fullscreen</span>
+          </button>
+          <button onclick="printOneSlide()" class="px-2.5 py-1 bg-emerald-600 text-white hover:bg-emerald-700 rounded-lg text-xs font-semibold flex items-center space-x-1 transition">
+            <i class="fa-solid fa-print text-[10px]"></i>
+            <span>Print / PDF</span>
+          </button>
+          <button onclick="closeOneSlideModal()" class="w-7 h-7 bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200 rounded-lg flex items-center justify-center transition">
+            <i class="fa-solid fa-xmark text-sm"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Edit Drawer (Expandable) -->
+      <div id="slide-edit-drawer" class="hidden bg-white p-3 rounded-xl border border-slate-200 shadow-xs text-xs space-y-2.5 print:hidden">
+        <div class="flex justify-between items-center border-b border-slate-200 pb-1.5">
+          <span class="font-bold text-slate-800 text-xs flex items-center space-x-1">
+            <i class="fa-solid fa-sliders text-[#0067B1]"></i>
+            <span>Customize Presentation Details (No PPT skills needed!)</span>
+          </span>
+          <button type="button" onclick="toggleSlideEditDrawer()" class="text-slate-400 hover:text-slate-600 text-xs">Close Edit</button>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+          <div>
+            <label class="block font-semibold text-slate-700 text-[11px] mb-0.5">Presentation Title</label>
+            <input type="text" id="edit-slide-title" class="w-full bg-slate-50 border border-slate-300 rounded p-1.5 text-xs focus:ring-1 focus:ring-[#0067B1]" value="Standardized Work & Waste Elimination at OP-120 Fixture Clamping">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 text-[11px] mb-0.5">Machine / Station</label>
+            <input type="text" id="edit-slide-station" class="w-full bg-slate-50 border border-slate-300 rounded p-1.5 text-xs focus:ring-1 focus:ring-[#0067B1]" value="GD HEAD Machining Line • OP-120 Clamping Station">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 text-[11px] mb-0.5">Reviewer / Approver</label>
+            <input type="text" id="edit-slide-reviewer" class="w-full bg-slate-50 border border-slate-300 rounded p-1.5 text-xs focus:ring-1 focus:ring-[#0067B1]" value="BINDUKUMAR S (GL) / GOVINDA R (AM)">
+          </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <div>
+            <label class="block font-semibold text-slate-700 text-[11px] mb-0.5">Problem Observed (Before Condition)</label>
+            <textarea id="edit-slide-problem" rows="2" class="w-full bg-slate-50 border border-slate-300 rounded p-1.5 text-xs focus:ring-1 focus:ring-[#0067B1]">Operator leaves station envelope and walks 14m to fetch hex wrench on every engine head loading, causing operator fatigue and cycle time bottleneck.</textarea>
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 text-[11px] mb-0.5">Countermeasures Applied (Standardized Work)</label>
+            <textarea id="edit-slide-countermeasure" rows="2" class="w-full bg-slate-50 border border-slate-300 rounded p-1.5 text-xs focus:ring-1 focus:ring-[#0067B1]">Fabricated point-of-use magnetic tool holster directly on fixture + installed quick cam-toggle clamp replacing manual 6-turn hex bolt.</textarea>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <div>
+            <label class="block font-semibold text-slate-700 text-[11px] mb-0.5">Cycle Time Reduction</label>
+            <input type="text" id="edit-slide-cycletime" class="w-full bg-slate-50 border border-slate-300 rounded p-1.5 text-xs" value="64s → 40s (-24s / 37.5%)">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 text-[11px] mb-0.5">Walking Distance Saved</label>
+            <input type="text" id="edit-slide-walking" class="w-full bg-slate-50 border border-slate-300 rounded p-1.5 text-xs" value="14m → 0m / cycle (100%)">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 text-[11px] mb-0.5">Annual Cost Savings</label>
+            <input type="text" id="edit-slide-savings" class="w-full bg-slate-50 border border-slate-300 rounded p-1.5 text-xs" value="₹ 1,25,000 / annum">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 text-[11px] mb-0.5">Ergonomic REBA Score</label>
+            <input type="text" id="edit-slide-ergo" class="w-full bg-slate-50 border border-slate-300 rounded p-1.5 text-xs" value="Score 8 (High) → 2 (Low Risk)">
+          </div>
+        </div>
+        <div class="flex justify-end space-x-2 pt-1 border-t border-slate-100">
+          <button type="button" onclick="applySlideCustomEdits()" class="px-3 py-1 bg-[#0067B1] text-white rounded font-bold hover:bg-[#004F8A] transition text-xs">Apply to 1-Slide Deck</button>
+        </div>
+      </div>
+
+      <!-- THE 1-SLIDE EXECUTIVE PRESENTATION (A3 / PPT Single Slide Canvas) -->
+      <div id="printable-one-slide" class="bg-white rounded-xl border-2 border-slate-300 shadow-lg p-4 sm:p-6 text-slate-900 space-y-3 font-sans print:p-0 print:border-none print:shadow-none">
+        
+        <!-- Slide Header -->
+        <div class="border-b-2 border-slate-900 pb-3 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+          <div class="flex items-center space-x-3">
+            <img src="/static/img/tiei_logo.png" alt="TIEI Logo" class="h-8 object-contain">
+            <div class="border-l border-slate-300 pl-3">
+              <div class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Toyota Industries Engine India Pvt. Ltd.</div>
+              <h2 id="slide-display-title" class="text-sm sm:text-base font-black text-slate-900 leading-tight">Gemba Kaizen: Standardized Work Optimization & Waste Elimination</h2>
+            </div>
+          </div>
+          <div class="text-right text-[11px] shrink-0 bg-slate-50 p-2 rounded-lg border border-slate-200">
+            <div><span class="font-bold text-slate-600">Presenter:</span> <span id="slide-display-presenter" class="font-bold text-slate-900">ARUNA D R</span> (<span id="slide-display-empno">#50031</span>)</div>
+            <div><span class="font-bold text-slate-600">Area:</span> <span id="slide-display-area" class="font-medium">GD HEAD Machining Line</span></div>
+            <div><span class="font-bold text-slate-600">Reviewer:</span> <span id="slide-display-reviewer" class="font-medium">BINDUKUMAR S (GL) / GOVINDA R (AM)</span></div>
+          </div>
+        </div>
+
+        <!-- 4-Quadrant Management Canvas -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+          
+          <!-- Quadrant 1: Problem Identification & Selected 21 KVP -->
+          <div class="bg-slate-50/70 p-3 rounded-lg border border-slate-300 flex flex-col justify-between space-y-2">
+            <div>
+              <div class="flex justify-between items-center border-b border-slate-200 pb-1 mb-1.5">
+                <span class="font-black text-slate-900 text-xs uppercase tracking-wider text-[#0067B1]">1. Worksite Problem (Komarigoto) & 21 KVP</span>
+                <span class="text-[10px] font-bold text-slate-400">Step 3-4</span>
+              </div>
+              <div class="space-y-1">
+                <div class="text-[11px] font-bold text-slate-700">Station / Process:</div>
+                <div id="slide-display-station" class="text-xs text-slate-800 font-semibold bg-white p-1.5 rounded border border-slate-200">GD HEAD Machining Line • OP-120 Clamping Station</div>
+              </div>
+              <div class="mt-2 space-y-1">
+                <div class="text-[11px] font-bold text-slate-700">Gemba Struggle Observed:</div>
+                <div id="slide-display-problem" class="text-xs text-slate-700 bg-white p-2 rounded border border-slate-200 leading-relaxed">
+                  Operator leaves station envelope and walks 14m to fetch hex wrench on every engine head loading, causing operator fatigue and cycle time bottleneck.
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="text-[11px] font-bold text-slate-700 mb-1">Selected 21 Kaizen Viewpoints (Observation Checklist):</div>
+              <div id="slide-selected-kvp-chips" class="flex flex-wrap gap-1">
+                <!-- Populated dynamically via JS -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Quadrant 2: Root Cause Analysis (5-Why Method) -->
+          <div class="bg-slate-50/70 p-3 rounded-lg border border-slate-300 space-y-2">
+            <div class="flex justify-between items-center border-b border-slate-200 pb-1 mb-1.5">
+              <span class="font-black text-slate-900 text-xs uppercase tracking-wider text-[#0067B1]">2. Root Cause Analysis (5-Why)</span>
+              <span class="text-[10px] font-bold text-slate-400">Step 5-6</span>
+            </div>
+            <div class="space-y-1.5 bg-white p-2.5 rounded border border-slate-200 text-xs">
+              <div class="flex items-start space-x-1.5">
+                <span class="font-bold text-slate-500 shrink-0">Why 1:</span>
+                <span class="text-slate-800">Operator cycle time exceeds takt by 14 seconds? &rarr; Operator leaves station envelope to find clamping tool.</span>
+              </div>
+              <div class="flex items-start space-x-1.5">
+                <span class="font-bold text-slate-500 shrink-0">Why 2:</span>
+                <span class="text-slate-800">Why leave station envelope? &rarr; Tool stored on general shared rack 7 meters away.</span>
+              </div>
+              <div class="flex items-start space-x-1.5">
+                <span class="font-bold text-slate-500 shrink-0">Why 3:</span>
+                <span class="text-slate-800">Why stored away? &rarr; No dedicated station-mounted tool presentation holster.</span>
+              </div>
+              <div class="flex items-start space-x-1.5">
+                <span class="font-bold text-slate-500 shrink-0">Why 4:</span>
+                <span class="text-slate-800">Why manual hex wrench used? &rarr; Standard work relied on 6-turn threaded bolt fixture.</span>
+              </div>
+              <div class="flex items-start space-x-1.5 pt-1 border-t border-slate-200 text-[#0067B1] font-semibold">
+                <span class="font-black shrink-0">Root Cause:</span>
+                <span>Absence of point-of-use Standardized Work tool placement and slow mechanical fastening.</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quadrant 3: Implemented Countermeasures & Standardized Work -->
+          <div class="bg-slate-50/70 p-3 rounded-lg border border-slate-300 space-y-2">
+            <div class="flex justify-between items-center border-b border-slate-200 pb-1 mb-1.5">
+              <span class="font-black text-slate-900 text-xs uppercase tracking-wider text-[#EA7625]">3. Implemented Countermeasure (Kaizen)</span>
+              <span class="text-[10px] font-bold text-slate-400">Step 7-8</span>
+            </div>
+            <div class="space-y-1.5">
+              <div id="slide-display-countermeasure" class="text-xs text-slate-800 bg-white p-2 rounded border border-slate-200 leading-relaxed font-medium">
+                Fabricated point-of-use magnetic tool holster directly on fixture + installed quick cam-toggle clamp replacing manual 6-turn hex bolt.
+              </div>
+              <div class="grid grid-cols-2 gap-2 text-[11px]">
+                <div class="p-2 bg-rose-50 border border-rose-200 rounded">
+                  <div class="font-bold text-rose-800 uppercase text-[10px]">Before Kaizen</div>
+                  <div class="text-slate-700 mt-0.5">&bull; Walking distance: 14m/cycle<br>&bull; Tool search delay: 28 sec<br>&bull; Operator posture: bending/strain</div>
+                </div>
+                <div class="p-2 bg-emerald-50 border border-emerald-200 rounded">
+                  <div class="font-bold text-emerald-800 uppercase text-[10px]">After Kaizen</div>
+                  <div class="text-slate-700 mt-0.5">&bull; Walking distance: 0m (100% eliminated)<br>&bull; Clamping time: 4 sec (-24s)<br>&bull; Operator posture: neutral & safe</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quadrant 4: Operational Results & Management Sign-off -->
+          <div class="bg-slate-50/70 p-3 rounded-lg border border-slate-300 flex flex-col justify-between space-y-2">
+            <div>
+              <div class="flex justify-between items-center border-b border-slate-200 pb-1 mb-1.5">
+                <span class="font-black text-slate-900 text-xs uppercase tracking-wider text-emerald-700">4. Tangible Results & Horizontal Deployment</span>
+                <span class="text-[10px] font-bold text-slate-400">Step 9-11</span>
+              </div>
+              
+              <!-- Metric Cards -->
+              <div class="grid grid-cols-2 gap-1.5 text-center">
+                <div class="bg-white p-1.5 rounded border border-slate-200">
+                  <span class="text-[10px] text-slate-500 font-semibold block uppercase">Cycle Time Reduction</span>
+                  <span id="slide-display-cycletime" class="font-black text-xs text-[#0067B1]">64s &rarr; 40s (-24s / 37.5%)</span>
+                </div>
+                <div class="bg-white p-1.5 rounded border border-slate-200">
+                  <span class="text-[10px] text-slate-500 font-semibold block uppercase">Walking Distance Saved</span>
+                  <span id="slide-display-walking" class="font-black text-xs text-indigo-700">14m &rarr; 0m (100% saved)</span>
+                </div>
+                <div class="bg-white p-1.5 rounded border border-slate-200">
+                  <span class="text-[10px] text-slate-500 font-semibold block uppercase">Annual Cost Savings</span>
+                  <span id="slide-display-savings" class="font-black text-xs text-emerald-600">&inr; 1,25,000 / annum</span>
+                </div>
+                <div class="bg-white p-1.5 rounded border border-slate-200">
+                  <span class="text-[10px] text-slate-500 font-semibold block uppercase">Ergonomic Safety</span>
+                  <span id="slide-display-ergo" class="font-black text-xs text-amber-600">REBA Score: 8 &rarr; 2 (Safe)</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Sign-off Matrix -->
+            <div class="grid grid-cols-3 gap-1.5 text-center text-[10px] border-t border-slate-200 pt-1.5">
+              <div class="bg-white p-1 rounded border border-slate-200">
+                <div class="text-slate-400 uppercase font-bold text-[9px]">Prepared By</div>
+                <div id="slide-sign-prepared" class="font-bold text-slate-800">Associate</div>
+              </div>
+              <div class="bg-white p-1 rounded border border-slate-200">
+                <div class="text-slate-400 uppercase font-bold text-[9px]">Verified By</div>
+                <div id="slide-sign-verified" class="font-bold text-slate-800">GL / AM</div>
+              </div>
+              <div class="bg-white p-1 rounded border border-slate-200">
+                <div class="text-slate-400 uppercase font-bold text-[9px]">TPS Office Approved</div>
+                <div class="font-bold text-emerald-700"><i class="fa-solid fa-circle-check text-[9px] mr-0.5"></i> Certified</div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- MODAL 6: VIEW ENROLLED BATCH MEMBERS           -->
+  <!-- ============================================== -->
+  <div id="batch-members-modal" class="fixed inset-0 bg-black/60 hidden z-50 flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white rounded-xl max-w-3xl w-full p-4 sm:p-5 space-y-3 max-h-[90vh] overflow-y-auto custom-scrollbar shadow-2xl">
+      
+      <!-- Modal Header -->
+      <div class="flex justify-between items-start border-b border-slate-200 pb-2.5">
+        <div>
+          <div class="flex items-center space-x-2">
+            <span id="modal-batch-code-pill" class="font-mono text-xs font-bold bg-[#0067B1] text-white px-2 py-0.5 rounded">BATCH-2026-Q3-01</span>
+            <span id="modal-batch-status-pill" class="text-xs px-2 py-0.5 rounded font-bold bg-emerald-100 text-emerald-800">Scheduled</span>
+          </div>
+          <h3 id="modal-batch-level-title" class="font-bold text-slate-900 text-sm sm:text-base mt-1">Level 2 - TPS Practitioner</h3>
+          <p id="modal-batch-module-desc" class="text-xs text-slate-500">Module: Standardized Work 3 Slips & 21 KVP</p>
+        </div>
+        <button onclick="closeBatchDetailsModal()" class="w-7 h-7 bg-slate-100 text-slate-500 hover:text-slate-800 rounded-lg flex items-center justify-center transition">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+
+      <!-- Batch Info Metadata Strip -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs bg-slate-50 p-2.5 rounded-lg border border-slate-200">
+        <div>
+          <span class="text-[10px] font-bold text-slate-400 uppercase block">Master Trainer</span>
+          <span id="modal-batch-trainer" class="font-semibold text-slate-800"><i class="fa-solid fa-chalkboard-user mr-1 text-[#0067B1]"></i> Dilip R</span>
+        </div>
+        <div>
+          <span class="text-[10px] font-bold text-slate-400 uppercase block">Training Venue</span>
+          <span id="modal-batch-venue" class="font-semibold text-slate-800"><i class="fa-solid fa-location-dot mr-1 text-rose-600"></i> TPS Dojo Room A</span>
+        </div>
+        <div>
+          <span class="text-[10px] font-bold text-slate-400 uppercase block">Scheduled Dates</span>
+          <span id="modal-batch-dates" class="font-semibold text-slate-800"><i class="fa-solid fa-calendar mr-1 text-[#EA7625]"></i> 15 - 17 Oct 2026</span>
+        </div>
+        <div>
+          <span class="text-[10px] font-bold text-slate-400 uppercase block">Enrolled / Capacity</span>
+          <span id="modal-batch-capacity" class="font-bold text-[#0067B1]"><i class="fa-solid fa-users mr-1"></i> 18 / 20 Trainees</span>
+        </div>
+      </div>
+
+      <!-- Search & Enrolled Associates Table -->
+      <div class="space-y-2">
+        <div class="flex justify-between items-center">
+          <h4 class="font-bold text-slate-800 text-xs">Enrolled Batch Members (<span id="modal-batch-members-count">18</span>)</h4>
+          <input type="text" id="modal-batch-search-input" oninput="filterBatchMembersModal(this.value)" placeholder="Search associate name or ID..." class="text-xs bg-slate-50 border border-slate-200 rounded-lg p-1.5 w-56 focus:ring-1 focus:ring-[#0067B1]">
+        </div>
+
+        <div class="overflow-x-auto border border-slate-200 rounded-lg">
+          <table class="w-full text-left text-xs whitespace-nowrap">
+            <thead class="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase text-[10px]">
+              <tr>
+                <th class="p-2">Emp ID</th>
+                <th class="p-2">Associate Name</th>
+                <th class="p-2">Role / Level</th>
+                <th class="p-2">Working Area</th>
+                <th class="p-2">Supervisor</th>
+                <th class="p-2 text-center">Batch Attendance</th>
+                <th class="p-2 text-center">Eligibility</th>
+              </tr>
+            </thead>
+            <tbody id="modal-batch-members-tbody" class="divide-y divide-slate-100">
+              <!-- Populated via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="flex justify-between items-center pt-2 border-t border-slate-200 text-xs">
+        <span class="text-[11px] text-slate-500">Associates enrolled as per Department HOD nominations</span>
+        <button onclick="closeBatchDetailsModal()" class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg transition">Close</button>
+      </div>
+
+    </div>
+  </div>
+
 
   <!-- ============================================== -->
   <!-- JAVASCRIPT APPLICATION LOGIC                   -->
@@ -1983,20 +2281,72 @@
     // ATTENDANCE LOGIC
     // ==========================================
     async function loadAttendanceData(batchCode, sessionDate) {
-      const bCode = batchCode || currentBatchCode;
+      const isTpsAdmin = currentUser && (currentUser.hierarchy_role === 'TPS_OFFICE' || currentUser.emp_no === 'TPS001' || currentUser.hierarchy_role === 'TRAINER');
+      const isEmployee = currentUser && (currentUser.hierarchy_role === 'WT' || currentUser.hierarchy_role === 'GAT');
+      const isLeadership = currentUser && ['TL', 'GL', 'AM', 'Manager'].includes(currentUser.hierarchy_role);
+
+      const batchSelect = document.getElementById('att-batch-select');
+      if (isEmployee && batchSelect && !batchCode) {
+        if (currentUser.hierarchy_role === 'WT' && batchSelect.value !== 'BATCH-2026-Q3-03') {
+          batchSelect.value = 'BATCH-2026-Q3-03';
+        } else if (currentUser.hierarchy_role === 'GAT' && batchSelect.value !== 'BATCH-2026-Q3-01') {
+          batchSelect.value = 'BATCH-2026-Q3-01';
+        }
+      }
+
+      const bCode = batchCode || (batchSelect ? batchSelect.value : currentBatchCode);
       currentBatchCode = bCode;
-      
+
+      const adminActions = document.getElementById('att-admin-actions');
+      const readonlyNotice = document.getElementById('att-readonly-notice');
+      const readonlyText = document.getElementById('att-readonly-text');
+      const attTitle = document.getElementById('att-title');
+      const attSubtitle = document.getElementById('att-subtitle');
+
+      if (isTpsAdmin) {
+        if (adminActions) adminActions.classList.remove('hidden');
+        if (readonlyNotice) readonlyNotice.classList.add('hidden');
+        if (attTitle) attTitle.innerText = 'Training Attendance Register (TPS Admin Mode)';
+        if (attSubtitle) attSubtitle.innerText = 'Mark daily session attendance and manage qualification records across plant batches';
+      } else if (isEmployee) {
+        if (adminActions) adminActions.classList.add('hidden');
+        if (readonlyNotice) readonlyNotice.classList.remove('hidden');
+        if (readonlyText) readonlyText.innerText = 'Personal Attendance Log • Read-Only';
+        if (attTitle) attTitle.innerText = 'My Training Attendance';
+        if (attSubtitle) attSubtitle.innerText = `Personal session attendance and certification qualification log for ${currentUser ? currentUser.name : ''}`;
+      } else {
+        if (adminActions) adminActions.classList.add('hidden');
+        if (readonlyNotice) readonlyNotice.classList.remove('hidden');
+        if (readonlyText) readonlyText.innerText = 'Team Attendance Register • Read-Only (Managed by TPS Office)';
+        if (attTitle) attTitle.innerText = 'Team Training Attendance';
+        if (attSubtitle) attSubtitle.innerText = `Session attendance for associates reporting under ${currentUser ? currentUser.name : ''} (${currentUser ? currentUser.hierarchy_role : ''})`;
+      }
+
       try {
-        const sumRes = await fetch(`/api/attendance/summary?batch_id=${bCode}`);
+        const viewerParam = currentUser ? `&viewer_emp_no=${currentUser.emp_no}&viewer_role=${currentUser.hierarchy_role}` : '';
+        const sumRes = await fetch(`/api/attendance/summary?batch_id=${bCode}${viewerParam}`);
         attendanceSummaryData = await sumRes.json();
 
         document.getElementById('att-stat-pct').innerText = `${attendanceSummaryData.overall_attendance_pct}%`;
         document.getElementById('att-stat-enrolled').innerText = attendanceSummaryData.total_enrolled;
         document.getElementById('att-stat-eligible').innerText = `${attendanceSummaryData.eligible_count} / ${attendanceSummaryData.total_enrolled}`;
-        document.getElementById('att-stat-atrisk').innerText = attendanceSummaryData.total_enrolled - attendanceSummaryData.eligible_count;
+        document.getElementById('att-stat-atrisk').innerText = Math.max(0, attendanceSummaryData.total_enrolled - attendanceSummaryData.eligible_count);
+
+        if (isEmployee) {
+          document.getElementById('att-stat-pct-label').innerText = 'My Attendance Rate';
+          document.getElementById('att-stat-enrolled-label').innerText = 'My Record';
+          document.getElementById('att-stat-eligible-label').innerText = 'My Qualification';
+          document.getElementById('att-stat-atrisk-label').innerText = 'Status';
+          document.getElementById('att-stat-atrisk').innerText = attendanceSummaryData.eligible_count > 0 ? 'Eligible' : 'In Progress';
+        } else {
+          document.getElementById('att-stat-pct-label').innerText = 'Batch Attendance';
+          document.getElementById('att-stat-enrolled-label').innerText = 'Enrolled Trainees';
+          document.getElementById('att-stat-eligible-label').innerText = 'Eligible for Exam';
+          document.getElementById('att-stat-atrisk-label').innerText = 'Action Required';
+        }
 
         const dateSel = document.getElementById('att-session-date-select');
-        if (dateSel && dateSel.options.length <= 1 && attendanceSummaryData.sessions) {
+        if (dateSel && attendanceSummaryData.sessions) {
           dateSel.innerHTML = '';
           attendanceSummaryData.sessions.forEach(s => {
             const opt = document.createElement('option');
@@ -2005,112 +2355,137 @@
             dateSel.appendChild(opt);
           });
         }
-        
+
         const selectedDate = sessionDate || (dateSel ? dateSel.value : currentSessionDate);
         currentSessionDate = selectedDate;
 
-        const attRes = await fetch(`/api/attendance?batch_id=${bCode}&session_date=${selectedDate}`);
+        const attRes = await fetch(`/api/attendance?batch_id=${bCode}&session_date=${selectedDate}${viewerParam}`);
         attendanceSessionsData = await attRes.json();
 
-        renderAttendanceSessionTable(attendanceSessionsData);
+        renderAttendanceSessionTable(attendanceSessionsData, isTpsAdmin);
         renderAttendanceSummaryTable(attendanceSummaryData.candidates);
       } catch (e) {
         console.error("Error loading attendance:", e);
       }
     }
 
-    function renderAttendanceSessionTable(records) {
-      const tbody = document.getElementById('att-session-tbody');
+    function renderAttendanceSessionTable(sessions, isTpsAdmin) {
+      const tbody = document.getElementById('att-session-table-body');
       if (!tbody) return;
       tbody.innerHTML = '';
 
-      if (!records || records.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-slate-400">No records for this session.</td></tr>`;
+      if (!sessions || sessions.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400 text-xs">No attendance records found for this session date or viewer role.</td></tr>`;
         return;
       }
 
-      records.forEach(r => {
-        const isPresent = r.status === 'Present';
+      sessions.forEach(s => {
+        let statusBadge = '';
+        if (s.status === 'Present') {
+          statusBadge = '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800"><i class="fa-solid fa-check text-[9px] mr-0.5"></i> Present</span>';
+        } else if (s.status === 'Absent') {
+          statusBadge = '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800"><i class="fa-solid fa-xmark text-[9px] mr-0.5"></i> Absent</span>';
+        } else {
+          statusBadge = '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800"><i class="fa-solid fa-clock text-[9px] mr-0.5"></i> Late</span>';
+        }
+
+        let statusControl = '';
+        if (isTpsAdmin) {
+          statusControl = `
+            <div class="flex items-center justify-center space-x-2">
+              <label class="flex items-center space-x-1 cursor-pointer">
+                <input type="radio" name="att_status_${s.id}" value="Present" ${s.status === 'Present' ? 'checked' : ''} onchange="setRowAttendanceStatus(${s.id}, 'Present')" class="text-emerald-600 focus:ring-emerald-500">
+                <span class="text-[11px] font-bold text-emerald-700">P</span>
+              </label>
+              <label class="flex items-center space-x-1 cursor-pointer">
+                <input type="radio" name="att_status_${s.id}" value="Absent" ${s.status === 'Absent' ? 'checked' : ''} onchange="setRowAttendanceStatus(${s.id}, 'Absent')" class="text-rose-600 focus:ring-rose-500">
+                <span class="text-[11px] font-bold text-rose-700">A</span>
+              </label>
+              <label class="flex items-center space-x-1 cursor-pointer">
+                <input type="radio" name="att_status_${s.id}" value="Late" ${s.status === 'Late' ? 'checked' : ''} onchange="setRowAttendanceStatus(${s.id}, 'Late')" class="text-amber-600 focus:ring-amber-500">
+                <span class="text-[11px] font-bold text-amber-700">L</span>
+              </label>
+            </div>
+          `;
+        } else {
+          statusControl = statusBadge;
+        }
+
+        const remarksControl = isTpsAdmin ? 
+          `<input type="text" id="att_remark_${s.id}" value="${s.remarks || ''}" placeholder="Remarks..." class="w-full text-xs bg-slate-50 border border-slate-200 rounded p-1">` :
+          `<span class="text-slate-600 text-xs">${s.remarks || '-'}</span>`;
+
         tbody.innerHTML += `
-          <tr class="hover:bg-slate-50 transition border-b border-slate-100 text-xs" data-att-id="${r.id}">
-            <td class="p-2">
-              <div class="font-bold text-slate-900 leading-tight">${r.emp_name}</div>
-              <div class="font-mono text-[9px] text-slate-400">#${r.emp_no}</div>
-            </td>
-            <td class="p-2 text-slate-600">${r.department}</td>
-            <td class="p-2 text-slate-600 truncate max-w-xs">${r.session_topic}</td>
-            <td class="p-2 text-center">
-              <div class="inline-flex rounded border border-slate-200 p-0.5 bg-slate-100">
-                <button type="button" onclick="setRowAttendanceStatus(${r.id}, 'Present')" class="att-status-btn-present-${r.id} px-2 py-0.5 rounded text-[10px] font-bold transition ${isPresent ? 'bg-emerald-600 text-white' : 'text-slate-600 hover:text-slate-900'}">
-                  Present
-                </button>
-                <button type="button" onclick="setRowAttendanceStatus(${r.id}, 'Absent')" class="att-status-btn-absent-${r.id} px-2 py-0.5 rounded text-[10px] font-bold transition ${!isPresent ? 'bg-rose-600 text-white' : 'text-slate-600 hover:text-slate-900'}">
-                  Absent
-                </button>
-              </div>
-            </td>
-            <td class="p-2">
-              <input type="text" id="att-remarks-${r.id}" value="${r.remarks || ''}" placeholder="Remarks..." class="w-full text-xs px-1.5 py-0.5 bg-white border border-slate-200 rounded text-slate-700 focus:outline-none focus:ring-1 focus:ring-[#0067B1]">
-            </td>
+          <tr class="hover:bg-slate-50 transition">
+            <td class="p-2.5 font-mono text-slate-700 font-bold">${s.emp_no}</td>
+            <td class="p-2.5 font-bold text-slate-900">${s.emp_name}</td>
+            <td class="p-2.5 text-slate-600">${s.department}</td>
+            <td class="p-2.5 text-center">${statusControl}</td>
+            <td class="p-2.5">${remarksControl}</td>
+            <td class="p-2.5 text-slate-500 text-[11px]">${s.marked_by || 'Dilip R'}</td>
           </tr>
         `;
       });
     }
 
-    function setRowAttendanceStatus(id, newStatus) {
-      const rec = attendanceSessionsData.find(x => x.id === id);
-      if (rec) rec.status = newStatus;
-      
-      const pBtn = document.querySelector(`.att-status-btn-present-${id}`);
-      const aBtn = document.querySelector(`.att-status-btn-absent-${id}`);
-      if (pBtn && aBtn) {
-        if (newStatus === 'Present') {
-          pBtn.className = `att-status-btn-present-${id} px-2 py-0.5 rounded text-[10px] font-bold transition bg-emerald-600 text-white`;
-          aBtn.className = `att-status-btn-absent-${id} px-2 py-0.5 rounded text-[10px] font-bold transition text-slate-600 hover:text-slate-900`;
-        } else {
-          pBtn.className = `att-status-btn-present-${id} px-2 py-0.5 rounded text-[10px] font-bold transition text-slate-600 hover:text-slate-900`;
-          aBtn.className = `att-status-btn-absent-${id} px-2 py-0.5 rounded text-[10px] font-bold transition bg-rose-600 text-white`;
-        }
-      }
+    function setRowAttendanceStatus(id, status) {
+      const rec = (attendanceSessionsData || []).find(r => r.id === id);
+      if (rec) rec.status = status;
     }
 
     function markAllPresent() {
-      attendanceSessionsData.forEach(r => {
-        setRowAttendanceStatus(r.id, 'Present');
+      const isTpsAdmin = currentUser && (currentUser.hierarchy_role === 'TPS_OFFICE' || currentUser.emp_no === 'TPS001' || currentUser.hierarchy_role === 'TRAINER');
+      if (!isTpsAdmin) {
+        alert("Access Denied: Only TPS Admin (TPS Office) has permission to mark attendance.");
+        return;
+      }
+      (attendanceSessionsData || []).forEach(s => {
+        s.status = 'Present';
+        const radio = document.querySelector(`input[name="att_status_${s.id}"][value="Present"]`);
+        if (radio) radio.checked = true;
       });
     }
 
     async function saveAttendanceRegister() {
-      const saveBtn = document.getElementById('btn-save-attendance');
-      if (saveBtn) saveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i>Saving...';
+      const isTpsAdmin = currentUser && (currentUser.hierarchy_role === 'TPS_OFFICE' || currentUser.emp_no === 'TPS001' || currentUser.hierarchy_role === 'TRAINER');
+      if (!isTpsAdmin) {
+        alert("Access Denied: Only TPS Admin (TPS Office) has permission to mark or update attendance.");
+        return;
+      }
 
-      const payload = attendanceSessionsData.map(r => {
-        const remInput = document.getElementById(`att-remarks-${r.id}`);
-        return {
-          id: r.id,
-          batch_id: r.batch_id,
-          emp_id: r.emp_id,
-          status: r.status,
-          remarks: remInput ? remInput.value : r.remarks,
-          session_date: r.session_date
-        };
+      const updates = [];
+      (attendanceSessionsData || []).forEach(s => {
+        const remarkInput = document.getElementById(`att_remark_${s.id}`);
+        const checkedRadio = document.querySelector(`input[name="att_status_${s.id}"]:checked`);
+        updates.push({
+          id: s.id,
+          status: checkedRadio ? checkedRadio.value : s.status,
+          remarks: remarkInput ? remarkInput.value : s.remarks,
+          user_role: currentUser.hierarchy_role,
+          user_emp_no: currentUser.emp_no
+        });
       });
 
       try {
         const res = await fetch('/api/attendance', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
+          headers: { 
+            'Content-Type': 'application/json',
+            'X-User-Role': currentUser.hierarchy_role,
+            'X-User-Emp-No': currentUser.emp_no
+          },
+          body: JSON.stringify(updates)
         });
-        const data = await res.json();
-        if (data.success) {
-          alert('Attendance saved successfully.');
+
+        if (res.ok) {
+          alert("Attendance records successfully saved and verified by TPS Office!");
           await loadAttendanceData(currentBatchCode, currentSessionDate);
+        } else {
+          const err = await res.json();
+          alert(`Error saving attendance: ${err.error || 'Server error'}`);
         }
       } catch (e) {
-        console.error("Error saving attendance:", e);
-      } finally {
-        if (saveBtn) saveBtn.innerHTML = '<i class="fa-solid fa-floppy-disk text-[10px] mr-1"></i>Save';
+        console.error("Save attendance error:", e);
       }
     }
 
@@ -2218,34 +2593,200 @@
     // ==========================================
     // 21 KAIZEN VIEWPOINTS
     // ==========================================
+        let selectedKvpIds = new Set([3, 8, 12]);
+    let currentSelectedKomarigoto = null;
+    let isSlideFullscreen = false;
+
     async function fetchKVP() {
       try {
         const res = await fetch('/api/viewpoints_21');
         kvpData = await res.json();
-        const grid = document.getElementById('kvp-grid');
-        if (!grid) return;
-        grid.innerHTML = '';
+        renderKVPGrid();
+        renderSlideKvpChips();
+      } catch (e) {
+        console.error("Error fetching KVP:", e);
+      }
+    }
 
-        kvpData.forEach(k => {
-          let badgeColor = 'bg-slate-100 text-slate-700';
-          if (k.category === 'Muri') badgeColor = 'bg-red-50 text-red-700';
-          if (k.category === 'Mura') badgeColor = 'bg-amber-50 text-amber-700';
-          if (k.category === 'Muda') badgeColor = 'bg-sky-50 text-sky-700';
+    function renderKVPGrid() {
+      const grid = document.getElementById('kvp-grid');
+      if (!grid || !kvpData) return;
+      grid.innerHTML = '';
 
-          grid.innerHTML += `
-            <div class="p-2 bg-slate-50 border border-slate-200 rounded-lg hover:shadow-xs transition">
-              <div class="flex justify-between items-center mb-0.5">
-                <span class="font-bold text-slate-800 text-[11px]">#${k.id}</span>
-                <span class="text-[9px] px-1 py-0.2 rounded font-semibold ${badgeColor}">${k.category} • ${k.subcategory}</span>
+      kvpData.forEach(k => {
+        const isSelected = selectedKvpIds.has(k.id);
+        let badgeColor = 'bg-slate-100 text-slate-700';
+        if (k.category === 'Muri') badgeColor = 'bg-rose-100 text-rose-800';
+        if (k.category === 'Mura') badgeColor = 'bg-amber-100 text-amber-800';
+        if (k.category === 'Muda') badgeColor = 'bg-sky-100 text-sky-800';
+
+        const cardBorder = isSelected ? 'border-[#0067B1] bg-sky-50/70 ring-2 ring-[#0067B1]/20' : 'border-slate-200 bg-white hover:border-slate-300';
+
+        grid.innerHTML += `
+          <div id="kvp-card-${k.id}" onclick="toggleKvpSelection(${k.id})" class="p-2.5 rounded-xl border ${cardBorder} cursor-pointer transition shadow-xs flex flex-col justify-between">
+            <div>
+              <div class="flex justify-between items-center mb-1">
+                <span class="font-mono font-black text-slate-800 text-xs">#${k.id}</span>
+                <div class="flex items-center space-x-1.5">
+                  <span class="text-[9px] px-1.5 py-0.5 rounded font-bold uppercase ${badgeColor}">${k.category} • ${k.subcategory}</span>
+                  <input type="checkbox" ${isSelected ? 'checked' : ''} onclick="event.stopPropagation(); toggleKvpSelection(${k.id})" class="w-3.5 h-3.5 text-[#0067B1] rounded border-slate-300 focus:ring-[#0067B1] pointer-events-none">
+                </div>
               </div>
-              <div class="font-bold text-slate-800 text-[11px] mb-0.5">${k.name}</div>
+              <div class="font-bold text-slate-900 text-xs mb-0.5">${k.name}</div>
               <div class="text-[10px] text-slate-500 leading-tight">${k.desc}</div>
             </div>
-          `;
-        });
-      } catch (e) {
-        console.error("Error fetching 21 KVP:", e);
+            <div class="mt-2 pt-1 border-t border-slate-100 flex justify-between items-center text-[10px]">
+              <span class="${isSelected ? 'text-[#0067B1] font-bold' : 'text-slate-400'}">
+                ${isSelected ? '<i class="fa-solid fa-check text-[9px] mr-0.5"></i> Included in 1-Slide' : 'Click to add to 1-Slide'}
+              </span>
+            </div>
+          </div>
+        `;
+      });
+
+      updateSelectedKvpBadge();
+    }
+
+    function toggleKvpSelection(id) {
+      if (selectedKvpIds.has(id)) {
+        selectedKvpIds.delete(id);
+      } else {
+        selectedKvpIds.add(id);
       }
+      renderKVPGrid();
+      renderSlideKvpChips();
+    }
+
+    function clearKvpSelections() {
+      selectedKvpIds.clear();
+      renderKVPGrid();
+      renderSlideKvpChips();
+    }
+
+    function updateSelectedKvpBadge() {
+      const badge = document.getElementById('selected-kvp-badge-count');
+      if (badge) {
+        badge.innerText = `${selectedKvpIds.size} selected`;
+      }
+    }
+
+    function renderSlideKvpChips() {
+      const container = document.getElementById('slide-selected-kvp-chips');
+      if (!container || !kvpData) return;
+      container.innerHTML = '';
+
+      if (selectedKvpIds.size === 0) {
+        container.innerHTML = '<span class="text-[10px] text-slate-400 italic">No viewpoints selected. Check items in the 21 KVP grid to add them to this slide.</span>';
+        return;
+      }
+
+      kvpData.filter(k => selectedKvpIds.has(k.id)).forEach(k => {
+        let chipColor = 'bg-slate-100 text-slate-700 border-slate-300';
+        if (k.category === 'Muri') chipColor = 'bg-rose-50 text-rose-800 border-rose-300';
+        if (k.category === 'Mura') chipColor = 'bg-amber-50 text-amber-800 border-amber-300';
+        if (k.category === 'Muda') chipColor = 'bg-sky-50 text-sky-800 border-sky-300';
+
+        container.innerHTML += `
+          <div class="px-2 py-0.5 rounded text-[10px] font-bold border ${chipColor} flex items-center space-x-1">
+            <span>#${k.id} [${k.category}]</span>
+            <span class="font-normal text-slate-600 truncate max-w-[150px]">${k.name}</span>
+          </div>
+        `;
+      });
+    }
+
+    function openOneSlidePresentationModal(komarigotoId) {
+      if (komarigotoId && komarigotoData) {
+        const k = komarigotoData.find(item => item.id == komarigotoId);
+        if (k) {
+          currentSelectedKomarigoto = k;
+          document.getElementById('slide-display-title').innerText = `Gemba Kaizen: ${k.challenge}`;
+          document.getElementById('slide-display-presenter').innerText = k.emp_name || (currentUser ? currentUser.name : 'ARUNA D R');
+          document.getElementById('slide-display-empno').innerText = `#${k.emp_no || (currentUser ? currentUser.emp_no : '50031')}`;
+          document.getElementById('slide-display-area').innerText = k.working_area || 'GD HEAD Machining Line';
+          document.getElementById('slide-display-station').innerText = `${k.working_area || 'GD'} • Station: ${k.machine_area || 'OP-120'}`;
+          document.getElementById('slide-display-problem').innerText = k.current_condition || k.challenge;
+          document.getElementById('slide-display-countermeasure').innerText = k.countermeasures || 'Point-of-use Standardized Work tool placement and quick clamp implementation.';
+          if (k.cost_savings_inr) {
+            document.getElementById('slide-display-savings').innerText = `₹ ${Number(k.cost_savings_inr).toLocaleString('en-IN')} / annum`;
+          }
+          document.getElementById('slide-sign-prepared').innerText = k.emp_name || 'Associate';
+        }
+      } else if (currentUser) {
+        document.getElementById('slide-display-presenter').innerText = currentUser.name;
+        document.getElementById('slide-display-empno').innerText = `#${currentUser.emp_no}`;
+        document.getElementById('slide-display-area').innerText = `GD ${currentUser.working_area || 'HEAD'} Machining Line`;
+        document.getElementById('slide-display-reviewer').innerText = currentUser.boss_name ? `${currentUser.boss_name}` : 'Section HOD / TPS Office';
+        document.getElementById('slide-sign-prepared').innerText = `${currentUser.name} (${currentUser.hierarchy_role})`;
+        document.getElementById('slide-sign-verified').innerText = currentUser.boss_name ? currentUser.boss_name.split('(')[0].trim() : 'Group Leader';
+      }
+
+      renderSlideKvpChips();
+      const modal = document.getElementById('one-slide-presentation-modal');
+      if (modal) {
+        modal.classList.remove('hidden');
+      }
+    }
+
+    function closeOneSlideModal() {
+      const modal = document.getElementById('one-slide-presentation-modal');
+      if (modal) modal.classList.add('hidden');
+      if (isSlideFullscreen) toggleSlideFullscreen();
+    }
+
+    function toggleSlideFullscreen() {
+      const container = document.getElementById('one-slide-container');
+      const btnLabel = document.getElementById('btn-slide-fullscreen-label');
+      isSlideFullscreen = !isSlideFullscreen;
+
+      if (isSlideFullscreen) {
+        container.classList.remove('max-w-5xl');
+        container.classList.add('fixed', 'inset-0', 'w-screen', 'h-screen', 'rounded-none', 'z-50', 'p-4', 'overflow-y-auto');
+        if (btnLabel) btnLabel.innerText = 'Exit Fullscreen';
+      } else {
+        container.classList.add('max-w-5xl');
+        container.classList.remove('fixed', 'inset-0', 'w-screen', 'h-screen', 'rounded-none', 'z-50', 'p-4', 'overflow-y-auto');
+        if (btnLabel) btnLabel.innerText = 'Fullscreen';
+      }
+    }
+
+    function printOneSlide() {
+      window.print();
+    }
+
+    function toggleSlideEditDrawer() {
+      const drawer = document.getElementById('slide-edit-drawer');
+      if (drawer) {
+        drawer.classList.toggle('hidden');
+      }
+    }
+
+    function applySlideCustomEdits() {
+      const title = document.getElementById('edit-slide-title').value.trim();
+      const station = document.getElementById('edit-slide-station').value.trim();
+      const reviewer = document.getElementById('edit-slide-reviewer').value.trim();
+      const problem = document.getElementById('edit-slide-problem').value.trim();
+      const countermeasure = document.getElementById('edit-slide-countermeasure').value.trim();
+      const cycletime = document.getElementById('edit-slide-cycletime').value.trim();
+      const walking = document.getElementById('edit-slide-walking').value.trim();
+      const savings = document.getElementById('edit-slide-savings').value.trim();
+      const ergo = document.getElementById('edit-slide-ergo').value.trim();
+
+      if (title) document.getElementById('slide-display-title').innerText = title;
+      if (station) document.getElementById('slide-display-station').innerText = station;
+      if (reviewer) document.getElementById('slide-display-reviewer').innerText = reviewer;
+      if (problem) document.getElementById('slide-display-problem').innerText = problem;
+      if (countermeasure) document.getElementById('slide-display-countermeasure').innerText = countermeasure;
+      if (cycletime) document.getElementById('slide-display-cycletime').innerText = cycletime;
+      if (walking) document.getElementById('slide-display-walking').innerText = walking;
+      if (savings) document.getElementById('slide-display-savings').innerText = savings;
+      if (ergo) document.getElementById('slide-display-ergo').innerText = ergo;
+
+      toggleSlideEditDrawer();
+    }
+
+    function generateOneSlideForKomarigoto(kId) {
+      openOneSlidePresentationModal(kId);
     }
 
     // ==========================================
@@ -2855,6 +3396,8 @@
     // ==========================================
     // TRAINING BATCHES
     // ==========================================
+        let currentBatchMembersList = [];
+
     async function fetchBatches() {
       try {
         const res = await fetch('/api/training_batches');
@@ -2864,26 +3407,138 @@
         grid.innerHTML = '';
 
         batches.forEach(b => {
+          const isMyAllocatedBatch = currentUser && (
+            (b.id === 1 && ['50031', '60101', '70201', '25811'].includes(currentUser.emp_no)) ||
+            (b.id === 2 && ['AM001', 'GL001', 'GL002'].includes(currentUser.emp_no)) ||
+            (b.id === 3 && (currentUser.hierarchy_role === 'WT' || currentUser.emp_no === '70201'))
+          );
+
           grid.innerHTML += `
-            <div class="bg-white p-2.5 rounded-xl border border-slate-200 shadow-xs space-y-1 text-xs">
+            <div class="bg-white p-3 rounded-xl border ${isMyAllocatedBatch ? 'border-[#0067B1] ring-2 ring-[#0067B1]/20 shadow-sm' : 'border-slate-200 shadow-xs'} space-y-1.5 text-xs transition">
               <div class="flex justify-between items-start">
-                <span class="font-mono text-[10px] font-bold bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded">${b.batch_code}</span>
-                <span class="text-[10px] px-1.5 py-0.5 rounded font-bold ${b.status === 'Full' ? 'bg-rose-100 text-rose-800' : 'bg-emerald-100 text-emerald-800'}">${b.status}</span>
+                <span class="font-mono text-[11px] font-bold bg-slate-100 text-slate-700 px-2 py-0.5 rounded">${b.batch_code}</span>
+                <div class="flex items-center space-x-1">
+                  ${isMyAllocatedBatch ? '<span class="text-[10px] px-2 py-0.5 rounded font-bold bg-amber-100 text-[#EA7625] border border-amber-300"><i class="fa-solid fa-star text-[9px] mr-0.5"></i>Your Allocated Batch</span>' : ''}
+                  <span class="text-[10px] px-1.5 py-0.5 rounded font-bold ${b.status === 'Full' ? 'bg-rose-100 text-rose-800' : 'bg-emerald-100 text-emerald-800'}">${b.status}</span>
+                </div>
               </div>
-              <h4 class="font-bold text-slate-900 text-xs">${b.level_name}</h4>
-              <div class="text-[11px] text-slate-600"><span class="font-semibold">Module:</span> ${b.module_name}</div>
+              <h4 class="font-bold text-slate-900 text-xs sm:text-sm mt-1">${b.level_name}</h4>
+              <div class="text-[11px] text-slate-600"><span class="font-semibold text-slate-700">Module:</span> ${b.module_name}</div>
               <div class="text-[11px] text-slate-500"><i class="fa-solid fa-chalkboard-user mr-1 text-[#0067B1]"></i> ${b.trainer_name}</div>
-              <div class="text-[11px] text-slate-500"><i class="fa-solid fa-location-dot mr-1 text-[#EA7625]"></i> ${b.venue}</div>
-              <div class="pt-1 border-t border-slate-100 flex justify-between items-center text-[10px] text-slate-400 font-mono">
-                <span>${b.start_date} to ${b.end_date}</span>
-                <span class="font-bold text-slate-700">${b.enrolled_count}/${b.capacity} Seats</span>
+              <div class="text-[11px] text-slate-500"><i class="fa-solid fa-location-dot mr-1 text-rose-500"></i> ${b.venue}</div>
+              <div class="text-[11px] text-slate-500"><i class="fa-solid fa-calendar mr-1 text-[#EA7625]"></i> ${b.start_date} to ${b.end_date}</div>
+              
+              <div class="pt-2 border-t border-slate-100 flex justify-between items-center text-[11px]">
+                <span class="text-slate-500 font-medium"><i class="fa-solid fa-users mr-1"></i> ${b.enrolled_count} / ${b.capacity} Enrolled</span>
               </div>
+
+              <!-- Open Batch Details / Members Button -->
+              <button onclick="openBatchDetailsModal('${b.batch_code}')" class="w-full mt-2 py-1.5 px-3 bg-[#0067B1] hover:bg-[#004F8A] text-white rounded-lg text-xs font-semibold flex items-center justify-center space-x-1.5 transition shadow-xs">
+                <i class="fa-solid fa-users text-[11px]"></i>
+                <span>View Enrolled Members (${b.enrolled_count || 18})</span>
+              </button>
             </div>
           `;
         });
       } catch (e) {
         console.error("Error fetching batches:", e);
       }
+    }
+
+    async function openBatchDetailsModal(batchCode) {
+      const modal = document.getElementById('batch-members-modal');
+      if (!modal) return;
+      modal.classList.remove('hidden');
+
+      document.getElementById('modal-batch-code-pill').innerText = batchCode;
+      document.getElementById('modal-batch-members-tbody').innerHTML = `
+        <tr><td colspan="7" class="p-4 text-center text-slate-400 text-xs">Loading batch members...</td></tr>
+      `;
+
+      try {
+        const res = await fetch(`/api/training_batches/${batchCode}/members`);
+        currentBatchMembersList = await res.json();
+        
+        const batchesRes = await fetch('/api/training_batches');
+        const allBatches = await batchesRes.json();
+        const batchInfo = allBatches.find(b => b.batch_code === batchCode) || {};
+
+        document.getElementById('modal-batch-level-title').innerText = batchInfo.level_name || 'TPS Training Level';
+        document.getElementById('modal-batch-module-desc').innerText = `Module: ${batchInfo.module_name || 'Standardized Work'}`;
+        document.getElementById('modal-batch-trainer').innerHTML = `<i class="fa-solid fa-chalkboard-user mr-1 text-[#0067B1]"></i> ${batchInfo.trainer_name || 'Master Trainer'}`;
+        document.getElementById('modal-batch-venue').innerHTML = `<i class="fa-solid fa-location-dot mr-1 text-rose-600"></i> ${batchInfo.venue || 'TPS Dojo'}`;
+        document.getElementById('modal-batch-dates').innerHTML = `<i class="fa-solid fa-calendar mr-1 text-[#EA7625]"></i> ${batchInfo.start_date} to ${batchInfo.end_date}`;
+        document.getElementById('modal-batch-capacity').innerHTML = `<i class="fa-solid fa-users mr-1"></i> ${currentBatchMembersList.length} / ${batchInfo.capacity || 20} Trainees`;
+        document.getElementById('modal-batch-members-count').innerText = currentBatchMembersList.length;
+
+        renderBatchMembersModalTable(currentBatchMembersList);
+      } catch (e) {
+        console.error("Error opening batch modal:", e);
+      }
+    }
+
+    function renderBatchMembersModalTable(members) {
+      const tbody = document.getElementById('modal-batch-members-tbody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      if (!members || members.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-slate-400 text-xs">No members found matching query.</td></tr>';
+        return;
+      }
+
+      members.forEach(m => {
+        const isMe = currentUser && m.emp_no === currentUser.emp_no;
+        const rowBg = isMe ? 'bg-amber-50/70 font-semibold' : 'hover:bg-slate-50';
+        const isEligible = m.attendance_pct >= 80;
+
+        tbody.innerHTML += `
+          <tr class="${rowBg} transition">
+            <td class="p-2 font-mono text-slate-700">${m.emp_no}</td>
+            <td class="p-2">
+              <div class="flex items-center space-x-2">
+                <img src="${m.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80'}" class="w-6 h-6 rounded-full object-cover border border-slate-200">
+                <div>
+                  <span class="font-bold text-slate-900">${m.name}</span>
+                  ${isMe ? '<span class="ml-1.5 px-1.5 py-0.2 rounded text-[9px] font-bold bg-[#EA7625] text-white">YOU</span>' : ''}
+                </div>
+              </div>
+            </td>
+            <td class="p-2 text-slate-600">${m.designation || m.hierarchy_role}</td>
+            <td class="p-2 text-slate-600">${m.working_area || 'GD'}</td>
+            <td class="p-2 text-slate-500 text-[11px]">${m.boss_name ? m.boss_name.split('(')[0].trim() : '-'}</td>
+            <td class="p-2 text-center">
+              <span class="font-bold text-slate-800">${m.attendance_pct}%</span>
+              <span class="text-[10px] text-slate-400 ml-1">(${m.attended_sessions}/${m.total_sessions})</span>
+            </td>
+            <td class="p-2 text-center">
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold ${isEligible ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                ${isEligible ? '<i class="fa-solid fa-check text-[9px] mr-0.5"></i> Eligible' : 'In Progress'}
+              </span>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function filterBatchMembersModal(query) {
+      const q = (query || '').toLowerCase().trim();
+      if (!q) {
+        renderBatchMembersModalTable(currentBatchMembersList);
+        return;
+      }
+      const filtered = currentBatchMembersList.filter(m => 
+        (m.name && m.name.toLowerCase().includes(q)) ||
+        (m.emp_no && m.emp_no.toLowerCase().includes(q)) ||
+        (m.working_area && m.working_area.toLowerCase().includes(q)) ||
+        (m.designation && m.designation.toLowerCase().includes(q))
+      );
+      renderBatchMembersModalTable(filtered);
+    }
+
+    function closeBatchDetailsModal() {
+      const modal = document.getElementById('batch-members-modal');
+      if (modal) modal.classList.add('hidden');
     }
 
     // ==========================================

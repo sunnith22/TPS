@@ -531,6 +531,34 @@ def get_batches():
     conn.close()
     return jsonify(batches)
 
+@app.route('/api/training_batches/<batch_identifier>/members')
+def get_batch_members(batch_identifier):
+    conn = get_db()
+    cursor = conn.cursor()
+    rows = cursor.execute('''
+        SELECT e.id, e.emp_no, e.name, e.designation, e.working_area, e.hierarchy_role,
+               e.hierarchy_rank, e.avatar, e.boss_name, e.practitioner_certified, e.champion_certified,
+               COUNT(ta.id) as total_sessions,
+               SUM(CASE WHEN ta.status = 'Present' THEN 1 ELSE 0 END) as attended_sessions,
+               MAX(ta.batch_code) as batch_code
+        FROM training_attendance ta
+        JOIN employees e ON ta.emp_id = e.id
+        WHERE ta.batch_id = ? OR ta.batch_code = ?
+        GROUP BY e.id, e.emp_no, e.name, e.designation, e.working_area, e.hierarchy_role,
+                 e.hierarchy_rank, e.avatar, e.boss_name, e.practitioner_certified, e.champion_certified
+        ORDER BY e.hierarchy_rank ASC, e.name ASC
+    ''', (batch_identifier, str(batch_identifier))).fetchall()
+
+    members = []
+    for r in rows:
+        d = dict(r)
+        d['attendance_pct'] = round((d['attended_sessions'] / d['total_sessions'] * 100), 1) if d['total_sessions'] > 0 else 0
+        d['is_eligible'] = d['attendance_pct'] >= 80.0
+        members.append(d)
+
+    conn.close()
+    return jsonify(members)
+
 @app.route('/api/kaizen_requests')
 def get_kaizens():
     conn = get_db()
@@ -549,8 +577,22 @@ def manage_attendance():
     cursor = conn.cursor()
 
     if request.method == 'POST':
+        # Authority Check: Only TPS Admin (TPS_OFFICE or TRAINER) can mark attendance
+        auth_role = request.headers.get('X-User-Role')
+        auth_emp_no = request.headers.get('X-User-Emp-No')
+        
         data = request.json or {}
-        # Support single mark or batch list
+        if isinstance(data, dict):
+            auth_role = auth_role or data.get('user_role')
+            auth_emp_no = auth_emp_no or data.get('user_emp_no')
+
+        if auth_role and auth_role not in ['TPS_OFFICE', 'TRAINER']:
+            conn.close()
+            return jsonify({
+                "success": False,
+                "error": "Access Denied: Only TPS Admin (TPS Office) has permission to mark or update training attendance."
+            }), 403
+
         items = data if isinstance(data, list) else [data]
         updated_ids = []
 
@@ -606,6 +648,8 @@ def manage_attendance():
     batch_id = request.args.get('batch_id')
     session_date = request.args.get('session_date')
     emp_no = request.args.get('emp_no')
+    viewer_emp_no = request.args.get('viewer_emp_no')
+    viewer_role = request.args.get('viewer_role')
 
     query = 'SELECT * FROM training_attendance WHERE 1=1'
     params = []
@@ -619,6 +663,17 @@ def manage_attendance():
     if emp_no:
         query += ' AND UPPER(emp_no) = ?'
         params.append(emp_no.upper())
+    elif viewer_role in ['WT', 'GAT'] and viewer_emp_no:
+        # Individual employee only sees their own attendance
+        query += ' AND UPPER(emp_no) = ?'
+        params.append(viewer_emp_no.upper())
+    elif viewer_role in ['TL', 'GL', 'AM', 'Manager'] and viewer_emp_no:
+        # Leadership sees themselves + employees under their hierarchy
+        sub_nos = get_subordinate_emp_nos(cursor, viewer_emp_no)
+        allowed = [viewer_emp_no] + sub_nos
+        placeholders = ','.join(['?'] * len(allowed))
+        query += f' AND emp_no IN ({placeholders})'
+        params.extend(allowed)
 
     query += ' ORDER BY session_date DESC, emp_name ASC'
     rows = cursor.execute(query, params).fetchall()
@@ -631,6 +686,8 @@ def get_attendance_summary():
     conn = get_db()
     cursor = conn.cursor()
     batch_param = request.args.get('batch_id', '1')
+    viewer_emp_no = request.args.get('viewer_emp_no')
+    viewer_role = request.args.get('viewer_role')
 
     # Candidate-wise summary for batch
     rows = cursor.execute('''
@@ -652,12 +709,22 @@ def get_attendance_summary():
         d = dict(r)
         pct = round((d['attended_sessions'] / d['total_sessions'] * 100), 1) if d['total_sessions'] > 0 else 0
         d['attendance_pct'] = pct
-        d['is_eligible'] = pct >= 80.0 # 80% attendance required as per Understanding Doc
+        d['is_eligible'] = pct >= 80.0
         candidates.append(d)
         total_present += d['attended_sessions']
         total_records += d['total_sessions']
 
-    overall_pct = round((total_present / total_records * 100), 1) if total_records > 0 else 94.4
+    # Role-based filtering of candidate summary
+    if viewer_role in ['WT', 'GAT'] and viewer_emp_no:
+        candidates = [c for c in candidates if c['emp_no'].upper() == viewer_emp_no.upper()]
+    elif viewer_role in ['TL', 'GL', 'AM', 'Manager'] and viewer_emp_no:
+        sub_nos = get_subordinate_emp_nos(cursor, viewer_emp_no)
+        allowed = [viewer_emp_no.upper()] + [s.upper() for s in sub_nos]
+        candidates = [c for c in candidates if c['emp_no'].upper() in allowed]
+
+    filtered_present = sum(c['attended_sessions'] for c in candidates)
+    filtered_records = sum(c['total_sessions'] for c in candidates)
+    overall_pct = round((filtered_present / filtered_records * 100), 1) if filtered_records > 0 else 94.4
 
     # List of unique session dates for batch
     session_rows = cursor.execute('''
