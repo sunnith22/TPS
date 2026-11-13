@@ -12,18 +12,18 @@
 Claude-*
 claude_chat*
 *.sql
-run_prototype.bat
+scratch/
 
 # Allow specific code project folders
-!/prototype/
-!/prototype/**
-!/client/
-!/client/**
-!/server/
-!/server/**
+!/backend/
+!/backend/**
+!/frontend/
+!/frontend/**
+!/backend/tps_database.db
 !/.gitignore
 !/README.md
-!/run_fullstack.bat
+!/run.py
+!/run.bat
 
 # Ignore build artifacts and dependencies
 node_modules/
@@ -42,5 +42,4 @@ yarn-debug.log*
 yarn-error.log*
 __pycache__/
 *.pyc
-*.db
 pgdata/

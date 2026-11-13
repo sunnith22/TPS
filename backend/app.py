@@ -7,10 +7,15 @@ sys.path.insert(0, os.path.dirname(__file__))
 from flask import Flask, render_template, jsonify, request
 from init_db import upgrade_and_seed_hierarchy
 
-app = Flask(__name__, template_folder='templates', static_folder='static')
-DB_PATH = os.path.join(os.path.dirname(__file__), 'tps_database.db')
-UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'static', 'uploads')
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+FRONTEND_DIR = os.path.abspath(os.path.join(BASE_DIR, '..', 'frontend'))
+TEMPLATE_DIR = os.path.join(FRONTEND_DIR, 'templates')
+STATIC_DIR = os.path.join(FRONTEND_DIR, 'static')
+DB_PATH = os.path.join(BASE_DIR, 'tps_database.db')
+UPLOAD_FOLDER = os.path.join(STATIC_DIR, 'uploads')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+app = Flask(__name__, template_folder=TEMPLATE_DIR, static_folder=STATIC_DIR)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 def get_db():
@@ -935,5 +940,6 @@ def check_promotion_readiness(emp_id):
     })
 
 if __name__ == '__main__':
-    print("Starting TPS LMS Prototype on http://127.0.0.1:5000 ...")
-    app.run(host='127.0.0.1', port=5000, debug=False)
+    port = int(os.environ.get('PORT', 5000))
+    print(f"Starting Toyota Industries Engine India TPS LMS Live Application on http://127.0.0.1:{port} ...")
+    app.run(host='127.0.0.1', port=port, debug=False)
