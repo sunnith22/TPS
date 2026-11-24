@@ -65,53 +65,47 @@ KVP_MASTER = [
     {"id": 21, "category": "Others", "subcategory": "Environment", "name": "Others (Gemba 5S & Environment)", "desc": "Lighting, noise, oil mist, chip accumulation, general worksite improvements"}
 ]
 
-# 6 Hierarchy Roles Master
+# Enterprise Plant Hierarchy Roles Master
 HIERARCHY_CONFIG = [
     {
         "rank": 1, "role": "Manager", "title": "1) Section Manager / HOD",
-        "description": "Full Section Oversight: Evaluates all AMs, GLs, TLs, GATs, and WTs",
+        "description": "Full Section Oversight: Evaluates all AMs, GLs, TLs, and AEs",
         "demo_emp_no": "MGR001", "demo_name": "MANUKUMAR G", "icon": "fa-user-tie",
         "color": "rose", "badge_bg": "bg-rose-600"
     },
     {
         "rank": 2, "role": "AM", "title": "2) Assistant Manager",
-        "description": "Area Operations: Supervises Group Leaders, Team Leaders, and Trainees across lines",
+        "description": "Area Operations: Supervises Group Leaders, Team Leaders, and Associate Engineers",
         "demo_emp_no": "AM001", "demo_name": "GOVINDA R", "icon": "fa-award",
         "color": "indigo", "badge_bg": "bg-indigo-600"
     },
     {
         "rank": 3, "role": "GL", "title": "3) Group Leader",
-        "description": "Shift & Line In-charge: Guides Team Leaders, GATs, and WT Boys across cell shifts",
+        "description": "Shift & Line In-charge: Guides Team Leaders and Associate Engineers across cell shifts",
         "demo_emp_no": "GL001", "demo_name": "BINDUKUMAR S", "icon": "fa-users-gear",
         "color": "blue", "badge_bg": "bg-blue-600"
     },
     {
         "rank": 4, "role": "TL", "title": "4) Team Leader",
-        "description": "Cell & Station Lead: Directly oversees GATs and WT Boys + Manages own TPS Pathway",
+        "description": "Cell & Station Lead: Directly oversees Associate Engineers + Manages own TPS Pathway",
         "demo_emp_no": "50031", "demo_name": "ARUNA D R", "icon": "fa-screwdriver-wrench",
         "color": "emerald", "badge_bg": "bg-emerald-600"
     },
     {
-        "rank": 5, "role": "GAT", "title": "5) Graduate Apprentice Trainee",
-        "description": "Trainee Engineer: Mentors assigned WT Boys on Gemba Kaizens + Completes A3 learning",
-        "demo_emp_no": "60101", "demo_name": "VINAY KUMAR", "icon": "fa-graduation-cap",
-        "color": "amber", "badge_bg": "bg-amber-600"
-    },
-    {
-        "rank": 6, "role": "WT", "title": "6) Working Trainee (WT Boy)",
-        "description": "Shopfloor Trainee: Dedicated Personal Portal (Level, 11-Step Pathway, Evidence Upload & Progress)",
+        "rank": 5, "role": "AE", "title": "5) Associate Engineer (AE)",
+        "description": "Shopfloor Associate: Dedicated Personal Portal (Level, 11-Step Pathway, Evidence Upload & Progress)",
         "demo_emp_no": "70201", "demo_name": "RAMESH K", "icon": "fa-helmet-safety",
         "color": "purple", "badge_bg": "bg-purple-600"
     },
     {
-        "rank": 7, "role": "TRAINER", "title": "7) Master Trainer & Verifier",
+        "rank": 6, "role": "TRAINER", "title": "6) Master Trainer & Verifier",
         "description": "Training Batches, Attendance Register & Knowledge Assessments",
         "demo_emp_no": "TRN001", "demo_name": "DILIP R", "icon": "fa-chalkboard-user",
         "color": "sky", "badge_bg": "bg-[#0067B1]"
     },
     {
-        "rank": 8, "role": "TPS_OFFICE", "title": "8) TPS Office / Digital Captain",
-        "description": "Plant Competency Governance, Department Nominations & Certifications",
+        "rank": 7, "role": "TPS_COORDINATOR", "title": "7) TPS Coordinator",
+        "description": "Plant Competency Governance, Department Nominations, Attendance & Certifications",
         "demo_emp_no": "TPS001", "demo_name": "RAKSHITH PRABHU", "icon": "fa-laptop-code",
         "color": "amber", "badge_bg": "bg-[#EA7625]"
     }
@@ -246,6 +240,121 @@ def get_stats():
     ''', params).fetchall()
     role_stats = {r['hierarchy_role']: r['count'] for r in role_rows}
 
+    # 1. Department-wise breakdown (Dept Wise)
+    dept_map = {
+        'Engine Assembly': "working_area LIKE '%ASSY%'",
+        'GD Head Machining': "working_area = 'HEAD'",
+        'GD Crank Machining': "working_area = 'CRANK'",
+        'GD Block Machining': "working_area = 'BLOCK'",
+        'Quality Assurance': "working_area IN ('DC', 'QA')",
+        'Maintenance (TPM)': "working_area IN ('TOOL MGT', 'MAINTENANCE')",
+        'Production Engineering': "working_area IN ('MEG', 'PE')",
+        'Supply Chain & Logistics': "working_area IN ('LINE SUPPLY', 'LOGISTICS')"
+    }
+    dept_stats = []
+    for d_name, cond in dept_map.items():
+        q = "SELECT COUNT(*), SUM(CASE WHEN current_level >= 2 OR practitioner_certified = 1 THEN 1 ELSE 0 END) FROM employees WHERE " + cond
+        row = cursor.execute(q).fetchone()
+        tot = row[0] or 0
+        cert = row[1] or 0
+        pct = round((cert / tot * 100), 1) if tot > 0 else 0.0
+        dept_stats.append({
+            "department": d_name,
+            "total": tot,
+            "certified": cert,
+            "percentage": pct
+        })
+
+    # 2. Total GL's vs Certified GL's
+    gl_row = cursor.execute('''
+        SELECT COUNT(*),
+               SUM(CASE WHEN current_level >= 2 OR practitioner_certified = 1 OR champion_certified = 1 THEN 1 ELSE 0 END)
+        FROM employees WHERE hierarchy_role = 'GL'
+    ''').fetchone()
+    total_gl = gl_row[0] or 0
+    cert_gl = gl_row[1] or 0
+    pct_gl = round((cert_gl / total_gl * 100), 1) if total_gl > 0 else 0.0
+
+    gl_list_rows = cursor.execute('''
+        SELECT emp_no, name, working_area, current_level, practitioner_certified, champion_certified
+        FROM employees WHERE hierarchy_role = 'GL'
+        ORDER BY emp_no
+    ''').fetchall()
+    gl_breakdown = [{
+        "emp_no": r['emp_no'],
+        "name": r['name'],
+        "area": r['working_area'],
+        "level": f"Level {r['current_level']}",
+        "certified": bool(r['current_level'] >= 2 or r['practitioner_certified'] == 1 or r['champion_certified'] == 1)
+    } for r in gl_list_rows]
+
+    gl_stats = {
+        "total_gl": total_gl,
+        "certified_gl": cert_gl,
+        "pending_gl": total_gl - cert_gl,
+        "percentage": pct_gl,
+        "breakdown": gl_breakdown
+    }
+
+    # 3. Total TL's vs Certified TL's
+    tl_row = cursor.execute('''
+        SELECT COUNT(*),
+               SUM(CASE WHEN current_level >= 2 OR practitioner_certified = 1 OR champion_certified = 1 THEN 1 ELSE 0 END)
+        FROM employees WHERE hierarchy_role = 'TL'
+    ''').fetchone()
+    total_tl = tl_row[0] or 0
+    cert_tl = tl_row[1] or 0
+    pct_tl = round((cert_tl / total_tl * 100), 1) if total_tl > 0 else 0.0
+
+    tl_area_rows = cursor.execute('''
+        SELECT working_area,
+               COUNT(*) as total,
+               SUM(CASE WHEN current_level >= 2 OR practitioner_certified = 1 OR champion_certified = 1 THEN 1 ELSE 0 END) as cert
+        FROM employees WHERE hierarchy_role = 'TL'
+        GROUP BY working_area
+        ORDER BY total DESC
+    ''').fetchall()
+    tl_area_breakdown = [{
+        "area": r['working_area'],
+        "total": r['total'],
+        "certified": r['cert'],
+        "pending": r['total'] - r['cert']
+    } for r in tl_area_rows]
+
+    tl_stats = {
+        "total_tl": total_tl,
+        "certified_tl": cert_tl,
+        "pending_tl": total_tl - cert_tl,
+        "percentage": pct_tl,
+        "area_breakdown": tl_area_breakdown
+    }
+
+    # 4. Month vs Month (Certified Associates in Each Month)
+    month_names = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov"]
+    month_counts_dict = {f"{i:02d}": 0 for i in range(1, 12)}
+    cert_month_rows = cursor.execute('''
+        SELECT strftime('%m', issue_date) as m, COUNT(*) as cnt
+        FROM certifications
+        WHERE strftime('%Y', issue_date) = '2026'
+        GROUP BY m ORDER BY m
+    ''').fetchall()
+    for r in cert_month_rows:
+        if r['m'] in month_counts_dict:
+            month_counts_dict[r['m']] = r['cnt']
+
+    monthly_certified = [month_counts_dict[f"{i:02d}"] for i in range(1, 12)]
+    cum = 0
+    cumulative_certified = []
+    for c in monthly_certified:
+        cum += c
+        cumulative_certified.append(cum)
+
+    month_stats = {
+        "months": month_names,
+        "certified_each_month": monthly_certified,
+        "cumulative_certified": cumulative_certified
+    }
+
     conn.close()
 
     return jsonify({
@@ -261,7 +370,11 @@ def get_stats():
         "manhours_saved_per_day": 4.0,
         "area_stats": area_stats,
         "level_stats": level_stats,
-        "role_stats": role_stats
+        "role_stats": role_stats,
+        "dept_stats": dept_stats,
+        "gl_stats": gl_stats,
+        "tl_stats": tl_stats,
+        "month_stats": month_stats
     })
 
 # Subordinate-Aware Employees List Endpoint
@@ -591,11 +704,11 @@ def manage_attendance():
             auth_role = auth_role or data.get('user_role')
             auth_emp_no = auth_emp_no or data.get('user_emp_no')
 
-        if auth_role and auth_role not in ['TPS_OFFICE', 'TRAINER']:
+        if auth_role and auth_role not in ['TPS_COORDINATOR', 'TPS_OFFICE', 'TRAINER']:
             conn.close()
             return jsonify({
                 "success": False,
-                "error": "Access Denied: Only TPS Admin (TPS Office) has permission to mark or update training attendance."
+                "error": "Access Denied: Only TPS Coordinator has permission to mark or update training attendance."
             }), 403
 
         items = data if isinstance(data, list) else [data]
@@ -668,7 +781,7 @@ def manage_attendance():
     if emp_no:
         query += ' AND UPPER(emp_no) = ?'
         params.append(emp_no.upper())
-    elif viewer_role in ['WT', 'GAT'] and viewer_emp_no:
+    elif viewer_role in ['AE', 'WT'] and viewer_emp_no:
         # Individual employee only sees their own attendance
         query += ' AND UPPER(emp_no) = ?'
         params.append(viewer_emp_no.upper())
@@ -720,7 +833,7 @@ def get_attendance_summary():
         total_records += d['total_sessions']
 
     # Role-based filtering of candidate summary
-    if viewer_role in ['WT', 'GAT'] and viewer_emp_no:
+    if viewer_role in ['AE', 'WT'] and viewer_emp_no:
         candidates = [c for c in candidates if c['emp_no'].upper() == viewer_emp_no.upper()]
     elif viewer_role in ['TL', 'GL', 'AM', 'Manager'] and viewer_emp_no:
         sub_nos = get_subordinate_emp_nos(cursor, viewer_emp_no)

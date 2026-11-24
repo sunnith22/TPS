@@ -1,7 +1,7 @@
 # Toyota Industries Engine India (TIEI) - GD Division
 ## TPS Competency Development, Certification & Learning Management System
 
-Enterprise full-stack live application designed for Toyota Production System (TPS) competency progression, 11-step qualification journey, shop-floor attendance management, 6-Block Toyota A3 presentation canvas, Amrut Kaizen integration, and official certification issuance across 78 Team Leaders and associates in GD Division.
+Enterprise full-stack live application designed for Toyota Production System (TPS) competency progression, 11-step qualification journey, shop-floor attendance management, 6-Block Toyota A3 presentation canvas, Amrut Kaizen integration, and official certification issuance across Team Leaders, Group Leaders, and associates in GD Division.
 
 ---
 
@@ -14,7 +14,7 @@ TPS/
 ├── backend/                  # Flask REST API, SQLite Persistence & Plant Hierarchy RBAC
 │   ├── app.py                # Main backend server application & API routes
 │   ├── init_db.py            # SQLite schema initialization and seed database migration
-│   ├── tps_database.db       # Active SQLite database (93 employees, batches, attendance, KVP)
+│   ├── tps_database.db       # Active SQLite database (96 employees, batches, attendance, KVP)
 │   ├── requirements.txt      # Python dependencies (Flask, openpyxl, python-dotenv)
 │   ├── run_backend.bat       # Dedicated launcher for backend API server
 │   └── README.md             # Backend architecture & REST API documentation
@@ -37,21 +37,23 @@ TPS/
 ### Key System Capabilities
 
 1. **Enterprise Plant Hierarchy & RBAC:**
-   - 6-Tier Hierarchy: Manager (`MGR001`), Assistant Manager (`AM001`), Group Leader (`GL001`), Team Leader (`50031`), Graduate Apprentice Trainee (`60101`), Work Trainee (`70201`), and TPS Admin (`TPS001`).
+   - Hierarchy: Manager (`MGR001`), Assistant Manager (`AM001`), Group Leader (`GL001`), Team Leader (`50031`), Associate Engineer (`70201`), Master Trainer (`TRN001`), and TPS Coordinator (`TPS001`).
    - Role-scoped data filters:
-     - Associate roles (GAT, WT) only view their own allocated batch, personal attendance records, and personal 11-step journey.
+     - Associate Engineers (`AE`) only view their own allocated batch, personal attendance records, and personal 11-step journey.
      - Supervisory roles (TL, GL, AM, Manager) view cell and section telemetry and subordinates' progress.
-     - TPS Admin (`TPS001`) has administrative rights to mark and update daily attendance across all batches.
+     - **TPS Coordinator** (`TPS001`) has exclusive administrative authority to mark and verify attendance across all training batches.
 
-2. **Executive Telemetry & Suggestions Dashboard:**
-   - Real-time shop-floor competency tracking for 78 Team Leaders across HEAD, CRANK, BLOCK, LINE SUPPLY, ASSY 1/2/3, TOOL MGT, MEG, and DC.
-   - 75.6% Dojo training completion rate.
-   - Cumulative cost savings tracker (₹2.24+ Cr delivered via Kaizen).
-   - **Department Suggestions for TPS Training Graph**: Department-wise proposed candidates distribution.
+2. **Executive Telemetry & Dashboard Visualizations:**
+   - **Total GL's vs Certified GL's**: Group Leader certification tracking (8 Total GLs, 6 Certified - 75.0%).
+   - **Total TL's vs Certified TL's**: Team Leader certification tracking across plant areas (78 Total TLs, 42 Certified - 53.8%).
+   - **Department-Wise Competency (Dept Wise)**: Distribution of total associates vs certified practitioners across 8 plant departments.
+   - **Month vs Month (Certified Associates in Each Month)**: Newly certified associates by month (Jan-Nov 2026) with cumulative trajectory.
+   - **Training Proposals by Department**: Department-wise proposed, enrolled, and completed candidate distribution.
 
 3. **Shop-Floor Training Attendance Register:**
-   - Real-time attendance tracking across training batches (BATCH-2026-001, BATCH-2026-002, BATCH-2026-003).
+   - Real-time attendance tracking across training batches (BATCH-2026-Q3-01, BATCH-2026-Q3-02, BATCH-2026-Q3-03).
    - Batch roster modal displaying all enrolled team members and their shop-floor designations.
+   - Restricted marking permissions exclusively for TPS Coordinator.
 
 4. **Interactive 11-Step Toyota Qualification Journey:**
    - Full 11-step competency journey from Shop Manager Nomination to Yokoten Horizontal Deployment.
@@ -79,7 +81,7 @@ TPS/
 
 #### Prerequisites
 - Python 3.10 or higher
-- Web Browser (Chrome, Edge, Firefox)
+- Modern Web Browser (Chrome, Edge, Firefox)
 
 #### 1-Click Startup (Windows)
 Double click `run.bat` or run:
@@ -99,15 +101,16 @@ Open your browser to: **`http://127.0.0.1:5000`**
 
 ---
 
-### Default Credentials (Plant Personas)
+### Standard Plant Personas (Sign In)
 
-| Role | Employee ID | Name | Working Area |
+| Role | Employee ID | Name | Department / Working Area |
 | :--- | :--- | :--- | :--- |
-| **Manager** | `MGR001` | DEEPAK GUPTA | GD Section |
+| **Section Manager** | `MGR001` | DEEPAK GUPTA | GD Section |
+| **Assistant Manager** | `AM001` | GOVINDA R | HEAD & CRANK |
 | **Group Leader** | `GL001` | BINDUKUMAR S | HEAD Line |
 | **Team Leader** | `50031` | ARUNA D R | HEAD Line |
-| **GAT Trainee** | `60101` | VINAY KUMAR | HEAD Line |
-| **Work Trainee** | `70201` | PRADEEP M | HEAD Line |
-| **TPS Admin** | `TPS001` | SURESH N | TPS Digital Office |
+| **Associate Engineer** | `70201` | RAMESH K | HEAD Line |
+| **Master Trainer** | `TRN001` | DILIP R | TPS DOJO / TRAINING |
+| **TPS Coordinator** | `TPS001` | RAKSHITH PRABHU | TPS COORDINATION OFFICE |
 
-*Default password for all accounts: `password` (or `tiei123`)*
+*Default password: `password` (or `tiei123`)*

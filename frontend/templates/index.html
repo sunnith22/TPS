@@ -122,20 +122,7 @@
           </button>
         </form>
 
-        <!-- Quick Demo Account Picker -->
-        <div class="pt-3 border-t border-slate-100 text-center">
-          <span class="text-[10px] text-slate-400 block mb-1.5 uppercase tracking-wider font-semibold">Select Demo Account:</span>
-          <div class="flex flex-wrap gap-1 justify-center text-[11px]">
-            <button type="button" onclick="quickLogin('MGR001')" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium">Manager</button>
-            <button type="button" onclick="quickLogin('AM001')" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium">AM</button>
-            <button type="button" onclick="quickLogin('GL001')" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium">GL</button>
-            <button type="button" onclick="quickLogin('50031')" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium">TL</button>
-            <button type="button" onclick="quickLogin('60101')" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium">GAT</button>
-            <button type="button" onclick="quickLogin('70201')" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium">WT</button>
-            <button type="button" onclick="quickLogin('TRN001')" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium">Trainer</button>
-            <button type="button" onclick="quickLogin('TPS001')" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium">TPS Office</button>
-          </div>
-        </div>
+
 
       </div>
     </main>
@@ -281,32 +268,82 @@
         </div>
       </div>
 
-      <!-- Charts Row 1: Competency & Level Funnel -->
+      <!-- Charts Row 1: LEADERSHIP CERTIFICATION (Total GL's vs Certified GL's & Total TL's vs Certified TL's) -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
-        <!-- Area Maturity -->
-        <div class="bg-white p-3 sm:p-3.5 rounded-xl border border-slate-200 shadow-xs">
-          <div class="flex justify-between items-center mb-2">
+        <!-- Total GL's vs Certified GL's -->
+        <div class="bg-white p-3 sm:p-3.5 rounded-xl border border-slate-200 shadow-xs flex flex-col">
+          <div class="flex flex-wrap justify-between items-start gap-1.5 mb-2 border-b border-slate-100 pb-2">
             <div>
-              <h3 class="font-bold text-slate-900 text-xs sm:text-sm">Competency by Area</h3>
-              <p class="text-[10px] text-slate-400">Head, Crank, Block, Assembly, Supply</p>
+              <div class="flex items-center space-x-1.5">
+                <span class="w-2 h-2 rounded-full bg-[#0067B1]"></span>
+                <h3 class="font-bold text-slate-900 text-xs sm:text-sm">Total GL's vs Certified GL's</h3>
+              </div>
+              <p class="text-[10px] text-slate-400 mt-0.5">Shift & line group leaders across GD division</p>
             </div>
-            <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-medium">GD Section</span>
+            <div class="flex items-center space-x-1 text-[11px] font-bold">
+              <span class="px-2 py-0.5 rounded bg-blue-50 text-[#0067B1] border border-blue-200">Total: <span id="stat-gl-total">8</span></span>
+              <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">Certified: <span id="stat-gl-certified">6</span> (<span id="stat-gl-pct">75%</span>)</span>
+            </div>
           </div>
-          <div class="h-52">
-            <canvas id="chart-area-maturity"></canvas>
+          <div class="h-52 relative">
+            <canvas id="chart-gl-certification"></canvas>
           </div>
         </div>
 
-        <!-- Level Pipeline -->
-        <div class="bg-white p-3 sm:p-3.5 rounded-xl border border-slate-200 shadow-xs">
-          <div class="flex justify-between items-center mb-2">
+        <!-- Total TL's vs Certified TL's -->
+        <div class="bg-white p-3 sm:p-3.5 rounded-xl border border-slate-200 shadow-xs flex flex-col">
+          <div class="flex flex-wrap justify-between items-start gap-1.5 mb-2 border-b border-slate-100 pb-2">
             <div>
-              <h3 class="font-bold text-slate-900 text-xs sm:text-sm">Competency by Level</h3>
-              <p class="text-[10px] text-slate-400">L1 Foundation to L4 Master</p>
+              <div class="flex items-center space-x-1.5">
+                <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
+                <h3 class="font-bold text-slate-900 text-xs sm:text-sm">Total TL's vs Certified TL's</h3>
+              </div>
+              <p class="text-[10px] text-slate-400 mt-0.5">Cell & station team leaders across GD production lines</p>
+            </div>
+            <div class="flex items-center space-x-1 text-[11px] font-bold">
+              <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">Total: <span id="stat-tl-total">78</span></span>
+              <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">Certified: <span id="stat-tl-certified">42</span> (<span id="stat-tl-pct">53.8%</span>)</span>
             </div>
           </div>
-          <div class="h-52">
-            <canvas id="chart-level-pipeline"></canvas>
+          <div class="h-52 relative">
+            <canvas id="chart-tl-certification"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts Row 2: DEPARTMENT-WISE & MONTH VS MONTH PROGRESSION -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        <!-- Department Wise Graph -->
+        <div class="bg-white p-3 sm:p-3.5 rounded-xl border border-slate-200 shadow-xs flex flex-col">
+          <div class="flex justify-between items-start mb-2 border-b border-slate-100 pb-2">
+            <div>
+              <div class="flex items-center space-x-1.5">
+                <span class="w-2 h-2 rounded-full bg-[#EA7625]"></span>
+                <h3 class="font-bold text-slate-900 text-xs sm:text-sm">Department-Wise Competency (Dept Wise)</h3>
+              </div>
+              <p class="text-[10px] text-slate-400 mt-0.5">Total associates vs certified practitioners across 8 plant departments</p>
+            </div>
+            <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-semibold">8 Departments</span>
+          </div>
+          <div class="h-56 relative">
+            <canvas id="chart-dept-wise"></canvas>
+          </div>
+        </div>
+
+        <!-- Month vs Month Graph -->
+        <div class="bg-white p-3 sm:p-3.5 rounded-xl border border-slate-200 shadow-xs flex flex-col">
+          <div class="flex justify-between items-start mb-2 border-b border-slate-100 pb-2">
+            <div>
+              <div class="flex items-center space-x-1.5">
+                <span class="w-2 h-2 rounded-full bg-indigo-600"></span>
+                <h3 class="font-bold text-slate-900 text-xs sm:text-sm">Month vs Month (Certified Associates in Each Month)</h3>
+              </div>
+              <p class="text-[10px] text-slate-400 mt-0.5">Newly certified associates by month with cumulative trajectory (2026)</p>
+            </div>
+            <span class="text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded font-bold">2026 MoM</span>
+          </div>
+          <div class="h-56 relative">
+            <canvas id="chart-month-vs-month"></canvas>
           </div>
         </div>
       </div>
@@ -366,8 +403,7 @@
             <button onclick="filterSubordinatesByRole('AM')" id="sub-filter-AM" class="sub-role-filter-btn px-2 py-0.5 rounded font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition text-xs">AM</button>
             <button onclick="filterSubordinatesByRole('GL')" id="sub-filter-GL" class="sub-role-filter-btn px-2 py-0.5 rounded font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition text-xs">GL</button>
             <button onclick="filterSubordinatesByRole('TL')" id="sub-filter-TL" class="sub-role-filter-btn px-2 py-0.5 rounded font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition text-xs">TL</button>
-            <button onclick="filterSubordinatesByRole('GAT')" id="sub-filter-GAT" class="sub-role-filter-btn px-2 py-0.5 rounded font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition text-xs">GAT</button>
-            <button onclick="filterSubordinatesByRole('WT')" id="sub-filter-WT" class="sub-role-filter-btn px-2 py-0.5 rounded font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition text-xs">WT</button>
+            <button onclick="filterSubordinatesByRole('AE')" id="sub-filter-AE" class="sub-role-filter-btn px-2 py-0.5 rounded font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition text-xs">AE</button>
           </div>
         </div>
 
@@ -395,16 +431,17 @@
       </div>
 
       <!-- ============================================== -->
-      <!-- WT PERSONAL DASHBOARD (For WT Role)            -->
+      <!-- AE PERSONAL DASHBOARD (For AE Role)            -->
       <!-- ============================================== -->
       <div id="wt-personal-dashboard-section" class="hidden space-y-2.5">
         <div class="bg-white rounded-xl p-3 sm:p-4 border border-slate-200 shadow-xs flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
           <div>
+            <div class="text-[10px] uppercase font-bold text-purple-700 tracking-wider">Associate Engineer (AE)</div>
             <h2 id="wt-dash-name" class="text-sm sm:text-base font-bold text-slate-900">RAMESH K</h2>
             <div class="text-xs text-slate-500 mt-0.5">
               <span id="wt-dash-code" class="font-mono font-semibold">#70201</span> • 
-              <span id="wt-dash-area">GD Crank Machining</span> • 
-              <span>Supervisor: <b id="wt-dash-boss">PRAVEEN KUMAR (TL)</b></span>
+              <span id="wt-dash-area">GD Head Machining</span> • 
+              <span>Supervisor: <b id="wt-dash-boss">ARUNA D R (TL)</b></span>
             </div>
           </div>
           <button onclick="showTab('journey')" class="px-3 py-1.5 bg-[#EA7625] hover:bg-[#d8661a] text-white rounded-lg font-bold text-xs shadow-xs transition flex items-center space-x-1">
@@ -463,7 +500,7 @@
           <!-- Read-Only Indicator for Non-Admin -->
           <div id="att-readonly-notice" class="flex items-center space-x-1 text-slate-500 bg-slate-100 border border-slate-200 px-2.5 py-1 rounded-lg text-xs font-medium">
             <i class="fa-solid fa-shield-halved text-[10px] text-[#0067B1]"></i>
-            <span id="att-readonly-text">Read-Only View • Managed by TPS Office</span>
+            <span id="att-readonly-text">Read-Only View • Managed by TPS Coordinator</span>
           </div>
         </div>
       </div>
@@ -1208,7 +1245,7 @@
             <select id="nom-input-desig" class="w-full bg-slate-50 border border-slate-300 rounded p-1.5 text-slate-800 focus:ring-1 focus:ring-[#0067B1]">
               <option value="Team Leader">Team Leader</option>
               <option value="Graduate Apprentice">Graduate Apprentice</option>
-              <option value="Working Trainee">Working Trainee</option>
+              <option value="Associate Engineer">Associate Engineer (AE)</option>
               <option value="Associate">Associate</option>
             </select>
           </div>
@@ -1492,7 +1529,7 @@
                 <div id="slide-sign-verified" class="font-bold text-slate-800 truncate">GL / AM</div>
               </div>
               <div class="bg-white p-0.5 rounded border border-slate-200">
-                <div class="text-slate-400 font-bold">TPS Office</div>
+                <div class="text-slate-400 font-bold">TPS Coordinator</div>
                 <div class="font-bold text-emerald-700">Certified</div>
               </div>
             </div>
@@ -1595,6 +1632,10 @@
     let chartMaturity = null;
     let chartPipeline = null;
     let chartDeptNominations = null;
+    let chartGlCert = null;
+    let chartTlCert = null;
+    let chartDeptWise = null;
+    let chartMonthVsMonth = null;
     let deptNominationsData = null;
     let currentSubRoleFilter = 'ALL';
     let cachedEmployeeEvidence = {};
@@ -1790,9 +1831,10 @@
           'AM': 'bg-indigo-700 text-white',
           'GL': 'bg-[#0067B1] text-white',
           'TL': 'bg-emerald-700 text-white',
-          'GAT': 'bg-amber-600 text-white',
+          'AE': 'bg-purple-700 text-white',
           'WT': 'bg-purple-700 text-white',
           'TRAINER': 'bg-sky-600 text-white',
+          'TPS_COORDINATOR': 'bg-[#EA7625] text-white',
           'TPS_OFFICE': 'bg-[#EA7625] text-white'
         };
         const roleRankNames = {
@@ -1800,10 +1842,11 @@
           'AM': 'Assistant Manager',
           'GL': 'Group Leader',
           'TL': 'Team Leader',
-          'GAT': 'Graduate Apprentice',
-          'WT': 'Working Trainee',
+          'AE': 'Associate Engineer',
+          'WT': 'Associate Engineer',
           'TRAINER': 'Master Trainer',
-          'TPS_OFFICE': 'TPS Office'
+          'TPS_COORDINATOR': 'TPS Coordinator',
+          'TPS_OFFICE': 'TPS Coordinator'
         };
         const rKey = user.hierarchy_role || 'Manager';
         roleBadgeEl.className = `px-1.5 py-0.2 rounded text-[9px] font-bold uppercase ${roleStyles[rKey] || 'bg-slate-700 text-white'}`;
@@ -1814,7 +1857,7 @@
       const subMatrixSection = document.getElementById('subordinates-matrix-section');
       const wtDashboardSection = document.getElementById('wt-personal-dashboard-section');
 
-      if (user.hierarchy_role === 'WT') {
+      if (user.hierarchy_role === 'AE' || user.hierarchy_role === 'WT') {
         if (subMatrixSection) {
           subMatrixSection.classList.add('hidden');
           subMatrixSection.style.display = 'none';
@@ -1901,9 +1944,10 @@
         'AM': 'bg-indigo-100 text-indigo-800',
         'GL': 'bg-blue-100 text-blue-800',
         'TL': 'bg-emerald-100 text-emerald-800',
-        'GAT': 'bg-amber-100 text-amber-800',
+        'AE': 'bg-purple-100 text-purple-800',
         'WT': 'bg-purple-100 text-purple-800',
         'TRAINER': 'bg-sky-100 text-sky-800',
+        'TPS_COORDINATOR': 'bg-orange-100 text-orange-800',
         'TPS_OFFICE': 'bg-orange-100 text-orange-800'
       };
 
@@ -2083,54 +2127,196 @@
     }
 
     function renderCharts() {
-      if (!statsData.area_stats) return;
+      if (!statsData) return;
 
-      const areaCtx = document.getElementById('chart-area-maturity');
-      if (areaCtx) {
-        if (chartMaturity) chartMaturity.destroy();
-        const labels = statsData.area_stats.map(a => a.working_area);
-        const totals = statsData.area_stats.map(a => a.total);
-        const certs = statsData.area_stats.map(a => a.certified);
+      // 1. TOTAL GL's VS CERTIFIED GL's CHART
+      const glCtx = document.getElementById('chart-gl-certification');
+      if (glCtx && statsData.gl_stats) {
+        if (chartGlCert) chartGlCert.destroy();
+        const glTotalEl = document.getElementById('stat-gl-total');
+        if (glTotalEl) glTotalEl.innerText = statsData.gl_stats.total_gl;
+        const glCertEl = document.getElementById('stat-gl-certified');
+        if (glCertEl) glCertEl.innerText = statsData.gl_stats.certified_gl;
+        const glPctEl = document.getElementById('stat-gl-pct');
+        if (glPctEl) glPctEl.innerText = statsData.gl_stats.percentage + '%';
 
-        chartMaturity = new Chart(areaCtx, {
+        chartGlCert = new Chart(glCtx, {
           type: 'bar',
           data: {
-            labels: labels,
-            datasets: [
-              { label: 'Total Associates', data: totals, backgroundColor: '#94A3B8' },
-              { label: 'Certified', data: certs, backgroundColor: '#0067B1' }
-            ]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: { y: { beginAtZero: true } },
-            plugins: { legend: { position: 'top', labels: { boxWidth: 10, font: { size: 10 } } } }
-          }
-        });
-      }
-
-      const pipeCtx = document.getElementById('chart-level-pipeline');
-      if (pipeCtx) {
-        if (chartPipeline) chartPipeline.destroy();
-        const l1 = (statsData.level_stats && statsData.level_stats[1]) || 0;
-        const l2 = (statsData.level_stats && statsData.level_stats[2]) || 0;
-        const l3 = (statsData.level_stats && statsData.level_stats[3]) || 0;
-        const l4 = (statsData.level_stats && statsData.level_stats[4]) || 0;
-
-        chartPipeline = new Chart(pipeCtx, {
-          type: 'doughnut',
-          data: {
-            labels: ['L1 Foundation', 'L2 Practitioner', 'L3 Champion', 'L4 Master'],
+            labels: ['Group Leaders (GL) Total', 'Certified GLs', 'In Progress'],
             datasets: [{
-              data: [l1, l2, l3, l4],
-              backgroundColor: ['#CBD5E1', '#38BDF8', '#10B981', '#0067B1']
+              label: 'Group Leaders',
+              data: [statsData.gl_stats.total_gl, statsData.gl_stats.certified_gl, statsData.gl_stats.pending_gl],
+              backgroundColor: ['#0067B1', '#10B981', '#CBD5E1'],
+              borderRadius: 5,
+              barPercentage: 0.55
             }]
           },
           options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } }
+            scales: {
+              y: { beginAtZero: true, max: 10, ticks: { stepSize: 2 } }
+            },
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  afterLabel: (ctx) => {
+                    if (ctx.dataIndex === 1) return `Certification Rate: ${statsData.gl_stats.percentage}%`;
+                    return '';
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+
+      // 2. TOTAL TL's VS CERTIFIED TL's CHART
+      const tlCtx = document.getElementById('chart-tl-certification');
+      if (tlCtx && statsData.tl_stats) {
+        if (chartTlCert) chartTlCert.destroy();
+        const tlTotalEl = document.getElementById('stat-tl-total');
+        if (tlTotalEl) tlTotalEl.innerText = statsData.tl_stats.total_tl;
+        const tlCertEl = document.getElementById('stat-tl-certified');
+        if (tlCertEl) tlCertEl.innerText = statsData.tl_stats.certified_tl;
+        const tlPctEl = document.getElementById('stat-tl-pct');
+        if (tlPctEl) tlPctEl.innerText = statsData.tl_stats.percentage + '%';
+
+        const areaLabels = (statsData.tl_stats.area_breakdown || []).map(a => a.area);
+        const totals = (statsData.tl_stats.area_breakdown || []).map(a => a.total);
+        const certs = (statsData.tl_stats.area_breakdown || []).map(a => a.certified);
+
+        chartTlCert = new Chart(tlCtx, {
+          type: 'bar',
+          data: {
+            labels: areaLabels,
+            datasets: [
+              {
+                label: 'Total TLs',
+                data: totals,
+                backgroundColor: '#94A3B8',
+                borderRadius: 3
+              },
+              {
+                label: 'Certified TLs',
+                data: certs,
+                backgroundColor: '#0067B1',
+                borderRadius: 3
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              x: { ticks: { font: { size: 9 }, maxRotation: 20, minRotation: 0 } },
+              y: { beginAtZero: true, ticks: { precision: 0 } }
+            },
+            plugins: {
+              legend: { position: 'top', labels: { boxWidth: 10, font: { size: 10 } } }
+            }
+          }
+        });
+      }
+
+      // 3. DEPARTMENT-WISE COMPETENCY (DEPT WISE) CHART
+      const deptCtx = document.getElementById('chart-dept-wise');
+      if (deptCtx && statsData.dept_stats) {
+        if (chartDeptWise) chartDeptWise.destroy();
+        const dLabels = statsData.dept_stats.map(d => d.department);
+        const dTotals = statsData.dept_stats.map(d => d.total);
+        const dCerts = statsData.dept_stats.map(d => d.certified);
+
+        chartDeptWise = new Chart(deptCtx, {
+          type: 'bar',
+          data: {
+            labels: dLabels,
+            datasets: [
+              {
+                label: 'Total Associates',
+                data: dTotals,
+                backgroundColor: '#64748B',
+                borderRadius: 3
+              },
+              {
+                label: 'Certified Practitioners',
+                data: dCerts,
+                backgroundColor: '#EA7625',
+                borderRadius: 3
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              x: { ticks: { font: { size: 8.5 }, maxRotation: 25, minRotation: 0 } },
+              y: { beginAtZero: true, ticks: { precision: 0 } }
+            },
+            plugins: {
+              legend: { position: 'top', labels: { boxWidth: 10, font: { size: 10 } } }
+            }
+          }
+        });
+      }
+
+      // 4. MONTH VS MONTH (CERTIFIED ASSOCIATES IN EACH MONTH) CHART
+      const monthCtx = document.getElementById('chart-month-vs-month');
+      if (monthCtx && statsData.month_stats) {
+        if (chartMonthVsMonth) chartMonthVsMonth.destroy();
+        const mLabels = statsData.month_stats.months;
+        const mNew = statsData.month_stats.certified_each_month;
+        const mCum = statsData.month_stats.cumulative_certified;
+
+        chartMonthVsMonth = new Chart(monthCtx, {
+          data: {
+            labels: mLabels,
+            datasets: [
+              {
+                type: 'bar',
+                label: 'Monthly Certified (MoM)',
+                data: mNew,
+                backgroundColor: '#0067B1',
+                borderRadius: 4,
+                yAxisID: 'y'
+              },
+              {
+                type: 'line',
+                label: 'Cumulative Certified',
+                data: mCum,
+                borderColor: '#10B981',
+                backgroundColor: '#10B981',
+                borderWidth: 2,
+                pointRadius: 3,
+                tension: 0.25,
+                yAxisID: 'y1'
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: {
+                beginAtZero: true,
+                position: 'left',
+                title: { display: true, text: 'Monthly New', font: { size: 9 } },
+                ticks: { precision: 0, font: { size: 9 } }
+              },
+              y1: {
+                beginAtZero: true,
+                position: 'right',
+                grid: { drawOnChartArea: false },
+                title: { display: true, text: 'Cumulative', font: { size: 9 } },
+                ticks: { precision: 0, font: { size: 9 } }
+              },
+              x: { ticks: { font: { size: 9 } } }
+            },
+            plugins: {
+              legend: { position: 'top', labels: { boxWidth: 10, font: { size: 10 } } }
+            }
           }
         });
       }
@@ -2312,16 +2498,14 @@
     // ATTENDANCE LOGIC
     // ==========================================
     async function loadAttendanceData(batchCode, sessionDate) {
-      const isTpsAdmin = currentUser && (currentUser.hierarchy_role === 'TPS_OFFICE' || currentUser.emp_no === 'TPS001' || currentUser.hierarchy_role === 'TRAINER');
-      const isEmployee = currentUser && (currentUser.hierarchy_role === 'WT' || currentUser.hierarchy_role === 'GAT');
+      const isTpsAdmin = currentUser && (currentUser.hierarchy_role === 'TPS_COORDINATOR' || currentUser.hierarchy_role === 'TPS_OFFICE' || currentUser.emp_no === 'TPS001' || currentUser.hierarchy_role === 'TRAINER');
+      const isEmployee = currentUser && (currentUser.hierarchy_role === 'AE' || currentUser.hierarchy_role === 'WT');
       const isLeadership = currentUser && ['TL', 'GL', 'AM', 'Manager'].includes(currentUser.hierarchy_role);
 
       const batchSelect = document.getElementById('att-batch-select');
       if (isEmployee && batchSelect && !batchCode) {
-        if (currentUser.hierarchy_role === 'WT' && batchSelect.value !== 'BATCH-2026-Q3-03') {
+        if ((currentUser.hierarchy_role === 'AE' || currentUser.hierarchy_role === 'WT') && batchSelect.value !== 'BATCH-2026-Q3-03') {
           batchSelect.value = 'BATCH-2026-Q3-03';
-        } else if (currentUser.hierarchy_role === 'GAT' && batchSelect.value !== 'BATCH-2026-Q3-01') {
-          batchSelect.value = 'BATCH-2026-Q3-01';
         }
       }
 
@@ -2337,7 +2521,7 @@
       if (isTpsAdmin) {
         if (adminActions) adminActions.classList.remove('hidden');
         if (readonlyNotice) readonlyNotice.classList.add('hidden');
-        if (attTitle) attTitle.innerText = 'Training Attendance Register (TPS Admin Mode)';
+        if (attTitle) attTitle.innerText = 'Training Attendance Register (TPS Coordinator Mode)';
         if (attSubtitle) attSubtitle.innerText = 'Mark daily session attendance and manage qualification records across plant batches';
       } else if (isEmployee) {
         if (adminActions) adminActions.classList.add('hidden');
@@ -2348,7 +2532,7 @@
       } else {
         if (adminActions) adminActions.classList.add('hidden');
         if (readonlyNotice) readonlyNotice.classList.remove('hidden');
-        if (readonlyText) readonlyText.innerText = 'Team Attendance Register • Read-Only (Managed by TPS Office)';
+        if (readonlyText) readonlyText.innerText = 'Team Attendance Register • Read-Only (Managed by TPS Coordinator)';
         if (attTitle) attTitle.innerText = 'Team Training Attendance';
         if (attSubtitle) attSubtitle.innerText = `Session attendance for associates reporting under ${currentUser ? currentUser.name : ''} (${currentUser ? currentUser.hierarchy_role : ''})`;
       }
@@ -2465,9 +2649,9 @@
     }
 
     function markAllPresent() {
-      const isTpsAdmin = currentUser && (currentUser.hierarchy_role === 'TPS_OFFICE' || currentUser.emp_no === 'TPS001' || currentUser.hierarchy_role === 'TRAINER');
+      const isTpsAdmin = currentUser && (currentUser.hierarchy_role === 'TPS_COORDINATOR' || currentUser.hierarchy_role === 'TPS_OFFICE' || currentUser.emp_no === 'TPS001' || currentUser.hierarchy_role === 'TRAINER');
       if (!isTpsAdmin) {
-        alert("Access Denied: Only TPS Admin (TPS Office) has permission to mark attendance.");
+        alert("Access Denied: Only TPS Coordinator has permission to mark attendance.");
         return;
       }
       (attendanceSessionsData || []).forEach(s => {
@@ -2478,9 +2662,9 @@
     }
 
     async function saveAttendanceRegister() {
-      const isTpsAdmin = currentUser && (currentUser.hierarchy_role === 'TPS_OFFICE' || currentUser.emp_no === 'TPS001' || currentUser.hierarchy_role === 'TRAINER');
+      const isTpsAdmin = currentUser && (currentUser.hierarchy_role === 'TPS_COORDINATOR' || currentUser.hierarchy_role === 'TPS_OFFICE' || currentUser.emp_no === 'TPS001' || currentUser.hierarchy_role === 'TRAINER');
       if (!isTpsAdmin) {
-        alert("Access Denied: Only TPS Admin (TPS Office) has permission to mark or update attendance.");
+        alert("Access Denied: Only TPS Coordinator has permission to mark or update attendance.");
         return;
       }
 
@@ -2509,7 +2693,7 @@
         });
 
         if (res.ok) {
-          alert("Attendance records successfully saved and verified by TPS Office!");
+          alert("Attendance records successfully saved and verified by TPS Coordinator!");
           await loadAttendanceData(currentBatchCode, currentSessionDate);
         } else {
           const err = await res.json();
@@ -2572,7 +2756,7 @@
         const res = await fetch(`/api/employees?supervisor=${sup}&include_self=true`);
         employeesData = await res.json();
 
-        if (currentUser && currentUser.hierarchy_role === 'WT') {
+        if (currentUser && (currentUser.hierarchy_role === 'AE' || currentUser.hierarchy_role === 'WT')) {
           subordinatesData = [];
         } else if (currentUser) {
           subordinatesData = employeesData.filter(e => e.emp_no !== currentUser.emp_no);
@@ -2600,7 +2784,7 @@
 
         if (employeesData.length > 0) {
           let targetEmp = null;
-          if (currentUser && currentUser.hierarchy_role === 'WT') {
+          if (currentUser && (currentUser.hierarchy_role === 'AE' || currentUser.hierarchy_role === 'WT')) {
             targetEmp = employeesData.find(e => e.emp_no === currentUser.emp_no) || employeesData[0];
           } else if (subordinatesData.length > 0) {
             targetEmp = subordinatesData[0];
@@ -2750,7 +2934,7 @@
         document.getElementById('slide-display-presenter').innerText = currentUser.name;
         document.getElementById('slide-display-empno').innerText = `#${currentUser.emp_no}`;
         document.getElementById('slide-display-area').innerText = `GD ${currentUser.working_area || 'HEAD'} Machining Line`;
-        document.getElementById('slide-display-reviewer').innerText = currentUser.boss_name ? `${currentUser.boss_name}` : 'Section HOD / TPS Office';
+        document.getElementById('slide-display-reviewer').innerText = currentUser.boss_name ? `${currentUser.boss_name}` : 'Section HOD / TPS Coordinator';
         document.getElementById('slide-sign-prepared').innerText = `${currentUser.name} (${currentUser.hierarchy_role})`;
         document.getElementById('slide-sign-verified').innerText = currentUser.boss_name ? currentUser.boss_name.split('(')[0].trim() : 'Group Leader';
       }
@@ -3450,7 +3634,7 @@
           const isMyAllocatedBatch = currentUser && (
             (b.id === 1 && ['50031', '60101', '70201', '25811'].includes(currentUser.emp_no)) ||
             (b.id === 2 && ['AM001', 'GL001', 'GL002'].includes(currentUser.emp_no)) ||
-            (b.id === 3 && (currentUser.hierarchy_role === 'WT' || currentUser.emp_no === '70201'))
+            (b.id === 3 && (currentUser.hierarchy_role === 'AE' || currentUser.hierarchy_role === 'WT' || currentUser.emp_no === '70201'))
           );
 
           grid.innerHTML += `

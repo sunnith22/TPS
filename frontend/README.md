@@ -10,46 +10,29 @@ The frontend provides an enterprise, minimalist, responsive user interface speci
 ### Key User Interface Modules
 
 1. **Authentication & Role-Based Workspaces:**
-   - Single sign-on portal with real-time credentials validation.
-   - Quick role preview switchers for testing plant hierarchy personas (Manager, TL, GAT, WT, TPS Admin).
+   - Single sign-on portal with realistic production credentials validation (Demo account picker removed).
    - Strict view isolation: associate workstations only display personal data; supervisor views display cell and team aggregates.
 
 2. **Executive Telemetry Dashboard:**
    - Plant TPS capability metrics (Total Associates, Completion Rate, Certified Practitioners, Amrut Kaizen Cost Savings).
-   - Chart.js visual telemetry:
-     - Shop-floor TPS Maturity by Working Area (GD Head, Crank, Block, Assembly, Supply).
-     - Competency Progression Pipeline (Level 1 Foundation through Level 4 Master).
-     - **Department Suggestions for TPS Training Graph**: Department-wise proposed candidates distribution.
+   - **Total GL's vs Certified GL's**: Group Leader certification tracking (8 Total GLs, 6 Certified - 75.0%).
+   - **Total TL's vs Certified TL's**: Team Leader certification tracking across plant areas (78 Total TLs, 42 Certified - 53.8%).
+   - **Department-Wise Competency (Dept Wise)**: Distribution of total associates vs certified practitioners across 8 plant departments.
+   - **Month vs Month (Certified Associates in Each Month)**: Newly certified associates by month (Jan-Nov 2026) with cumulative trajectory.
+   - **Training Proposals by Department**: Department-wise proposed, enrolled, and completed candidate distribution.
 
 3. **Shop-Floor Training Attendance Register:**
    - Interactive attendance tracking by training batch and date.
-   - TPS Admin exclusive permission to mark, update, and persist daily attendance.
+   - TPS Coordinator exclusive permission to mark, update, and persist daily attendance.
    - Associate-restricted view showing only personal attendance records.
 
 4. **Interactive 11-Step Toyota Qualification Journey:**
-   - Step 1: Shop Manager Nomination
-   - Step 2: Pre-Assessment Knowledge Diagnostic
-   - Step 3: 3-Day Classroom & Practical Dojo Training
-   - Step 4: Post-Assessment Test (Target &ge; 70%)
-   - Step 5: Gemba Komarigoto Problem Identification
-   - Step 6: Standardized Work (3 Slips) & 21 KVP Countermeasures
-   - Step 7: Shop Manager Defense Presentation & Sign-off
-   - Step 8: Production Kaizen Implementation
-   - Step 9: Amrut Kaizen System Integration
-   - Step 10: Official Level 2 Practitioner Certification
-   - Step 11: Continuous Mentorship & Horizontal Deployment (Yokoten)
-   - Real-time file upload modal with remarks for auditing qualification evidence.
+   - Full 11-step competency journey from Shop Manager Nomination to Yokoten Horizontal Deployment.
+   - Evidence file upload modal with remarks for qualification verification.
 
 5. **Toyota A3 1-Slide Management Presentation Canvas:**
    - Single-slide summary board for executive review.
-   - 6-Block layout:
-     - Block 1: Worksite Problem (Komarigoto) & Selected 21 Kaizen Viewpoints
-     - Block 2: Root Cause Analysis (5-Why Investigation)
-     - Block 3: Implemented Countermeasure (Kaizen)
-     - Block 4: Tangible Results & Horizontal Deployment (Yokoten)
-     - Block 5: Standardized Work (3 Slips: Capacity Sheet, Combination Sheet, Work Instruction)
-     - Block 6: Sign-off & Competency Certification Status
-   - Interactive 21 Kaizen Viewpoints selector (Muri, Mura, Muda) with dynamic counter.
+   - 6-Block layout with interactive 21 Kaizen Viewpoints selector (Muri, Mura, Muda).
    - 1-Click Print / PDF export and Fullscreen mode.
 
 6. **Department Skill Matrix & Promotion Audit:**

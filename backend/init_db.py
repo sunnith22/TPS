@@ -10,24 +10,24 @@ EXCEL_PATH = os.path.join(os.path.dirname(__file__), '..', '001_TPS Journey Visu
 HIERARCHY_LEADERS = [
     # Level 1: Manager
     {
-        "emp_no": "MGR001", "name": "MANUKUMAR G", "division": "GD", "working_area": "ALL (GD Section)",
+        "emp_no": "MGR001", "name": "DEEPAK GUPTA", "division": "GD", "working_area": "ALL (GD Section)",
         "designation": "Section Manager / HOD", "boss_name": "Antony John Sudhakar P (VP)", "hierarchy_role": "Manager",
         "hierarchy_rank": 1, "reports_to_emp_no": "VP001", "gender": "Male",
-        "avatar": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=120&q=80",
-        "current_level": 3, "target_level": 4, "training_status": 2, "pre_test_score": 80.0, "post_test_score": 95.0,
+        "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80",
+        "current_level": 3, "target_level": 4, "training_status": 2, "pre_test_score": 85.0, "post_test_score": 95.0,
         "assignment_status": 2, "presentation_mgr": 2, "presentation_vp": 2, "presentation_dmd": 2,
-        "practitioner_certified": 1, "jishuken_1": 1, "jishuken_2": 1, "champion_eval": 95.0, "champion_certified": 1,
-        "kaizens_submitted": 18, "kaizens_approved": 15, "cost_savings_inr": 850000.0, "kpi_score": 96.5
+        "practitioner_certified": 1, "jishuken_1": 1, "jishuken_2": 1, "champion_eval": 96.5, "champion_certified": 1,
+        "kaizens_submitted": 18, "kaizens_approved": 16, "cost_savings_inr": 620000.0, "kpi_score": 96.5
     },
-    # Level 2: AM (Assistant Manager)
+    # Level 2: Assistant Managers (AM)
     {
         "emp_no": "AM001", "name": "GOVINDA R", "division": "GD", "working_area": "HEAD & CRANK",
         "designation": "Assistant Manager", "boss_name": "MANUKUMAR G (Manager)", "hierarchy_role": "AM",
         "hierarchy_rank": 2, "reports_to_emp_no": "MGR001", "gender": "Male",
         "avatar": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&q=80",
-        "current_level": 3, "target_level": 4, "training_status": 2, "pre_test_score": 75.0, "post_test_score": 92.0,
-        "assignment_status": 2, "presentation_mgr": 2, "presentation_vp": 2, "presentation_dmd": 2,
-        "practitioner_certified": 1, "jishuken_1": 1, "jishuken_2": 1, "champion_eval": 91.0, "champion_certified": 1,
+        "current_level": 3, "target_level": 4, "training_status": 2, "pre_test_score": 82.0, "post_test_score": 91.0,
+        "assignment_status": 2, "presentation_mgr": 2, "presentation_vp": 2, "presentation_dmd": 1,
+        "practitioner_certified": 1, "jishuken_1": 1, "jishuken_2": 1, "champion_eval": 92.0, "champion_certified": 1,
         "kaizens_submitted": 14, "kaizens_approved": 11, "cost_savings_inr": 480000.0, "kpi_score": 92.4
     },
     {
@@ -40,7 +40,7 @@ HIERARCHY_LEADERS = [
         "practitioner_certified": 1, "jishuken_1": 1, "jishuken_2": 0, "champion_eval": 84.0, "champion_certified": 0,
         "kaizens_submitted": 10, "kaizens_approved": 7, "cost_savings_inr": 290000.0, "kpi_score": 88.0
     },
-    # Level 3: GL (Group Leader)
+    # Level 3: GL (Group Leaders across 8 plant areas)
     {
         "emp_no": "GL001", "name": "BINDUKUMAR S", "division": "GD", "working_area": "HEAD",
         "designation": "Group Leader", "boss_name": "GOVINDA R (AM)", "hierarchy_role": "GL",
@@ -61,62 +61,91 @@ HIERARCHY_LEADERS = [
         "practitioner_certified": 1, "jishuken_1": 1, "jishuken_2": 0, "champion_eval": 82.0, "champion_certified": 0,
         "kaizens_submitted": 8, "kaizens_approved": 6, "cost_savings_inr": 210000.0, "kpi_score": 86.2
     },
-    # Level 5: GAT (Graduate Apprentice Trainee)
     {
-        "emp_no": "60101", "name": "VINAY KUMAR", "division": "GD", "working_area": "HEAD",
-        "designation": "Graduate Apprentice Trainee (GAT)", "boss_name": "ARUNA D R (TL)", "hierarchy_role": "GAT",
-        "hierarchy_rank": 5, "reports_to_emp_no": "50031", "gender": "Male",
-        "avatar": "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=120&q=80",
-        "current_level": 1, "target_level": 2, "training_status": 2, "pre_test_score": 68.0, "post_test_score": 86.0,
-        "assignment_status": 2, "presentation_mgr": 1, "presentation_vp": 0, "presentation_dmd": 0,
-        "practitioner_certified": 0, "jishuken_1": 0, "jishuken_2": 0, "champion_eval": 0.0, "champion_certified": 0,
-        "kaizens_submitted": 4, "kaizens_approved": 2, "cost_savings_inr": 54000.0, "kpi_score": 82.5
+        "emp_no": "GL003", "name": "MAHESH BABU", "division": "GD", "working_area": "BLOCK",
+        "designation": "Group Leader", "boss_name": "KAILASH NATH (AM)", "hierarchy_role": "GL",
+        "hierarchy_rank": 3, "reports_to_emp_no": "AM002", "gender": "Male",
+        "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80",
+        "current_level": 2, "target_level": 3, "training_status": 2, "pre_test_score": 75.0, "post_test_score": 88.0,
+        "assignment_status": 2, "presentation_mgr": 2, "presentation_vp": 1, "presentation_dmd": 0,
+        "practitioner_certified": 1, "jishuken_1": 1, "jishuken_2": 0, "champion_eval": 84.0, "champion_certified": 0,
+        "kaizens_submitted": 10, "kaizens_approved": 8, "cost_savings_inr": 290000.0, "kpi_score": 88.0
     },
     {
-        "emp_no": "60102", "name": "POOJA SHARMA", "division": "GD", "working_area": "HEAD",
-        "designation": "Graduate Apprentice Trainee (GAT)", "boss_name": "ARUNA D R (TL)", "hierarchy_role": "GAT",
-        "hierarchy_rank": 5, "reports_to_emp_no": "50031", "gender": "Female",
-        "avatar": "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=120&q=80",
-        "current_level": 1, "target_level": 2, "training_status": 2, "pre_test_score": 62.0, "post_test_score": 84.0,
-        "assignment_status": 1, "presentation_mgr": 0, "presentation_vp": 0, "presentation_dmd": 0,
-        "practitioner_certified": 0, "jishuken_1": 0, "jishuken_2": 0, "champion_eval": 0.0, "champion_certified": 0,
-        "kaizens_submitted": 3, "kaizens_approved": 1, "cost_savings_inr": 32000.0, "kpi_score": 79.0
+        "emp_no": "GL004", "name": "RAJESH GOWDA", "division": "GD", "working_area": "ASSY 1",
+        "designation": "Group Leader", "boss_name": "KAILASH NATH (AM)", "hierarchy_role": "GL",
+        "hierarchy_rank": 3, "reports_to_emp_no": "AM002", "gender": "Male",
+        "avatar": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&q=80",
+        "current_level": 2, "target_level": 3, "training_status": 2, "pre_test_score": 78.0, "post_test_score": 89.0,
+        "assignment_status": 2, "presentation_mgr": 2, "presentation_vp": 2, "presentation_dmd": 0,
+        "practitioner_certified": 1, "jishuken_1": 1, "jishuken_2": 0, "champion_eval": 86.0, "champion_certified": 0,
+        "kaizens_submitted": 11, "kaizens_approved": 9, "cost_savings_inr": 320000.0, "kpi_score": 89.0
     },
     {
-        "emp_no": "60103", "name": "SNEHA R", "division": "GD", "working_area": "CRANK",
-        "designation": "Graduate Apprentice Trainee (GAT)", "boss_name": "KIRAN GOWDA (TL)", "hierarchy_role": "GAT",
-        "hierarchy_rank": 5, "reports_to_emp_no": "476", "gender": "Female",
-        "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80",
-        "current_level": 1, "target_level": 2, "training_status": 1, "pre_test_score": 59.0, "post_test_score": 78.0,
-        "assignment_status": 1, "presentation_mgr": 0, "presentation_vp": 0, "presentation_dmd": 0,
-        "practitioner_certified": 0, "jishuken_1": 0, "jishuken_2": 0, "champion_eval": 0.0, "champion_certified": 0,
-        "kaizens_submitted": 2, "kaizens_approved": 1, "cost_savings_inr": 18000.0, "kpi_score": 76.2
+        "emp_no": "GL005", "name": "VENKATESH M", "division": "GD", "working_area": "ASSY 2",
+        "designation": "Group Leader", "boss_name": "KAILASH NATH (AM)", "hierarchy_role": "GL",
+        "hierarchy_rank": 3, "reports_to_emp_no": "AM002", "gender": "Male",
+        "avatar": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=120&q=80",
+        "current_level": 2, "target_level": 3, "training_status": 2, "pre_test_score": 74.0, "post_test_score": 86.0,
+        "assignment_status": 2, "presentation_mgr": 2, "presentation_vp": 1, "presentation_dmd": 0,
+        "practitioner_certified": 1, "jishuken_1": 1, "jishuken_2": 0, "champion_eval": 82.0, "champion_certified": 0,
+        "kaizens_submitted": 9, "kaizens_approved": 7, "cost_savings_inr": 260000.0, "kpi_score": 87.5
     },
-    # Level 6: WT (Working Trainee / WT Boys)
+    {
+        "emp_no": "GL006", "name": "SUNIL KUMAR", "division": "GD", "working_area": "ASSY 3",
+        "designation": "Group Leader", "boss_name": "KAILASH NATH (AM)", "hierarchy_role": "GL",
+        "hierarchy_rank": 3, "reports_to_emp_no": "AM002", "gender": "Male",
+        "avatar": "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=120&q=80",
+        "current_level": 1, "target_level": 2, "training_status": 1, "pre_test_score": 65.0, "post_test_score": 78.0,
+        "assignment_status": 1, "presentation_mgr": 1, "presentation_vp": 0, "presentation_dmd": 0,
+        "practitioner_certified": 0, "jishuken_1": 0, "jishuken_2": 0, "champion_eval": 72.0, "champion_certified": 0,
+        "kaizens_submitted": 5, "kaizens_approved": 3, "cost_savings_inr": 110000.0, "kpi_score": 79.0
+    },
+    {
+        "emp_no": "GL007", "name": "NAGARAJ P", "division": "GD", "working_area": "TOOL MGT",
+        "designation": "Group Leader", "boss_name": "GOVINDA R (AM)", "hierarchy_role": "GL",
+        "hierarchy_rank": 3, "reports_to_emp_no": "AM001", "gender": "Male",
+        "avatar": "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=120&q=80",
+        "current_level": 2, "target_level": 3, "training_status": 2, "pre_test_score": 76.0, "post_test_score": 87.0,
+        "assignment_status": 2, "presentation_mgr": 2, "presentation_vp": 1, "presentation_dmd": 0,
+        "practitioner_certified": 1, "jishuken_1": 1, "jishuken_2": 0, "champion_eval": 85.0, "champion_certified": 0,
+        "kaizens_submitted": 8, "kaizens_approved": 6, "cost_savings_inr": 240000.0, "kpi_score": 88.5
+    },
+    {
+        "emp_no": "GL008", "name": "ANIL SHARMA", "division": "GD", "working_area": "LINE SUPPLY",
+        "designation": "Group Leader", "boss_name": "GOVINDA R (AM)", "hierarchy_role": "GL",
+        "hierarchy_rank": 3, "reports_to_emp_no": "AM001", "gender": "Male",
+        "avatar": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=120&q=80",
+        "current_level": 1, "target_level": 2, "training_status": 1, "pre_test_score": 62.0, "post_test_score": 75.0,
+        "assignment_status": 1, "presentation_mgr": 1, "presentation_vp": 0, "presentation_dmd": 0,
+        "practitioner_certified": 0, "jishuken_1": 0, "jishuken_2": 0, "champion_eval": 70.0, "champion_certified": 0,
+        "kaizens_submitted": 4, "kaizens_approved": 2, "cost_savings_inr": 85000.0, "kpi_score": 77.0
+    },
+    # Level 5: AE (Associate Engineer)
     {
         "emp_no": "70201", "name": "RAMESH K", "division": "GD", "working_area": "HEAD",
-        "designation": "Working Trainee (WT Boy)", "boss_name": "VINAY KUMAR (GAT)", "hierarchy_role": "WT",
-        "hierarchy_rank": 6, "reports_to_emp_no": "60101", "gender": "Male",
-        "avatar": "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=120&q=80",
-        "current_level": 1, "target_level": 2, "training_status": 2, "pre_test_score": 58.0, "post_test_score": 82.0,
+        "designation": "Associate Engineer (AE)", "boss_name": "ARUNA D R (TL)", "hierarchy_role": "AE",
+        "hierarchy_rank": 5, "reports_to_emp_no": "50031", "gender": "Male",
+        "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80",
+        "current_level": 1, "target_level": 2, "training_status": 2, "pre_test_score": 52.0, "post_test_score": 82.0,
         "assignment_status": 1, "presentation_mgr": 1, "presentation_vp": 0, "presentation_dmd": 0,
         "practitioner_certified": 0, "jishuken_1": 0, "jishuken_2": 0, "champion_eval": 0.0, "champion_certified": 0,
         "kaizens_submitted": 3, "kaizens_approved": 2, "cost_savings_inr": 42000.0, "kpi_score": 78.4
     },
     {
         "emp_no": "70202", "name": "SURESH N", "division": "GD", "working_area": "HEAD",
-        "designation": "Working Trainee (WT Boy)", "boss_name": "VINAY KUMAR (GAT)", "hierarchy_role": "WT",
-        "hierarchy_rank": 6, "reports_to_emp_no": "60101", "gender": "Male",
-        "avatar": "https://images.unsplash.com/photo-1501196354995-cbb51c65aaea?auto=format&fit=crop&w=120&q=80",
-        "current_level": 1, "target_level": 2, "training_status": 2, "pre_test_score": 50.0, "post_test_score": 76.0,
+        "designation": "Associate Engineer (AE)", "boss_name": "ARUNA D R (TL)", "hierarchy_role": "AE",
+        "hierarchy_rank": 5, "reports_to_emp_no": "50031", "gender": "Male",
+        "avatar": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&q=80",
+        "current_level": 1, "target_level": 2, "training_status": 1, "pre_test_score": 46.0, "post_test_score": 74.0,
         "assignment_status": 1, "presentation_mgr": 0, "presentation_vp": 0, "presentation_dmd": 0,
         "practitioner_certified": 0, "jishuken_1": 0, "jishuken_2": 0, "champion_eval": 0.0, "champion_certified": 0,
         "kaizens_submitted": 2, "kaizens_approved": 1, "cost_savings_inr": 28000.0, "kpi_score": 74.0
     },
     {
         "emp_no": "70203", "name": "MANJUNATH B", "division": "GD", "working_area": "HEAD",
-        "designation": "Working Trainee (WT Boy)", "boss_name": "POOJA SHARMA (GAT)", "hierarchy_role": "WT",
-        "hierarchy_rank": 6, "reports_to_emp_no": "60102", "gender": "Male",
+        "designation": "Associate Engineer (AE)", "boss_name": "ARUNA D R (TL)", "hierarchy_role": "AE",
+        "hierarchy_rank": 5, "reports_to_emp_no": "50031", "gender": "Male",
         "avatar": "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=120&q=80",
         "current_level": 1, "target_level": 2, "training_status": 1, "pre_test_score": 48.0, "post_test_score": 0.0,
         "assignment_status": 0, "presentation_mgr": 0, "presentation_vp": 0, "presentation_dmd": 0,
@@ -125,8 +154,8 @@ HIERARCHY_LEADERS = [
     },
     {
         "emp_no": "70204", "name": "CHETAN M", "division": "GD", "working_area": "CRANK",
-        "designation": "Working Trainee (WT Boy)", "boss_name": "SNEHA R (GAT)", "hierarchy_role": "WT",
-        "hierarchy_rank": 6, "reports_to_emp_no": "60103", "gender": "Male",
+        "designation": "Associate Engineer (AE)", "boss_name": "KIRAN GOWDA (TL)", "hierarchy_role": "AE",
+        "hierarchy_rank": 5, "reports_to_emp_no": "476", "gender": "Male",
         "avatar": "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=120&q=80",
         "current_level": 1, "target_level": 2, "training_status": 2, "pre_test_score": 54.0, "post_test_score": 79.0,
         "assignment_status": 1, "presentation_mgr": 0, "presentation_vp": 0, "presentation_dmd": 0,
@@ -135,30 +164,30 @@ HIERARCHY_LEADERS = [
     },
     {
         "emp_no": "70205", "name": "PRAVEEN S", "division": "GD", "working_area": "CRANK",
-        "designation": "Working Trainee (WT Boy)", "boss_name": "SNEHA R (GAT)", "hierarchy_role": "WT",
-        "hierarchy_rank": 6, "reports_to_emp_no": "60103", "gender": "Male",
+        "designation": "Associate Engineer (AE)", "boss_name": "KIRAN GOWDA (TL)", "hierarchy_role": "AE",
+        "hierarchy_rank": 5, "reports_to_emp_no": "476", "gender": "Male",
         "avatar": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=120&q=80",
         "current_level": 1, "target_level": 2, "training_status": 1, "pre_test_score": 45.0, "post_test_score": 0.0,
         "assignment_status": 0, "presentation_mgr": 0, "presentation_vp": 0, "presentation_dmd": 0,
         "practitioner_certified": 0, "jishuken_1": 0, "jishuken_2": 0, "champion_eval": 0.0, "champion_certified": 0,
         "kaizens_submitted": 1, "kaizens_approved": 0, "cost_savings_inr": 0.0, "kpi_score": 66.0
     },
-    # Level 7: Master Trainer / Verifier
+    # Level 6: Master Trainer / Verifier
     {
         "emp_no": "TRN001", "name": "DILIP R", "division": "GD", "working_area": "TPS DOJO / TRAINING",
         "designation": "Master Trainer & Verifier", "boss_name": "MANUKUMAR G (Manager)", "hierarchy_role": "TRAINER",
-        "hierarchy_rank": 3, "reports_to_emp_no": "MGR001", "gender": "Male",
+        "hierarchy_rank": 6, "reports_to_emp_no": "MGR001", "gender": "Male",
         "avatar": "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=120&q=80",
         "current_level": 4, "target_level": 4, "training_status": 2, "pre_test_score": 92.0, "post_test_score": 98.0,
         "assignment_status": 2, "presentation_mgr": 2, "presentation_vp": 2, "presentation_dmd": 2,
         "practitioner_certified": 1, "jishuken_1": 1, "jishuken_2": 1, "champion_eval": 98.0, "champion_certified": 1,
         "kaizens_submitted": 25, "kaizens_approved": 24, "cost_savings_inr": 1250000.0, "kpi_score": 98.5
     },
-    # Level 8: TPS Office / Digital Captain
+    # Level 7: TPS Coordinator
     {
-        "emp_no": "TPS001", "name": "RAKSHITH PRABHU", "division": "GD", "working_area": "TPS DIGITAL OFFICE",
-        "designation": "TPS Office / Digital Captain", "boss_name": "Antony John Sudhakar P (VP)", "hierarchy_role": "TPS_OFFICE",
-        "hierarchy_rank": 2, "reports_to_emp_no": "VP001", "gender": "Male",
+        "emp_no": "TPS001", "name": "RAKSHITH PRABHU", "division": "GD", "working_area": "TPS COORDINATION OFFICE",
+        "designation": "TPS Coordinator", "boss_name": "Antony John Sudhakar P (VP)", "hierarchy_role": "TPS_COORDINATOR",
+        "hierarchy_rank": 7, "reports_to_emp_no": "VP001", "gender": "Male",
         "avatar": "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=120&q=80",
         "current_level": 3, "target_level": 4, "training_status": 2, "pre_test_score": 88.0, "post_test_score": 96.0,
         "assignment_status": 2, "presentation_mgr": 2, "presentation_vp": 2, "presentation_dmd": 2,
@@ -185,6 +214,11 @@ def upgrade_and_seed_hierarchy(conn):
     if 'password' not in cols:
         cursor.execute("ALTER TABLE employees ADD COLUMN password TEXT DEFAULT 'tiei123'")
     conn.commit()
+
+    # Delete GAT and update WT to AE
+    cursor.execute("DELETE FROM employees WHERE hierarchy_role = 'GAT' OR emp_no IN ('60101', '60102', '60103')")
+    cursor.execute("UPDATE employees SET hierarchy_role = 'AE', designation = 'Associate Engineer (AE)', hierarchy_rank = 5 WHERE hierarchy_role = 'WT'")
+    cursor.execute("UPDATE employees SET hierarchy_role = 'TPS_COORDINATOR', designation = 'TPS Coordinator', working_area = 'TPS COORDINATION OFFICE' WHERE hierarchy_role = 'TPS_OFFICE' OR emp_no = 'TPS001'")
 
     # Update existing Team Leaders
     cursor.execute("UPDATE employees SET hierarchy_role = 'TL', hierarchy_rank = 4 WHERE hierarchy_role IS NULL OR hierarchy_role = 'TL'")
