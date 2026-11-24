@@ -75,6 +75,22 @@ TPS/
    - 4-Level competency tracking (L1 Knowledge, L2 Basic Practice, L3 Independent, L4 Trainer/Master).
    - Automated promotion readiness gap analysis engine comparing actual vs. required criteria.
 
+7. **TIEI Employee Details API Integration & Safe Ingestion:**
+   - Live synchronization with internal TIEI HRMS / ERP Employee APIs.
+   - Exact Postman schema ingestion:
+     - `EMP_NO` &rarr; `emp_no` (5-digit plant badge format, e.g. `09069`)
+     - `EMP_NAME` &rarr; `name` (Full associate name, e.g. `PRASANNA B V`)
+     - `EMP_BOSS` &rarr; `reports_to_emp_no` & hierarchical supervisor line
+     - `EMP_DEPT` &rarr; `dept_code` (Department numeric identifier, e.g. `396`)
+     - `DEP_DEPTNAME` &rarr; `working_area` (Plant section, e.g. `PRODUCTION SUPPORT-AUTO`)
+     - `ADD_OFFICE_MAILID` &rarr; `email` (Company email, supports strings or empty `{}`)
+   - Safe Upsert Guarantee: Updating employee details never overwrites TPS journey progress, test scores, certifications, or Kaizen logs.
+   - Dual-Mode Connection:
+     - **Live REST API Sync**: Configure endpoint URL and optional bearer token in UI modal or via `TIEI_EMP_API_URL` environment variable.
+     - **Direct Postman JSON Import**: Paste JSON payload directly or upload `.json` export file in 1 click.
+     - **CLI Tool**: `python backend/sync_employees.py --url <API_URL>` or `python backend/sync_employees.py --file <DATA.json>`.
+   - Multi-Identifier Login: Associates can log in using their badge number (`09069`, `9069`), email address (`prasanna.bv@tiei.toyota-industries.com`), or employee name.
+
 ---
 
 ### Quick Start Guide

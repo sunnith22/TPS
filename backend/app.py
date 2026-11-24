@@ -6,6 +6,7 @@ import random
 sys.path.insert(0, os.path.dirname(__file__))
 from flask import Flask, render_template, jsonify, request
 from init_db import upgrade_and_seed_hierarchy
+from emp_sync import sync_employees_data, fetch_and_sync_from_api, ensure_sync_columns
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 FRONTEND_DIR = os.path.abspath(os.path.join(BASE_DIR, '..', 'frontend'))
@@ -127,23 +128,52 @@ def get_hierarchy_roles():
 @app.route('/api/login', methods=['POST'])
 def api_login():
     data = request.json or {}
-    emp_no = str(data.get('emp_no', '')).strip().upper()
+    raw_input = str(data.get('emp_no', '')).strip()
     password = str(data.get('password', '')).strip()
 
-    if not emp_no:
-        return jsonify({"success": False, "error": "Please enter an Employee ID"}), 400
+    if not raw_input:
+        return jsonify({"success": False, "error": "Please enter an Employee ID or Email"}), 400
+
+    clean_id = raw_input.lstrip('#').strip()
+    upper_id = clean_id.upper()
+    lower_email = raw_input.lower().strip()
 
     conn = get_db()
+    ensure_sync_columns(conn)
     cursor = conn.cursor()
-    clean_id = emp_no.split('@')[0].strip()
-    emp = cursor.execute('SELECT * FROM employees WHERE UPPER(emp_no) = ? OR UPPER(emp_no) = ?', (emp_no, clean_id)).fetchone()
+
+    # Search strategy in strict order of priority:
+    # 1. Exact match by emp_no
+    emp = cursor.execute('SELECT * FROM employees WHERE UPPER(emp_no) = ?', (upper_id,)).fetchone()
+
+    # 2. Match by email
+    if not emp and '@' in lower_email:
+        emp = cursor.execute('SELECT * FROM employees WHERE LOWER(email) = ?', (lower_email,)).fetchone()
+
+    # 3. Match with zero-padding (e.g. '9069' -> '09069') or zero-stripped ('09069' -> '9069')
+    if not emp and clean_id.isdigit():
+        padded = clean_id.zfill(5).upper()
+        stripped = clean_id.lstrip('0').upper()
+        emp = cursor.execute('SELECT * FROM employees WHERE UPPER(emp_no) = ? OR UPPER(emp_no) = ?', (padded, stripped)).fetchone()
+
+    # 4. Match prefix before @ against emp_no
+    if not emp and '@' in raw_input:
+        prefix = raw_input.split('@')[0].strip().upper()
+        emp = cursor.execute('SELECT * FROM employees WHERE UPPER(emp_no) = ?', (prefix,)).fetchone()
+
+    # 5. Substring match by employee name
+    if not emp:
+        name_query = clean_id.split('@')[0].strip()
+        emp = cursor.execute('SELECT * FROM employees WHERE UPPER(name) LIKE ?', (f'%{name_query.upper()}%',)).fetchone()
+
     if not emp:
         # Also try matching by name substring
-        emp = cursor.execute('SELECT * FROM employees WHERE UPPER(name) LIKE ?', (f'%{clean_id}%',)).fetchone()
+        name_query = clean_id.split('@')[0].strip()
+        emp = cursor.execute('SELECT * FROM employees WHERE UPPER(name) LIKE ?', (f'%{name_query.upper()}%',)).fetchone()
 
     if not emp:
         conn.close()
-        return jsonify({"success": False, "error": f"Employee ID or account '{emp_no}' not found in TIEI plant records"}), 404
+        return jsonify({"success": False, "error": f"Employee ID or account '{raw_input}' not found in TIEI plant records"}), 404
 
     emp_dict = dict(emp)
 
@@ -153,7 +183,7 @@ def api_login():
     # Fetch direct boss information if exists
     boss_info = None
     if emp_dict.get('reports_to_emp_no'):
-        b = cursor.execute('SELECT emp_no, name, designation, hierarchy_role, avatar FROM employees WHERE emp_no = ?', (emp_dict['reports_to_emp_no'],)).fetchone()
+        b = cursor.execute('SELECT emp_no, name, designation, hierarchy_role, avatar, email FROM employees WHERE emp_no = ?', (emp_dict['reports_to_emp_no'],)).fetchone()
         if b:
             boss_info = dict(b)
 
@@ -164,6 +194,95 @@ def api_login():
         "subordinate_emp_nos": sub_emp_nos,
         "subordinates_count": len(sub_emp_nos),
         "boss": boss_info
+    })
+
+# Employee Ingestion & Sync Endpoints
+@app.route('/api/employees/sync', methods=['POST'])
+def api_sync_employees():
+    """
+    Synchronizes employees from external TIEI Employee Details API.
+    Can receive api_url & token in payload or read from environment variables.
+    """
+    body = request.json or {}
+    api_url = body.get('api_url') or os.environ.get('TIEI_EMP_API_URL')
+    api_token = body.get('api_token') or os.environ.get('TIEI_EMP_API_KEY')
+    custom_headers = body.get('headers')
+
+    if not api_url:
+        return jsonify({
+            "success": False,
+            "error": "No API URL provided. Please supply 'api_url' in request or set TIEI_EMP_API_URL environment variable."
+        }), 400
+
+    conn = get_db()
+    try:
+        result = fetch_and_sync_from_api(
+            conn,
+            api_url=api_url,
+            auth_header=api_token,
+            custom_headers=custom_headers
+        )
+        conn.close()
+        return jsonify(result)
+    except Exception as e:
+        conn.close()
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route('/api/employees/import', methods=['POST'])
+def api_import_employees():
+    """
+    Directly imports employee records from JSON payload (e.g. copied from Postman or uploaded .json).
+    """
+    payload = request.json
+    if payload is None:
+        return jsonify({"success": False, "error": "Request body must be valid JSON"}), 400
+
+    # Accept either list of records or dict with records/data array
+    records = payload
+    if isinstance(payload, dict):
+        if 'records' in payload:
+            records = payload['records']
+        elif 'data' in payload:
+            records = payload['data']
+        elif 'employees' in payload:
+            records = payload['employees']
+        elif 'EMP_NO' in payload:
+            records = [payload]
+
+    if not isinstance(records, list):
+        return jsonify({"success": False, "error": "JSON payload must contain an array of employee objects"}), 400
+
+    conn = get_db()
+    try:
+        result = sync_employees_data(conn, records, source_label="Direct JSON Import")
+        conn.close()
+        return jsonify(result)
+    except Exception as e:
+        conn.close()
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route('/api/employees/sync/status', methods=['GET'])
+def api_sync_status():
+    """
+    Returns current synchronization status, total employees in DB, and latest sync timestamp.
+    """
+    conn = get_db()
+    ensure_sync_columns(conn)
+    cursor = conn.cursor()
+
+    total_emps = cursor.execute("SELECT COUNT(*) FROM employees").fetchone()[0]
+    last_synced = cursor.execute("SELECT MAX(last_synced_at) FROM employees").fetchone()[0]
+    synced_count = cursor.execute("SELECT COUNT(*) FROM employees WHERE last_synced_at IS NOT NULL").fetchone()[0]
+    with_email_count = cursor.execute("SELECT COUNT(*) FROM employees WHERE email IS NOT NULL AND email != ''").fetchone()[0]
+
+    conn.close()
+    return jsonify({
+        "success": True,
+        "total_employees": total_emps,
+        "synced_employees": synced_count,
+        "employees_with_email": with_email_count,
+        "last_synced_at": last_synced or "Not synced yet",
+        "configured_api_url": os.environ.get('TIEI_EMP_API_URL', '')
     })
 
 # Subordinate-Aware Stats Endpoint

@@ -84,7 +84,7 @@
             <input 
               type="text" 
               id="login-emp-input" 
-              placeholder="e.g. 50031, MGR001, 70201" 
+              placeholder="e.g. 09069, 50031, or prasanna.bv@tiei.toyota-industries.com" 
               class="w-full text-xs text-slate-800 bg-white border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#0067B1] focus:border-[#0067B1]"
               required
             >
@@ -168,8 +168,14 @@
               </div>
             </div>
 
+            <!-- HR / API Sync Button -->
+            <button onclick="openSyncModal()" id="btn-open-sync" class="px-2.5 py-1 bg-sky-50 hover:bg-sky-100 text-[#0067B1] border border-sky-200 rounded text-xs font-semibold flex items-center space-x-1.5 transition cursor-pointer" title="Sync TIEI Employee API or Import Postman JSON">
+              <i class="fa-solid fa-arrows-rotate text-[11px]"></i>
+              <span class="hidden md:inline">Sync API</span>
+            </button>
+
             <!-- Sign Out Button -->
-            <button onclick="logoutUser()" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-xs font-semibold flex items-center space-x-1 transition border border-slate-200" title="Sign Out">
+            <button onclick="logoutUser()" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-xs font-semibold flex items-center space-x-1 transition border border-slate-200 cursor-pointer" title="Sign Out">
               <i class="fa-solid fa-arrow-right-from-bracket text-slate-500 text-[11px]"></i>
               <span class="hidden sm:inline">Sign Out</span>
             </button>
@@ -1612,6 +1618,221 @@
       <div class="flex justify-between items-center pt-2 border-t border-slate-200 text-xs">
         <span class="text-[11px] text-slate-500">Associates enrolled as per Department HOD nominations</span>
         <button onclick="closeBatchDetailsModal()" class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg transition">Close</button>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ============================================== -->
+  <!-- MODAL: TIEI EMPLOYEE API SYNC & INGESTION      -->
+  <!-- ============================================== -->
+  <div id="sync-modal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 hidden">
+    <div class="bg-white rounded-xl max-w-2xl w-full p-4 sm:p-6 shadow-2xl border border-slate-200 space-y-4 max-h-[92vh] overflow-y-auto custom-scrollbar">
+      
+      <!-- Modal Header -->
+      <div class="flex justify-between items-start pb-3 border-b border-slate-200">
+        <div class="flex items-center space-x-2.5">
+          <div class="w-9 h-9 rounded-lg bg-sky-50 border border-sky-200 text-[#0067B1] flex items-center justify-center text-sm shrink-0">
+            <i class="fa-solid fa-cloud-arrow-down"></i>
+          </div>
+          <div>
+            <h3 class="text-sm sm:text-base font-bold text-slate-900 flex items-center space-x-2">
+              <span>TIEI Employee Details API Integration</span>
+              <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">Live Sync Engine</span>
+            </h3>
+            <p class="text-[11px] text-slate-500">Connect internal HRMS/ERP API or paste Postman JSON to sync employee records</p>
+          </div>
+        </div>
+        <button onclick="closeSyncModal()" class="text-slate-400 hover:text-slate-700 text-base p-1 transition cursor-pointer">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Sync Status Ribbon -->
+      <div class="grid grid-cols-3 gap-2 p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs">
+        <div>
+          <span class="text-[10px] text-slate-400 font-bold uppercase block">Total in DB</span>
+          <span id="modal-sync-stat-total" class="font-extrabold text-slate-900 text-sm">--</span>
+        </div>
+        <div>
+          <span class="text-[10px] text-slate-400 font-bold uppercase block">With Email</span>
+          <span id="modal-sync-stat-email" class="font-extrabold text-[#0067B1] text-sm">--</span>
+        </div>
+        <div>
+          <span class="text-[10px] text-slate-400 font-bold uppercase block">Last Sync Time</span>
+          <span id="modal-sync-stat-time" class="font-bold text-slate-700 text-[11px] truncate block">--</span>
+        </div>
+      </div>
+
+      <!-- Result Banner -->
+      <div id="sync-result-box" class="hidden p-3 rounded-lg text-xs border flex items-start space-x-2">
+        <i id="sync-result-icon" class="fa-solid fa-circle-check text-sm shrink-0 mt-0.5"></i>
+        <div id="sync-result-message" class="flex-1 font-medium"></div>
+      </div>
+
+      <!-- Modal Tabs Navigation -->
+      <div class="flex border-b border-slate-200 text-xs font-semibold space-x-2">
+        <button id="sync-tab-btn-api" onclick="switchSyncModalTab('api')" class="pb-2 border-b-2 border-[#0067B1] text-[#0067B1] flex items-center space-x-1.5 cursor-pointer">
+          <i class="fa-solid fa-globe"></i>
+          <span>1. Live API Sync</span>
+        </button>
+        <button id="sync-tab-btn-json" onclick="switchSyncModalTab('json')" class="pb-2 border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center space-x-1.5 cursor-pointer">
+          <i class="fa-solid fa-file-code"></i>
+          <span>2. Import Postman JSON</span>
+        </button>
+        <button id="sync-tab-btn-mapping" onclick="switchSyncModalTab('mapping')" class="pb-2 border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center space-x-1.5 cursor-pointer">
+          <i class="fa-solid fa-table-list"></i>
+          <span>3. Field Schema Mapping</span>
+        </button>
+      </div>
+
+      <!-- TAB 1: LIVE API SYNC -->
+      <div id="sync-tab-content-api" class="space-y-3">
+        <div class="space-y-1">
+          <label class="block text-xs font-bold text-slate-700">TIEI Employee Details API URL</label>
+          <div class="relative">
+            <input 
+              type="url" 
+              id="sync-input-api-url" 
+              placeholder="e.g. http://10.12.34.56:8080/api/employees or https://tiei.internal/hr/api" 
+              class="w-full text-xs bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:ring-1 focus:ring-[#0067B1] focus:border-[#0067B1]"
+            >
+          </div>
+          <span class="text-[10px] text-slate-400">Can also be set in backend environment variable: <code class="bg-slate-100 px-1 py-0.5 rounded font-mono text-slate-600">TIEI_EMP_API_URL</code></span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <div class="space-y-1">
+            <label class="block text-xs font-bold text-slate-700">Authorization / API Key (Optional)</label>
+            <input 
+              type="text" 
+              id="sync-input-api-token" 
+              placeholder="Bearer token or API Secret Key" 
+              class="w-full text-xs bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:ring-1 focus:ring-[#0067B1] focus:border-[#0067B1]"
+            >
+          </div>
+          <div class="space-y-1">
+            <label class="block text-xs font-bold text-slate-700">Sync Mode</label>
+            <select class="w-full text-xs bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:ring-1 focus:ring-[#0067B1]">
+              <option value="upsert">Safe Upsert (Preserves all TPS progress)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="bg-sky-50 border border-sky-100 rounded-lg p-2.5 text-xs text-slate-600 flex items-start space-x-2">
+          <i class="fa-solid fa-shield-halved text-[#0067B1] text-sm shrink-0 mt-0.5"></i>
+          <div>
+            <span class="font-bold text-slate-800">Zero Data Loss Guarantee:</span>
+            <span> Syncing or re-fetching updates employee names, bosses, emails, and departments without ever resetting existing TPS 11-step progress, test scores, certifications, or Kaizen logs.</span>
+          </div>
+        </div>
+
+        <div class="flex justify-end space-x-2 pt-2 border-t border-slate-100">
+          <button onclick="closeSyncModal()" class="px-3.5 py-1.5 rounded-lg border border-slate-300 text-slate-700 font-semibold hover:bg-slate-50 transition text-xs">Cancel</button>
+          <button id="btn-trigger-api-sync" onclick="triggerLiveApiSync()" class="px-4 py-1.5 rounded-lg bg-[#0067B1] hover:bg-[#005594] text-white font-bold transition text-xs shadow-xs flex items-center space-x-1.5 cursor-pointer">
+            <i class="fa-solid fa-arrows-rotate"></i>
+            <span>Fetch & Sync Employees Now</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- TAB 2: IMPORT POSTMAN JSON -->
+      <div id="sync-tab-content-json" class="space-y-3 hidden">
+        <div class="flex justify-between items-center text-xs">
+          <label class="font-bold text-slate-700">Paste JSON Response (from Postman / curl)</label>
+          <div class="flex items-center space-x-2">
+            <label class="text-[11px] text-[#0067B1] hover:underline font-semibold cursor-pointer">
+              <i class="fa-solid fa-upload mr-1"></i>Upload .json File
+              <input type="file" accept=".json" class="hidden" onchange="handlePostmanFileUpload(this)">
+            </label>
+          </div>
+        </div>
+
+        <textarea 
+          id="sync-input-json-payload" 
+          rows="7" 
+          placeholder='[
+  {
+    "EMP_NO": "09069",
+    "EMP_NAME": "PRASANNA B V",
+    "EMP_BOSS": "00865",
+    "EMP_DEPT": "396",
+    "ADD_OFFICE_MAILID": "prasanna.bv@tiei.toyota-industries.com",
+    "DEP_DEPTNAME": "PRODUCTION SUPPORT-AUTO"
+  }
+]'
+          class="w-full text-xs font-mono bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-slate-800 focus:bg-white focus:ring-1 focus:ring-[#0067B1] focus:border-[#0067B1]"
+        ></textarea>
+
+        <div class="flex justify-between items-center pt-2 border-t border-slate-100 text-xs">
+          <button onclick="loadSamplePostmanPayload()" class="text-slate-500 hover:text-slate-800 text-[11px] underline">
+            Load sample payload from screenshot
+          </button>
+          <div class="flex space-x-2">
+            <button onclick="closeSyncModal()" class="px-3.5 py-1.5 rounded-lg border border-slate-300 text-slate-700 font-semibold hover:bg-slate-50 transition">Cancel</button>
+            <button id="btn-trigger-json-import" onclick="triggerJsonImport()" class="px-4 py-1.5 rounded-lg bg-[#EA7625] hover:bg-[#d8661a] text-white font-bold transition shadow-xs flex items-center space-x-1.5 cursor-pointer">
+              <i class="fa-solid fa-file-import"></i>
+              <span>Import & Update Database</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: FIELD SCHEMA MAPPING -->
+      <div id="sync-tab-content-mapping" class="space-y-3 hidden">
+        <p class="text-xs text-slate-600">The ingestion engine automatically maps the TIEI ERP/Postman JSON attributes to the application schema:</p>
+        
+        <div class="overflow-x-auto border border-slate-200 rounded-lg">
+          <table class="w-full text-left text-xs whitespace-nowrap">
+            <thead class="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase text-[10px]">
+              <tr>
+                <th class="p-2">TIEI API Field</th>
+                <th class="p-2">Application Column</th>
+                <th class="p-2">Sample Value</th>
+                <th class="p-2">Description & Handling</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 text-slate-700">
+              <tr>
+                <td class="p-2 font-mono font-bold text-[#0067B1]">EMP_NO</td>
+                <td class="p-2 font-mono font-bold text-slate-900">emp_no</td>
+                <td class="p-2 font-mono text-slate-500">"09069"</td>
+                <td class="p-2">Employee badge number; padded/cleaned, primary login identifier</td>
+              </tr>
+              <tr>
+                <td class="p-2 font-mono font-bold text-[#0067B1]">EMP_NAME</td>
+                <td class="p-2 font-mono font-bold text-slate-900">name</td>
+                <td class="p-2 text-slate-500">"PRASANNA B V"</td>
+                <td class="p-2">Full associate name displayed across reports and certificates</td>
+              </tr>
+              <tr>
+                <td class="p-2 font-mono font-bold text-[#0067B1]">EMP_BOSS</td>
+                <td class="p-2 font-mono font-bold text-slate-900">reports_to_emp_no</td>
+                <td class="p-2 font-mono text-slate-500">"00865"</td>
+                <td class="p-2">Supervisor ID; resolves supervisor name and hierarchical reporting line</td>
+              </tr>
+              <tr>
+                <td class="p-2 font-mono font-bold text-[#0067B1]">EMP_DEPT</td>
+                <td class="p-2 font-mono font-bold text-slate-900">dept_code</td>
+                <td class="p-2 font-mono text-slate-500">"396"</td>
+                <td class="p-2">Plant department numeric code for organization charts</td>
+              </tr>
+              <tr>
+                <td class="p-2 font-mono font-bold text-[#0067B1]">DEP_DEPTNAME</td>
+                <td class="p-2 font-mono font-bold text-slate-900">working_area</td>
+                <td class="p-2 text-slate-500">"PRODUCTION SUPPORT-AUTO"</td>
+                <td class="p-2">Plant work area / section used for skill matrix and competency graphs</td>
+              </tr>
+              <tr>
+                <td class="p-2 font-mono font-bold text-[#0067B1]">ADD_OFFICE_MAILID</td>
+                <td class="p-2 font-mono font-bold text-slate-900">email</td>
+                <td class="p-2 font-mono text-slate-500">"prasanna.bv@tiei..."</td>
+                <td class="p-2">Official email; supports string or empty dict <code class="font-mono">{}</code>; enables login via email</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
 
     </div>
@@ -3786,6 +4007,205 @@
 
     function closeCertificateModal() {
       document.getElementById('certificate-modal').classList.add('hidden');
+    }
+
+    // ==========================================
+    // TIEI EMPLOYEE API SYNC & INGESTION LOGIC
+    // ==========================================
+    async function openSyncModal() {
+      const modal = document.getElementById('sync-modal');
+      if (!modal) return;
+      modal.classList.remove('hidden');
+      hideSyncResult();
+      await refreshSyncStatus();
+    }
+
+    function closeSyncModal() {
+      const modal = document.getElementById('sync-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function switchSyncModalTab(tabId) {
+      const tabs = ['api', 'json', 'mapping'];
+      tabs.forEach(t => {
+        const btn = document.getElementById(`sync-tab-btn-${t}`);
+        const content = document.getElementById(`sync-tab-content-${t}`);
+        if (t === tabId) {
+          if (btn) {
+            btn.className = "pb-2 border-b-2 border-[#0067B1] text-[#0067B1] flex items-center space-x-1.5 cursor-pointer font-bold";
+          }
+          if (content) content.classList.remove('hidden');
+        } else {
+          if (btn) {
+            btn.className = "pb-2 border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center space-x-1.5 cursor-pointer";
+          }
+          if (content) content.classList.add('hidden');
+        }
+      });
+    }
+
+    async function refreshSyncStatus() {
+      try {
+        const res = await fetch('/api/employees/sync/status');
+        const data = await res.json();
+        if (data.success) {
+          document.getElementById('modal-sync-stat-total').innerText = data.total_employees;
+          document.getElementById('modal-sync-stat-email').innerText = data.employees_with_email;
+          document.getElementById('modal-sync-stat-time').innerText = data.last_synced_at || 'Not synced yet';
+          if (data.configured_api_url && !document.getElementById('sync-input-api-url').value) {
+            document.getElementById('sync-input-api-url').value = data.configured_api_url;
+          }
+        }
+      } catch (e) {
+        console.error("Error refreshing sync status:", e);
+      }
+    }
+
+    function showSyncResult(isSuccess, message) {
+      const box = document.getElementById('sync-result-box');
+      const icon = document.getElementById('sync-result-icon');
+      const msg = document.getElementById('sync-result-message');
+      if (!box || !icon || !msg) return;
+
+      if (isSuccess) {
+        box.className = "p-3 rounded-lg text-xs border flex items-start space-x-2 bg-emerald-50 border-emerald-200 text-emerald-800";
+        icon.className = "fa-solid fa-circle-check text-emerald-600 text-sm shrink-0 mt-0.5";
+      } else {
+        box.className = "p-3 rounded-lg text-xs border flex items-start space-x-2 bg-rose-50 border-rose-200 text-rose-800";
+        icon.className = "fa-solid fa-circle-xmark text-rose-600 text-sm shrink-0 mt-0.5";
+      }
+      msg.innerHTML = message;
+      box.classList.remove('hidden');
+    }
+
+    function hideSyncResult() {
+      const box = document.getElementById('sync-result-box');
+      if (box) box.classList.add('hidden');
+    }
+
+    async function triggerLiveApiSync() {
+      const apiUrl = document.getElementById('sync-input-api-url').value.trim();
+      const apiToken = document.getElementById('sync-input-api-token').value.trim();
+      const btn = document.getElementById('btn-trigger-api-sync');
+
+      if (!apiUrl) {
+        showSyncResult(false, "Please enter your TIEI Employee API endpoint URL.");
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1.5"></i> Connecting & Syncing...`;
+      hideSyncResult();
+
+      try {
+        const res = await fetch('/api/employees/sync', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            api_url: apiUrl,
+            api_token: apiToken || undefined
+          })
+        });
+        const result = await res.json();
+        if (result.success) {
+          showSyncResult(true, `<b>Sync Successful!</b> Processed <b>${result.valid_processed}</b> employee records (${result.new_inserted} new associates added, ${result.updated} existing updated).`);
+          await refreshSyncStatus();
+          await fetchEmployees();
+          await fetchStats(currentUser ? currentUser.emp_no : 'MGR001');
+        } else {
+          showSyncResult(false, `<b>API Sync Failed:</b> ${result.error || 'Unable to connect to external endpoint.'}`);
+        }
+      } catch (err) {
+        showSyncResult(false, `<b>Connection Error:</b> ${err.message}`);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fa-solid fa-arrows-rotate mr-1.5"></i> Fetch & Sync Employees Now`;
+      }
+    }
+
+    async function triggerJsonImport() {
+      const rawJson = document.getElementById('sync-input-json-payload').value.trim();
+      const btn = document.getElementById('btn-trigger-json-import');
+
+      if (!rawJson) {
+        showSyncResult(false, "Please paste the JSON payload or upload a .json file.");
+        return;
+      }
+
+      let parsedPayload;
+      try {
+        parsedPayload = JSON.parse(rawJson);
+      } catch (e) {
+        showSyncResult(false, `<b>JSON Syntax Error:</b> Invalid JSON format. ${e.message}`);
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1.5"></i> Ingesting Records...`;
+      hideSyncResult();
+
+      try {
+        const res = await fetch('/api/employees/import', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(parsedPayload)
+        });
+        const result = await res.json();
+        if (result.success) {
+          showSyncResult(true, `<b>Import Successful!</b> Ingested <b>${result.valid_processed}</b> employee records (${result.new_inserted} new associates added, ${result.updated} existing updated).`);
+          await refreshSyncStatus();
+          await fetchEmployees();
+          await fetchStats(currentUser ? currentUser.emp_no : 'MGR001');
+        } else {
+          showSyncResult(false, `<b>Import Failed:</b> ${result.error}`);
+        }
+      } catch (err) {
+        showSyncResult(false, `<b>Request Error:</b> ${err.message}`);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fa-solid fa-file-import mr-1.5"></i> Import & Update Database`;
+      }
+    }
+
+    function handlePostmanFileUpload(input) {
+      if (!input.files || input.files.length === 0) return;
+      const file = input.files[0];
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        document.getElementById('sync-input-json-payload').value = e.target.result;
+        showSyncResult(true, `Loaded file <b>${file.name}</b> (${(file.size / 1024).toFixed(1)} KB). Click 'Import & Update Database' to proceed.`);
+      };
+      reader.onerror = function() {
+        showSyncResult(false, "Failed to read the chosen file.");
+      };
+      reader.readAsText(file);
+    }
+
+    function loadSamplePostmanPayload() {
+      const sample = [
+        {
+          "ADD_OFFICE_MAILID": {},
+          "DEP_DEPTNAME": "MANUFACTURING EXCELLENCE"
+        },
+        {
+          "EMP_NO": "09069",
+          "EMP_NAME": "PRASANNA B V",
+          "EMP_BOSS": "00865",
+          "EMP_DEPT": "396",
+          "ADD_OFFICE_MAILID": "prasanna.bv@tiei.toyota-industries.com",
+          "DEP_DEPTNAME": "PRODUCTION SUPPORT-AUTO"
+        },
+        {
+          "EMP_NO": "09072",
+          "EMP_NAME": "KARIBASAPPA M",
+          "EMP_BOSS": "00865",
+          "EMP_DEPT": "396",
+          "ADD_OFFICE_MAILID": "karibasappa.m@tiei.toyota-industries.com",
+          "DEP_DEPTNAME": "PRODUCTION SUPPORT-AUTO"
+        }
+      ];
+      document.getElementById('sync-input-json-payload').value = JSON.stringify(sample, null, 2);
+      hideSyncResult();
     }
   </script>
 </body>

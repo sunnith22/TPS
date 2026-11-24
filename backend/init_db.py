@@ -213,6 +213,12 @@ def upgrade_and_seed_hierarchy(conn):
         cursor.execute("ALTER TABLE employees ADD COLUMN avatar TEXT")
     if 'password' not in cols:
         cursor.execute("ALTER TABLE employees ADD COLUMN password TEXT DEFAULT 'tiei123'")
+    if 'email' not in cols:
+        cursor.execute("ALTER TABLE employees ADD COLUMN email TEXT")
+    if 'dept_code' not in cols:
+        cursor.execute("ALTER TABLE employees ADD COLUMN dept_code TEXT")
+    if 'last_synced_at' not in cols:
+        cursor.execute("ALTER TABLE employees ADD COLUMN last_synced_at TEXT")
     conn.commit()
 
     # Delete GAT and update WT to AE
@@ -612,7 +618,10 @@ def init_db(reset=False):
         reports_to_emp_no TEXT,
         gender TEXT DEFAULT 'Male',
         avatar TEXT,
-        password TEXT DEFAULT 'tiei123'
+        password TEXT DEFAULT 'tiei123',
+        email TEXT,
+        dept_code TEXT,
+        last_synced_at TEXT
     )
     ''')
 
