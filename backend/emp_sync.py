@@ -13,10 +13,21 @@ Field Mapping:
 
 import sqlite3
 import json
+import os
+import time
+import threading
 import urllib.request
 import urllib.error
 import ssl
 from datetime import datetime
+
+try:
+    import config
+except ImportError:
+    try:
+        from . import config
+    except ImportError:
+        import backend.config as config
 
 def ensure_sync_columns(conn):
     """Ensure email, dept_code, and last_synced_at exist in employees table."""
@@ -88,6 +99,12 @@ def sync_employees_data(conn, records, source_label="API"):
     if not isinstance(records, list):
         if isinstance(records, dict) and 'data' in records:
             records = records['data']
+        elif isinstance(records, dict) and 'records' in records:
+            records = records['records']
+        elif isinstance(records, dict) and 'employees' in records:
+            records = records['employees']
+        elif isinstance(records, dict) and ('EMP_NO' in records or 'emp_no' in records):
+            records = [records]
         else:
             raise ValueError("Employee API response must be a JSON array or have a 'data' array")
 
@@ -225,39 +242,126 @@ def sync_employees_data(conn, records, source_label="API"):
         "updated": updated
     }
 
-def fetch_and_sync_from_api(conn, api_url, auth_header=None, custom_headers=None, timeout=30):
+def fetch_and_sync_from_api(conn, api_url=None, auth_header=None, custom_headers=None, timeout=None):
     """
-    Connects to an external HTTP/HTTPS TIEI Employee API endpoint and ingests records.
+    Connects to the external HTTP/HTTPS TIEI Employee Details API and updates database.
+    Defaults to settings configured in backend/config.py.
     """
+    api_url = (api_url or config.TIEI_EMP_API_URL).strip()
+    auth_header = auth_header or config.TIEI_EMP_API_KEY
+    custom_headers = custom_headers or config.TIEI_EMP_API_HEADERS
+    timeout = timeout or config.API_TIMEOUT_SECONDS
+
+    # If no URL is configured, check if local fallback file exists
+    if not api_url:
+        fallback_file = getattr(config, 'LOCAL_FALLBACK_FILE', None)
+        if fallback_file and os.path.exists(fallback_file):
+            print(f"[TIEI EMP SYNC] No remote API URL specified, using local cache: {fallback_file}")
+            with open(fallback_file, 'r', encoding='utf-8') as f:
+                records = json.load(f)
+            return sync_employees_data(conn, records, source_label=f"Local Cache: {os.path.basename(fallback_file)}")
+        raise ValueError("TIEI Employee API URL is not configured. Set TIEI_EMP_API_URL in backend/config.py or .env")
+
     headers = {
-        "User-Agent": "TIEI-TPS-App/2.0",
+        "User-Agent": "TIEI-TPS-Backend/2.0",
         "Accept": "application/json"
     }
 
     if auth_header:
-        # If user supplies 'Bearer xxx' or just token 'xxx'
-        if not auth_header.lower().startswith(('bearer ', 'basic ', 'token ')):
-            headers["Authorization"] = f"Bearer {auth_header.strip()}"
+        if not str(auth_header).lower().startswith(('bearer ', 'basic ', 'token ')):
+            headers["Authorization"] = f"Bearer {str(auth_header).strip()}"
         else:
-            headers["Authorization"] = auth_header.strip()
+            headers["Authorization"] = str(auth_header).strip()
 
     if custom_headers and isinstance(custom_headers, dict):
         headers.update(custom_headers)
 
     req = urllib.request.Request(api_url, headers=headers, method="GET")
-    
-    # Safe SSL context that handles corporate internal certificates if necessary
     ctx = ssl.create_default_context()
+    
     try:
         with urllib.request.urlopen(req, context=ctx, timeout=timeout) as response:
             status_code = response.getcode()
             if status_code != 200:
-                raise RuntimeError(f"TIEI Employee API returned status {status_code}")
+                raise RuntimeError(f"TIEI Employee API returned HTTP status {status_code}")
             raw_body = response.read().decode('utf-8')
             records = json.loads(raw_body)
+            
+            # Save local cache of successful response
+            fallback_file = getattr(config, 'LOCAL_FALLBACK_FILE', None)
+            if fallback_file:
+                try:
+                    with open(fallback_file, 'w', encoding='utf-8') as f:
+                        json.dump(records, f, indent=2)
+                except Exception:
+                    pass
+
             return sync_employees_data(conn, records, source_label=api_url)
     except urllib.error.HTTPError as e:
         error_msg = e.read().decode('utf-8', errors='ignore')
         raise RuntimeError(f"HTTP Error {e.code} connecting to API: {error_msg or e.reason}")
     except urllib.error.URLError as e:
+        # If remote connection fails and fallback file exists, use cached data
+        fallback_file = getattr(config, 'LOCAL_FALLBACK_FILE', None)
+        if fallback_file and os.path.exists(fallback_file):
+            print(f"[TIEI EMP SYNC WARNING] Remote API unreachable ({e.reason}). Falling back to local cache: {fallback_file}")
+            with open(fallback_file, 'r', encoding='utf-8') as f:
+                records = json.load(f)
+            return sync_employees_data(conn, records, source_label=f"Local Fallback Cache (API offline: {e.reason})")
         raise RuntimeError(f"Connection failed to '{api_url}': {e.reason}")
+
+def resolve_unknown_employee_from_api(conn, query_identifier):
+    """
+    Called when an associate tries to log in with an ID/email that is not in the local database.
+    Attempts to pull fresh data from the configured external API.
+    """
+    if not config.DYNAMIC_LOGIN_SYNC or not (config.TIEI_EMP_API_URL or getattr(config, 'LOCAL_FALLBACK_FILE', None)):
+        return None
+
+    try:
+        print(f"[TIEI EMP SYNC] Attempting real-time API lookup for unknown associate: '{query_identifier}'...")
+        fetch_and_sync_from_api(conn)
+        
+        # Check if the employee is now present in the database
+        cursor = conn.cursor()
+        clean_id = str(query_identifier).lstrip('#').strip()
+        upper_id = clean_id.upper()
+        lower_email = str(query_identifier).lower().strip()
+
+        emp = cursor.execute('SELECT * FROM employees WHERE UPPER(emp_no) = ?', (upper_id,)).fetchone()
+        if not emp and '@' in lower_email:
+            emp = cursor.execute('SELECT * FROM employees WHERE LOWER(email) = ?', (lower_email,)).fetchone()
+        if not emp and clean_id.isdigit():
+            padded = clean_id.zfill(5).upper()
+            stripped = clean_id.lstrip('0').upper()
+            emp = cursor.execute('SELECT * FROM employees WHERE UPPER(emp_no) = ? OR UPPER(emp_no) = ?', (padded, stripped)).fetchone()
+        return dict(emp) if emp else None
+    except Exception as e:
+        print(f"[TIEI EMP SYNC WARNING] Dynamic API lookup failed: {e}")
+        return None
+
+def start_background_sync_scheduler(get_db_fn):
+    """
+    Starts a background daemon thread that runs periodic synchronization in the background.
+    """
+    interval_hours = getattr(config, 'BACKGROUND_SYNC_INTERVAL_HOURS', 4)
+    if interval_hours <= 0:
+        return
+
+    interval_seconds = interval_hours * 3600
+
+    def worker():
+        print(f"[TIEI EMP SYNC] Background sync scheduler active (Interval: every {interval_hours} hours).")
+        while True:
+            time.sleep(interval_seconds)
+            try:
+                if config.TIEI_EMP_API_URL:
+                    conn = get_db_fn()
+                    res = fetch_and_sync_from_api(conn)
+                    conn.close()
+                    print(f"[TIEI EMP SYNC BACKGROUND] Periodic sync complete: {res.get('valid_processed')} processed ({res.get('new_inserted')} new, {res.get('updated')} updated).")
+            except Exception as e:
+                print(f"[TIEI EMP SYNC BACKGROUND ERROR] Periodic sync failed: {e}")
+
+    thread = threading.Thread(target=worker, daemon=True, name="TIEI_Employee_Sync_Worker")
+    thread.start()

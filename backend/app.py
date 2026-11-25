@@ -3,10 +3,18 @@ import os
 import sys
 import json
 import random
+import threading
 sys.path.insert(0, os.path.dirname(__file__))
+import config
 from flask import Flask, render_template, jsonify, request
 from init_db import upgrade_and_seed_hierarchy
-from emp_sync import sync_employees_data, fetch_and_sync_from_api, ensure_sync_columns
+from emp_sync import (
+    sync_employees_data,
+    fetch_and_sync_from_api,
+    resolve_unknown_employee_from_api,
+    start_background_sync_scheduler,
+    ensure_sync_columns
+)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 FRONTEND_DIR = os.path.abspath(os.path.join(BASE_DIR, '..', 'frontend'))
@@ -23,6 +31,23 @@ def get_db():
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
+
+# Launch automatic background synchronization scheduler
+start_background_sync_scheduler(get_db)
+
+# Auto-sync on startup if enabled and configured in backend/config.py or .env
+if config.AUTO_SYNC_ON_STARTUP and (config.TIEI_EMP_API_URL or os.path.exists(getattr(config, 'LOCAL_FALLBACK_FILE', ''))):
+    def initial_startup_sync():
+        try:
+            print("[TIEI BACKEND] Auto-connecting to Employee Details API on startup...")
+            conn = get_db()
+            res = fetch_and_sync_from_api(conn)
+            conn.close()
+            print(f"[TIEI BACKEND] Startup API sync completed successfully: {res.get('valid_processed')} records ({res.get('new_inserted')} new, {res.get('updated')} updated).")
+        except Exception as e:
+            print(f"[TIEI BACKEND NOTICE] Startup API sync skipped: {e}")
+
+    threading.Thread(target=initial_startup_sync, daemon=True, name="TIEI_Startup_Sync").start()
 
 # Helper: Find all recursive subordinates for an employee in the plant hierarchy
 def get_subordinate_emp_nos(cursor, supervisor_emp_no):
@@ -167,9 +192,10 @@ def api_login():
         emp = cursor.execute('SELECT * FROM employees WHERE UPPER(name) LIKE ?', (f'%{name_query.upper()}%',)).fetchone()
 
     if not emp:
-        # Also try matching by name substring
-        name_query = clean_id.split('@')[0].strip()
-        emp = cursor.execute('SELECT * FROM employees WHERE UPPER(name) LIKE ?', (f'%{name_query.upper()}%',)).fetchone()
+        # Dynamic fallback: if associate is not found locally, auto-query external API from backend in real-time
+        fresh_emp = resolve_unknown_employee_from_api(conn, raw_input)
+        if fresh_emp:
+            emp = fresh_emp
 
     if not emp:
         conn.close()

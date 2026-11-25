@@ -14,17 +14,18 @@ import sqlite3
 
 # Add backend directory to sys.path
 sys.path.insert(0, os.path.dirname(__file__))
+import config
 from emp_sync import sync_employees_data, fetch_and_sync_from_api, ensure_sync_columns
 
 DB_PATH = os.path.join(os.path.dirname(__file__), 'tps_database.db')
 
 def main():
     parser = argparse.ArgumentParser(description="Synchronize TIEI Employee API data with TPS Application Database")
-    group = parser.add_mutually_exclusive_group(required=True)
+    group = parser.add_mutually_exclusive_group(required=False)
     group.add_argument("--file", "-f", help="Path to JSON file containing TIEI employee records (e.g., exported from Postman)")
-    group.add_argument("--url", "-u", help="URL of TIEI Employee Details API")
+    group.add_argument("--url", "-u", default=config.TIEI_EMP_API_URL, help="URL of TIEI Employee Details API (defaults to backend/config.py)")
 
-    parser.add_argument("--token", "-t", help="Bearer token or API key for remote API authentication")
+    parser.add_argument("--token", "-t", default=config.TIEI_EMP_API_KEY, help="Bearer token or API key for remote API authentication")
     parser.add_argument("--header", "-H", action="append", help="Custom HTTP headers in 'Key: Value' format")
     parser.add_argument("--db", default=DB_PATH, help="Target SQLite database path")
 

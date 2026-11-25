@@ -85,10 +85,12 @@ TPS/
      - `DEP_DEPTNAME` &rarr; `working_area` (Plant section, e.g. `PRODUCTION SUPPORT-AUTO`)
      - `ADD_OFFICE_MAILID` &rarr; `email` (Company email, supports strings or empty `{}`)
    - Safe Upsert Guarantee: Updating employee details never overwrites TPS journey progress, test scores, certifications, or Kaizen logs.
-   - Dual-Mode Connection:
-     - **Live REST API Sync**: Configure endpoint URL and optional bearer token in UI modal or via `TIEI_EMP_API_URL` environment variable.
-     - **Direct Postman JSON Import**: Paste JSON payload directly or upload `.json` export file in 1 click.
-     - **CLI Tool**: `python backend/sync_employees.py --url <API_URL>` or `python backend/sync_employees.py --file <DATA.json>`.
+   - Backend-Driven Connection:
+     - **Backend Configuration**: Set TIEI_EMP_API_URL and optional TIEI_EMP_API_KEY in ackend/config.py or ackend/.env.
+     - **Startup Auto-Sync**: The backend automatically connects to the API on startup and populates/updates employee records.
+     - **Background Scheduler**: A background daemon periodically refreshes employee records every 4 hours without any user intervention.
+     - **Dynamic Login Resolution**: If an employee logs in with a new badge ID or email not yet cached locally, the backend queries the API in real time.
+     - **CLI Synchronization Tool**: Run anytime via python backend/sync_employees.py (or specify --file data.json / --url <URL>).
    - Multi-Identifier Login: Associates can log in using their badge number (`09069`, `9069`), email address (`prasanna.bv@tiei.toyota-industries.com`), or employee name.
 
 ---
