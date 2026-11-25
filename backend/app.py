@@ -686,10 +686,12 @@ def manage_step_evidence(emp_id):
             remarks = request.form.get('remarks', '')
             file = request.files.get('file')
             if file and file.filename:
-                filename = file.filename
-                save_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                clean_name = os.path.basename(file.filename).replace(' ', '_')
+                stored_filename = f"emp{emp_id}_step{step_num}_{clean_name}"
+                save_path = os.path.join(app.config['UPLOAD_FOLDER'], stored_filename)
                 file.save(save_path)
-                file_url = f'/static/uploads/{filename}'
+                filename = file.filename
+                file_url = f'/static/uploads/{stored_filename}'
                 file_size = f"{round(os.path.getsize(save_path) / 1024, 1)} KB"
             else:
                 filename = request.form.get('filename', f'Evidence_Step_{step_num}.pdf')
