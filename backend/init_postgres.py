@@ -205,8 +205,28 @@ def create_tables(conn):
     );
     """)
 
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS kaizen_requests (
+        id SERIAL PRIMARY KEY,
+        control_no VARCHAR(100) UNIQUE,
+        emp_id INTEGER REFERENCES employees (id) ON DELETE SET NULL,
+        emp_no VARCHAR(50),
+        emp_name VARCHAR(255),
+        work_name VARCHAR(255),
+        category VARCHAR(100),
+        line VARCHAR(100),
+        machine VARCHAR(100),
+        material_cost NUMERIC DEFAULT 0,
+        man_hours_cost NUMERIC DEFAULT 0,
+        machine_cost NUMERIC DEFAULT 0,
+        total_cost NUMERIC DEFAULT 0,
+        status VARCHAR(50),
+        request_date VARCHAR(50)
+    );
+    """)
+
     conn.commit()
-    print("[SUCCESS] All 7 PostgreSQL tables verified/created!")
+    print("[SUCCESS] All 8 PostgreSQL tables verified/created!")
 
 def migrate_sqlite_data(sqlite_path, pg_conn):
     """Copies all records from local SQLite database into PostgreSQL."""

@@ -3563,6 +3563,11 @@
         if (!tbody) return;
         tbody.innerHTML = '';
 
+        if (!kaizens || kaizens.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="9" class="p-6 text-center text-slate-400 text-xs"><i class="fa-solid fa-lightbulb text-slate-300 text-lg mb-1 block"></i>No Kaizen records logged yet. Ready to synchronize with Amrut Kaizen portal.</td></tr>';
+          return;
+        }
+
         kaizens.forEach(k => {
           tbody.innerHTML += `
             <tr class="hover:bg-slate-50 transition border-b border-slate-100 text-xs">
