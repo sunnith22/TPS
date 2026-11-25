@@ -221,7 +221,7 @@ def sync_employees_data(conn, records, source_label="API"):
                     0, 0,
                     0, 0, 0, 70.0,
                     'tiei123',
-                    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80',
+                    None,
                     ?
                 )
             """, (

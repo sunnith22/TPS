@@ -2,6 +2,7 @@ import sqlite3
 import os
 import sys
 import json
+import time
 import random
 import threading
 sys.path.insert(0, os.path.dirname(__file__))
@@ -23,9 +24,12 @@ STATIC_DIR = os.path.join(FRONTEND_DIR, 'static')
 DB_PATH = os.path.join(BASE_DIR, 'tps_database.db')
 UPLOAD_FOLDER = os.path.join(STATIC_DIR, 'uploads')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+UPLOAD_AVATAR_FOLDER = os.path.join(UPLOAD_FOLDER, 'avatars')
+os.makedirs(UPLOAD_AVATAR_FOLDER, exist_ok=True)
 
 app = Flask(__name__, template_folder=TEMPLATE_DIR, static_folder=STATIC_DIR)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['UPLOAD_AVATAR_FOLDER'] = UPLOAD_AVATAR_FOLDER
 
 from database import get_db
 
@@ -647,6 +651,110 @@ def update_journey(emp_id):
     updated_emp = cursor.execute('SELECT * FROM employees WHERE id = ?', (emp_id,)).fetchone()
     conn.close()
     return jsonify(dict(updated_emp))
+
+@app.route('/api/profile/avatar', methods=['POST', 'DELETE'])
+@app.route('/api/employees/<emp_identifier>/avatar', methods=['POST', 'DELETE'])
+def manage_employee_avatar(emp_identifier=None):
+    """
+    Uploads or removes an employee's personal profile picture.
+    Stores files securely in: frontend/static/uploads/avatars/
+    Updates the 'avatar' column in the employees database table.
+    """
+    conn = get_db()
+    cursor = conn.cursor()
+
+    emp_no_arg = request.form.get('emp_no') or request.args.get('emp_no')
+    emp_id_arg = request.form.get('emp_id') or request.args.get('emp_id')
+    identifier = emp_identifier or emp_no_arg or emp_id_arg
+
+    if not identifier and request.is_json:
+        data = request.json or {}
+        identifier = data.get('emp_no') or data.get('emp_id')
+
+    if not identifier:
+        conn.close()
+        return jsonify({"success": False, "error": "Employee identifier (emp_no or emp_id) is required"}), 400
+
+    emp = None
+    if str(identifier).isdigit():
+        emp = cursor.execute('SELECT * FROM employees WHERE id = ? OR emp_no = ?', (int(identifier), str(identifier))).fetchone()
+    if not emp:
+        emp = cursor.execute('SELECT * FROM employees WHERE emp_no = ?', (str(identifier),)).fetchone()
+
+    if not emp:
+        conn.close()
+        return jsonify({"success": False, "error": f"Employee '{identifier}' not found in master records"}), 404
+
+    emp_id = emp['id']
+    emp_no = emp['emp_no']
+
+    if request.method == 'DELETE':
+        old_avatar = emp.get('avatar') if isinstance(emp, dict) else emp['avatar']
+        if old_avatar and str(old_avatar).startswith('/static/uploads/avatars/'):
+            old_file_path = os.path.join(FRONTEND_DIR, str(old_avatar).lstrip('/'))
+            if os.path.exists(old_file_path):
+                try:
+                    os.remove(old_file_path)
+                except Exception as e:
+                    print(f"[AVATAR DELETE] Note: Could not remove old file {old_file_path}: {e}")
+
+        cursor.execute('UPDATE employees SET avatar = NULL WHERE id = ?', (emp_id,))
+        conn.commit()
+        conn.close()
+        return jsonify({
+            "success": True,
+            "message": "Profile photo removed successfully",
+            "avatar_url": None,
+            "emp_no": emp_no
+        })
+
+    # POST method: Save uploaded photo
+    if 'file' not in request.files:
+        conn.close()
+        return jsonify({"success": False, "error": "No file uploaded. Expected 'file' parameter."}), 400
+
+    file = request.files['file']
+    if not file or not file.filename:
+        conn.close()
+        return jsonify({"success": False, "error": "No file selected."}), 400
+
+    allowed_exts = {'png', 'jpg', 'jpeg', 'webp', 'gif'}
+    ext = file.filename.rsplit('.', 1)[-1].lower() if '.' in file.filename else ''
+    if ext not in allowed_exts:
+        conn.close()
+        return jsonify({"success": False, "error": f"Invalid image format '.{ext}'. Allowed: {', '.join(allowed_exts)}"}), 400
+
+    # Clean up previous local avatar file if it exists
+    old_avatar = emp.get('avatar') if isinstance(emp, dict) else emp['avatar']
+    if old_avatar and str(old_avatar).startswith('/static/uploads/avatars/'):
+        old_file_path = os.path.join(FRONTEND_DIR, str(old_avatar).lstrip('/'))
+        if os.path.exists(old_file_path):
+            try:
+                os.remove(old_file_path)
+            except Exception as e:
+                print(f"[AVATAR UPDATE] Note: Could not remove previous file {old_file_path}: {e}")
+
+    timestamp = int(time.time())
+    new_filename = f"avatar_emp{emp_no}_{timestamp}.{ext}"
+    avatar_dir = os.path.join(STATIC_DIR, 'uploads', 'avatars')
+    os.makedirs(avatar_dir, exist_ok=True)
+    save_path = os.path.join(avatar_dir, new_filename)
+
+    file.save(save_path)
+    file_url = f"/static/uploads/avatars/{new_filename}"
+
+    cursor.execute('UPDATE employees SET avatar = ? WHERE id = ?', (file_url, emp_id))
+    conn.commit()
+    conn.close()
+
+    return jsonify({
+        "success": True,
+        "avatar_url": file_url,
+        "emp_no": emp_no,
+        "filename": new_filename,
+        "storage_path": save_path,
+        "message": f"Profile photo updated successfully for employee #{emp_no}"
+    })
 
 @app.route('/api/employees/<int:emp_id>/evidence', methods=['GET', 'POST'])
 def manage_step_evidence(emp_id):
