@@ -61,3 +61,14 @@ LOCAL_FALLBACK_FILE = os.environ.get(
     "LOCAL_FALLBACK_FILE",
     str(BASE_DIR / "tiei_employees_cache.json")
 )
+
+# ==============================================================================
+# 3. POSTGRESQL ENTERPRISE DATABASE SETTINGS
+# ==============================================================================
+# Set your PostgreSQL host, credentials and database name here or in backend/.env
+POSTGRES_HOST = os.environ.get("POSTGRES_HOST", "10.82.126.44").strip()
+POSTGRES_PORT = int(os.environ.get("POSTGRES_PORT", "5432"))
+POSTGRES_DB = os.environ.get("POSTGRES_DB", "").strip()
+POSTGRES_USER = os.environ.get("POSTGRES_USER", "").strip()
+POSTGRES_PASSWORD = os.environ.get("POSTGRES_PASSWORD", "").strip()
+

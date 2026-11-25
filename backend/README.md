@@ -36,8 +36,18 @@ The backend is built with Python and Flask, delivering high-performance REST API
      python sync_employees.py
      python sync_employees.py --url https://tiei.internal/hr/api --token <BEARER_TOKEN>
      python sync_employees.py --file postman_export.json
-     `
-4. **Dashboard & Telemetry REST API (`/api/stats`):**
+     ``
+
+4. **PostgreSQL Enterprise Database Layer (database.py & init_postgres.py):**
+   - Dual-Mode Persistence: Connects to PostgreSQL (10.82.126.44:5432) in production, with automatic graceful fallback to SQLite (	ps_database.db).
+   - Query translation: Automatically handles cross-database query syntax and dict cursors.
+   - Initializer & Migration Tool (init_postgres.py):
+     - Automatically creates the new target database on the PostgreSQL server.
+     - Creates all 7 relational tables (employees, step_evidence, 	raining_attendance, department_nominations, komarigoto, certifications, 	raining_batches).
+     - Migrates all 96 existing associates and plant records from SQLite into PostgreSQL.
+     - Saves connection settings into ackend/.env.
+
+5. **Dashboard & Telemetry REST API (`/api/stats`):**
    - `dept_stats`: Department-wise total associates vs certified practitioners across 8 departments.
    - `gl_stats`: Total GLs vs Certified GLs (8 GLs total, 6 certified - 75.0%).
    - `tl_stats`: Total TLs vs Certified TLs (78 TLs total, 42 certified - 53.8%) with plant area breakdown.
